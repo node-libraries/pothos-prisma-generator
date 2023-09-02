@@ -1,0 +1,75 @@
+query FindManyCategory {
+  findManyCategory {
+    id
+    name
+    posts {
+      id
+      published
+      title
+      content
+      author {
+        id
+        name
+        createdAt
+        updatedAt
+      }
+      createdAt
+      updatedAt
+      publishedAt
+    }
+    createdAt
+    updatedAt
+  }
+}
+
+query FindManyPost {
+  findManyPost {
+    id
+    published
+    title
+    content
+    author {
+      id
+      name
+      createdAt
+      updatedAt
+    }
+    authorId
+    categories {
+      id
+      name
+      createdAt
+      updatedAt
+    }
+    createdAt
+    updatedAt
+    publishedAt
+  }
+}
+
+mutation CreateOnePost(
+  $input: PostCreateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput!
+) {
+  createOnePost(input: $input) {
+    id
+    published
+    title
+    content
+    author {
+      id
+      name
+      createdAt
+      updatedAt
+    }
+    authorId
+    categories {
+      id
+      name
+      createdAt
+      updatedAt
+    }
+    createdAt
+    updatedAt
+    publishedAt
+  }
+}

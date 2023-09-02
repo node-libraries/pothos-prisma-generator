@@ -6,6 +6,7 @@
   ],
   "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint", "import"],
+  "ignorePatterns": ["generated/*"],
   "rules": {
     "no-empty": 0,
     "@typescript-eslint/no-namespace": 0,

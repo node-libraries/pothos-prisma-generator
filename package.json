@@ -1,6 +1,7 @@
 {
   "name": "pothos-prisma-generator",
   "version": "0.0.1",
+  "main": "./dist/cjs/index.js",
   "exports": {
     "require": "./dist/cjs/index.js",
     "import": "./dist/esm/index.js"
@@ -8,14 +9,17 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "build": "tsc && tsc -p ./tsconfig.esm.json",
+    "build": "tsc && tsc -p ./tsconfig.cjs.json",
     "watch": "tsc -b -w",
-    "lint": "eslint --fix ./src",
+    "lint": "eslint ./src",
     "lint:fix": "eslint --fix ./src",
     "dev:docker": "docker compose -p pothos-prisma-generator -f test/docker/docker-compose.yml up -d",
     "prisma:format": "yarn prisma format --schema=test/prisma/schema.prisma",
     "prisma:reset": " next-exec -c test -- prisma migrate reset --schema=test/prisma/schema.prisma -f",
-    "prisma:seed": "next-exec -c test -- ts-node -r tsconfig-paths/register -T test/seeds/index",
+    "prisma:seed": "next-exec -c test -- node --experimental-specifier-resolution=node --no-warnings --loader ts-node/esm test/bin/seeds",
+    "pothos:schema": "node --experimental-specifier-resolution=node --no-warnings --loader ts-node/esm test/bin/createSchema",
+    "codegen": "graphql-codegen --config test/codegen/codegen.json",
+    "test:reset": "yarn prisma:reset && yarn prisma:seed",
     "test": "next-exec -c test -- jest --coverage"
   },
   "dependencies": {
@@ -25,8 +29,12 @@
   },
   "devDependencies": {
     "@apollo/server": "^4.9.3",
+    "@graphql-codegen/cli": "^5.0.0",
+    "@graphql-codegen/typescript": "^4.0.1",
+    "@graphql-codegen/typescript-generic-sdk": "^3.1.0",
+    "@graphql-codegen/typescript-operations": "^4.0.1",
     "@pothos/core": "^3.33.1",
-    "@pothos/plugin-prisma": "^3.58.0",
+    "@pothos/plugin-prisma": "^3.59.0",
     "@pothos/plugin-prisma-utils": "^0.11.0",
     "@pothos/plugin-scope-auth": "^3.20.0",
     "@prisma/client": "^5.2.0",

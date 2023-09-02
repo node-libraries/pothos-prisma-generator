@@ -1,7 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import gql from "graphql-tag";
 import { beforeAllAsync } from "jest-async";
-import { getApolloServer, getBodyData } from "../libs/test-tools";
+import { getApolloServer, getClient } from "../libs/test-tools";
 
 describe("Category", () => {
   const prisma = new PrismaClient({});
@@ -11,51 +10,19 @@ describe("Category", () => {
     const user = await prisma.user.findUniqueOrThrow({
       where: { email: "example@example.com" },
     });
-    return { server, user };
+    const client = await getClient();
+    return { server, user, client };
   });
 
   afterAll(async () => {
     prisma.$disconnect();
   });
 
-  it("Query: findManyCategory", async () => {
-    const { server } = await property;
-    await server
-      .executeOperation(
-        {
-          query: gql`
-            query FindManyCategory {
-              findManyCategory {
-                id
-                name
-                posts {
-                  id
-                  published
-                  title
-                  content
-                  author {
-                    id
-                    name
-                    createdAt
-                    updatedAt
-                  }
-                  createdAt
-                  updatedAt
-                  publishedAt
-                }
-                createdAt
-                updatedAt
-              }
-            }
-          `,
-        },
-        { contextValue: { prisma } }
-      )
-      .then((result) => {
-        const { data } = getBodyData(result);
-        const findManyCategory = data?.findManyCategory;
-        expect(findManyCategory).not.toHaveLength(0);
-        expect;
-      });
+  it("findManyCategory", async () => {
+    const { client } = await property;
+    await client.FindManyCategory().then((result) => {
+      const findManyCategory = result.findManyCategory;
+      expect(findManyCategory).not.toHaveLength(0);
+    });
   });
 });

@@ -80,9 +80,10 @@ model ModelName {
 - `mutation`  
   `createOne`,`createMany`,`updateOne`,`updateMany`,`deleteOne`,`deleteMany`
 
-### operation `{include:[...OperationNames],exclude[...OperationNames]}`
+### Select the operation to output
 
-Select the operation to output.  
+`operation {include:[...OperationNames],exclude[...OperationNames]}`
+
 The default is all output.
 
 Example
@@ -99,53 +100,47 @@ Example
 /// @pothos-generator operation {exclude:["delete"]}
 ```
 
-### option `option {include:[...OperationNames],exclude[...OperationNames],option:{OptionName:Params,…}}`
+### Sets options to be set for Pothos fields.
 
-Sets options to be set for Pothos fields.
+`option {include:[...OperationNames],exclude[...OperationNames],option:{OptionName:Params,…}}`
 
 Example
 
-`createOne`,`createMany`,`updateOne`,`updateMany`,`deleteOne`,`deleteMany`に対して auth-plugin の`authScopes`を設定する
+Set auth-plugin's `authScopes` for `createOne`,`createMany`,`updateOne`,`updateMany`,`deleteOne`,`deleteMany`.
 
 ```prisma
 /// @pothos-generator option {include:["mutation"],option:{authScopes:{authenticated:true}}}
 ```
 
-### select `{fields:{include:[...FieldNames],exclude:[...FieldNames]}}`
+### Select the fields to be set for the model type
 
-Select the fields to be set for the model type
+`select {fields:{include:[...FieldNames],exclude:[...FieldNames]}}`
 
-### input-field `{include:[...OperationNames],exclude[...OperationNames],fields:{include:[...FieldNames],exclude:[...FieldNames]}}`
+### Set the fields that are allowed to be entered
 
-Set the fields that are allowed to be entered
+`input-field {include:[...OperationNames],exclude[...OperationNames],fields:{include:[...FieldNames],exclude:[...FieldNames]}}`
 
-### input-data `{include:[...OperationNames],exclude[...OperationNames],data:InputData,authority:[...Authorities]}`
+### Set the data to be interrupted in prisma data
 
-Set the data to be interrupted in prisma data.  
+`input-data {include:[...OperationNames],exclude[...OperationNames],data:InputData,authority:[...Authorities]}`
+
 When authority is set, the first matching `input-data` directive is used.  
 The `replace` option of builder will replace the content.
 
-### where `{include:[...OperationNames],exclude[...OperationNames],where:Where,authority:[...Authorities]}`
+### Interrupts where to pass to prisma; if authority is set, the first match is used
 
-Interrupts where to pass to prisma; if authority is set, the first match is used.  
+`where {include:[...OperationNames],exclude[...OperationNames],where:Where,authority:[...Authorities]}`
+
 The `replace` option of builder will replace the content.
 
-### order `{include:[...OperationNames],exclude[...OperationNames],orderBy:order,authority:[...Authorities]}`
+### Interrupts orderBy to pass to prisma; if authority is set, the first match is used
 
-Interrupts orderBy to pass to prisma; if authority is set, the first match is used.
+`order {include:[...OperationNames],exclude[...OperationNames],orderBy:order,authority:[...Authorities]}`
 
 ## Prisma schema settings
 
 The output content is controlled by `@pothos-generator`.  
 Details are omitted since the specification is still under development and is likely to change.
-
-- Automatic output setting for query/mutation  
-  `find`,`findMany`,`create`,`createMany`,`update`,`updateMany`,`delete`,`deleteMany`
-- Insertion of `orderBy` and `where` at query time
-- Configuration of authentication by adding options.
-- Restrict fields that can be input during create and update.
-- Set data to be forced during create and update
-- Function to generate `where' to prisma at runtime by referring to context information at create and update
 
 ```prisma
 // This is your Prisma schema file,

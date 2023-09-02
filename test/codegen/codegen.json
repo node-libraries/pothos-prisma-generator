@@ -1,0 +1,15 @@
+{
+  "schema": "./test/generated/schema.graphql",
+  "overwrite": true,
+  "documents": "./test/graphql/*.graphql",
+  "generates": {
+    "./test/generated/graphql.ts": {
+      "plugins": [
+        "typescript",
+        "typescript-operations",
+        "typescript-generic-sdk"
+      ],
+      "config": { "scalars": { "DateTime": "string" } }
+    }
+  }
+}
