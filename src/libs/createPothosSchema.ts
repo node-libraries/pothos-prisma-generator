@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { queryFromInfo } from "@pothos/plugin-prisma";
-import { PrismaSchemaGenerator } from "./generator/PrismaSchemaGenerator";
+import { PrismaSchemaGenerator } from "./generator/PrismaSchemaGenerator.js";
 import type {
   InputFieldRef,
   InputShapeFromFields,

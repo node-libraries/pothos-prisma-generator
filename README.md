@@ -7,6 +7,11 @@ generate `findFirst`,`findMany`,`createOne`,`createMany`,`updateOne`,`updateMany
 
 The schema is generated internally at runtime, so no text output of the code is performed.
 
+## Sample code
+
+- Next.js  
+  <https://github.com/SoraKumo001/next-pothos>
+
 ## Builder Settings
 
 Add PrismaPlugin,PrismaUtil,PothosPrismaGeneratorPlugin  

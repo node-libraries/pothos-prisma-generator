@@ -3,7 +3,7 @@ import SchemaBuilder, {
   BuildCache,
   SchemaTypes,
 } from "@pothos/core";
-import "./global-types";
+import "./global-types.js";
 import {
   BigIntResolver,
   ByteResolver,
@@ -20,8 +20,8 @@ import {
   deleteModelMutation,
   updateManyModelMutation,
   updateModelMutation,
-} from "./libs/createPothosSchema";
-import { PrismaSchemaGenerator } from "./libs/generator/PrismaSchemaGenerator";
+} from "./libs/createPothosSchema.js";
+import { PrismaSchemaGenerator } from "./libs/generator/PrismaSchemaGenerator.js";
 
 export class PothosPrismaGeneratorPlugin<
   Types extends SchemaTypes

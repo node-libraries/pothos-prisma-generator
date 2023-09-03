@@ -1,6 +1,6 @@
 import JSON5 from "json5";
 import traverse from "traverse";
-import { PrismaCrudGenerator } from "./PrismaCrudGenerator";
+import { PrismaCrudGenerator } from "./PrismaCrudGenerator.js";
 import type { SchemaTypes } from "@pothos/core";
 
 const findOperations = ["findFirst", "findMany"] as const;

@@ -1,6 +1,7 @@
 import type { Config } from "jest";
 
 const config: Config = {
+  resolver: "ts-jest-resolver",
   moduleFileExtensions: ["js", "json", "ts"],
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1",

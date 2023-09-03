@@ -1,9 +1,13 @@
 node_modules
 /src
+/test
+/.github
+/dist/package.json
 .gitignore
 yarn.lock
 tsconfig.json
-jest.config.js
+tsconfig.cjs.json
+jest.config.ts
 .eslintrc.json
-/test
 .prettierrc
+.env.test
