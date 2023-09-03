@@ -14,6 +14,7 @@
     "lint": "eslint ./src",
     "lint:fix": "eslint --fix ./src",
     "dev:docker": "docker compose -p pothos-prisma-generator -f test/docker/docker-compose.yml up -d",
+    "prisma:generate": "yarn prisma generate --schema=test/prisma/schema.prisma",
     "prisma:format": "yarn prisma format --schema=test/prisma/schema.prisma",
     "prisma:reset": " next-exec -c test -- prisma migrate reset --schema=test/prisma/schema.prisma -f",
     "prisma:seed": "next-exec -c test -- node --experimental-specifier-resolution=node --no-warnings --loader ts-node/esm test/bin/seeds",

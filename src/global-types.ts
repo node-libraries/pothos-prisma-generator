@@ -15,13 +15,9 @@ declare global {
             context,
           }: {
             context: Types["Context"];
-          }) => Promise<object | string | number | undefined>;
+          }) => object | string | number | undefined;
         };
-        authority: ({
-          context,
-        }: {
-          context: Types["Context"];
-        }) => Promise<string[]>;
+        authority: ({ context }: { context: Types["Context"] }) => string[];
       };
     }
   }

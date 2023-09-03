@@ -412,7 +412,12 @@ export type UserUpdateWithoutIdWithoutEmailWithoutPostsWithoutCreatedAtWithoutUp
   name?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type FindManyCategoryQueryVariables = Exact<{ [key: string]: never; }>;
+export type FindManyCategoryQueryVariables = Exact<{
+  filter?: InputMaybe<CategoryFilter>;
+  orderBy?: InputMaybe<CategoryOrderBy>;
+  postsFilter?: InputMaybe<PostFilter>;
+  postsOrderBy?: InputMaybe<PostOrderBy>;
+}>;
 
 
 export type FindManyCategoryQuery = { __typename?: 'Query', findManyCategory: Array<{ __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string, posts: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, createdAt: string, updatedAt: string, publishedAt: string, author: { __typename?: 'User', id: string, name: string, createdAt: string, updatedAt: string } }> }> };
@@ -431,11 +436,11 @@ export type CreateOnePostMutation = { __typename?: 'Mutation', createOnePost: { 
 
 
 export const FindManyCategoryDocument = gql`
-    query FindManyCategory {
-  findManyCategory {
+    query FindManyCategory($filter: CategoryFilter, $orderBy: CategoryOrderBy, $postsFilter: PostFilter, $postsOrderBy: PostOrderBy) {
+  findManyCategory(filter: $filter, orderBy: $orderBy) {
     id
     name
-    posts {
+    posts(filter: $postsFilter, orderBy: $postsOrderBy) {
       id
       published
       title

@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { queryFromInfo } from "@pothos/plugin-prisma";
 import { PrismaSchemaGenerator } from "./generator/PrismaSchemaGenerator";
 import type {
   InputFieldRef,
@@ -63,31 +64,27 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                       args: field.isList
                         ? generator.findManyArgs(field.type)
                         : undefined,
-                      query: async (args, ctx) => {
-                        const authority = await generator.getAuthority(ctx);
-                        const modelOrder = await generator.getModelOrder(
-                          model.name,
+                      query: (args, ctx) => {
+                        const authority = generator.getAuthority(ctx);
+                        const modelOrder = generator.getModelOrder(
+                          field.type,
                           operationPrefix,
                           authority
                         );
-                        const modelWhere = await generator.getModelWhere(
-                          model.name,
+                        const modelWhere = generator.getModelWhere(
+                          field.type,
                           operationPrefix,
                           authority,
                           ctx
                         );
                         const where = { ...args.filter, ...modelWhere };
                         if (!field.isList) return { where };
-
-                        const orderBy = {
-                          ...args.orderBy,
-                          ...modelOrder,
-                        };
                         return {
                           where: Object.keys(where).length ? where : undefined,
-                          orderBy: Object.keys(orderBy).length
-                            ? orderBy
-                            : undefined,
+                          orderBy:
+                            args.orderBy && Object.keys(args.orderBy).length
+                              ? args.orderBy
+                              : modelOrder,
                         };
                       },
                     });
@@ -127,8 +124,8 @@ export const createModelQuery = (
             },
             resolve: async (query, _root, args, ctx, _info) => {
               const prisma = getPrisma(t, ctx);
-              const authority = await generator.getAuthority(ctx);
-              const modelWhere = await generator.getModelWhere(
+              const authority = generator.getAuthority(ctx);
+              const modelWhere = generator.getModelWhere(
                 model.name,
                 operationPrefix,
                 authority,
@@ -176,27 +173,26 @@ export const createModelListQuery = (
               _info
             ) => {
               const prisma = getPrisma(t, ctx);
-              const modelOrder = await generator.getModelOrder(
+              const authority = generator.getAuthority(ctx);
+              const modelOrder = generator.getModelOrder(
                 model.name,
                 operationPrefix,
-                ctx
+                authority
               );
-              const authority = await generator.getAuthority(ctx);
-              const modelWhere = await generator.getModelWhere(
+              const modelWhere = generator.getModelWhere(
                 model.name,
                 operationPrefix,
                 authority,
                 ctx
               );
               const where = { ...args.filter, ...modelWhere };
-              const orderBy = {
-                ...args.orderBy,
-                ...modelOrder,
-              };
               return prisma[lowerFirst(model.name)].findMany({
                 ...query,
                 where: Object.keys(where).length ? where : undefined,
-                orderBy: Object.keys(orderBy).length ? orderBy : undefined,
+                orderBy:
+                  args.orderBy && Object.keys(args.orderBy).length
+                    ? args.orderBy
+                    : modelOrder,
               });
             },
           }),
@@ -230,8 +226,8 @@ export const createModelMutation = (
               }),
             },
             resolve: async (query, _root, args, ctx, _info) => {
-              const authority = await generator.getAuthority(ctx);
-              const modelInput = await generator.getModelInputData(
+              const authority = generator.getAuthority(ctx);
+              const modelInput = generator.getModelInputData(
                 name,
                 operationPrefix,
                 authority,
@@ -273,8 +269,8 @@ export const createManyModelMutation = (
               }),
             },
             resolve: async (_root, args, ctx, _info) => {
-              const authority = await generator.getAuthority(ctx);
-              const modelInput = await generator.getModelInputData(
+              const authority = generator.getAuthority(ctx);
+              const modelInput = generator.getModelInputData(
                 name,
                 operationPrefix,
                 authority,
@@ -322,14 +318,14 @@ export const updateModelMutation = (
               }),
             },
             resolve: async (query, _root, args, ctx, _info) => {
-              const authority = await generator.getAuthority(ctx);
-              const modelWhere = await generator.getModelWhere(
+              const authority = generator.getAuthority(ctx);
+              const modelWhere = generator.getModelWhere(
                 name,
                 operationPrefix,
                 authority,
                 ctx
               );
-              const modelInput = await generator.getModelInputData(
+              const modelInput = generator.getModelInputData(
                 name,
                 operationPrefix,
                 authority,
@@ -385,14 +381,14 @@ export const updateManyModelMutation = (
               }),
             },
             resolve: async (_parent, args, ctx, _info) => {
-              const authority = await generator.getAuthority(ctx);
-              const modelWhere = await generator.getModelWhere(
+              const authority = generator.getAuthority(ctx);
+              const modelWhere = generator.getModelWhere(
                 name,
                 operationPrefix,
                 authority,
                 ctx
               );
-              const modelInput = await generator.getModelInputData(
+              const modelInput = generator.getModelInputData(
                 name,
                 operationPrefix,
                 authority,
@@ -437,8 +433,8 @@ export const deleteModelMutation = (
               }),
             },
             resolve: async (query, _root, args, ctx, _info) => {
-              const authority = await generator.getAuthority(ctx);
-              const modelWhere = await generator.getModelWhere(
+              const authority = generator.getAuthority(ctx);
+              const modelWhere = generator.getModelWhere(
                 model.name,
                 operationPrefix,
                 authority,
@@ -480,8 +476,8 @@ export const deleteManyModelMutation = (
               }),
             },
             resolve: async (_parent, args, ctx, _info) => {
-              const authority = await generator.getAuthority(ctx);
-              const modelWhere = await generator.getModelWhere(
+              const authority = generator.getAuthority(ctx);
+              const modelWhere = generator.getModelWhere(
                 model.name,
                 operationPrefix,
                 authority,

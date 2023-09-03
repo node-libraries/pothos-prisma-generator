@@ -40,6 +40,7 @@ type ModelDirective = {
   } & FilterOperations;
   order?: {
     orderBy?: object;
+    authority?: string[];
   } & FilterOperations &
     DirectiveAuthority;
   where?: {
@@ -143,11 +144,9 @@ export class PrismaSchemaGenerator<
   replaceValues?: {
     [key: string]: (props: {
       context: Types["Context"];
-    }) => Promise<object | string | number | undefined>;
+    }) => object | string | number | undefined;
   };
-  authorityFunc?: (props: {
-    context: SchemaTypes["Context"];
-  }) => Promise<string[]>;
+  authorityFunc?: (props: { context: SchemaTypes["Context"] }) => string[];
 
   constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>) {
     super(builder);
@@ -181,16 +180,16 @@ export class PrismaSchemaGenerator<
     search: string,
     replaceFunction: (props: {
       context: Types["Context"];
-    }) => Promise<object | string | number | undefined>
+    }) => object | string | number | undefined
   ) {
     if (!this.replaceValues) this.replaceValues = {};
     this.replaceValues[search] = replaceFunction;
   }
-  async replaceValue(target: object, props: { context: Types["Context"] }) {
+  replaceValue(target: object, props: { context: Types["Context"] }) {
     const replaces: {
       [key: string]: (props: {
         context: Types["Context"];
-      }) => Promise<object | string | number | undefined>;
+      }) => object | string | number | undefined;
     } = {};
     const src = { ...target };
     traverse(src).forEach((value) => {
@@ -200,12 +199,7 @@ export class PrismaSchemaGenerator<
       }
     });
     const replaceValues = Object.fromEntries(
-      await Promise.all(
-        Object.entries(replaces).map(async ([key, func]) => [
-          key,
-          await func(props),
-        ])
-      )
+      Object.entries(replaces).map(([key, func]) => [key, func(props)])
     );
     return traverse(src).forEach(function (value) {
       const v = replaceValues[value];
@@ -215,15 +209,11 @@ export class PrismaSchemaGenerator<
     });
   }
 
-  setAuthority(
-    func: (props: { context: SchemaTypes["Context"] }) => Promise<string[]>
-  ) {
+  setAuthority(func: (props: { context: SchemaTypes["Context"] }) => string[]) {
     this.authorityFunc = func;
   }
   getAuthority(context: SchemaTypes["Context"]) {
-    return this.authorityFunc
-      ? this.authorityFunc({ context })
-      : Promise.resolve([]);
+    return this.authorityFunc ? this.authorityFunc({ context }) : [];
   }
   getModels() {
     const builder = this.getBuilder();
@@ -385,7 +375,7 @@ export class PrismaSchemaGenerator<
     return this.modelSelections[modelName] ?? [];
   }
 
-  async getModelWhere(
+  getModelWhere(
     modelName: string,
     operationPrefix: Operation,
     authority: string[],
@@ -397,13 +387,13 @@ export class PrismaSchemaGenerator<
         value[0].length === 0 || value[0].some((v) => authority.includes(v))
     );
 
-    const where = await this.replaceValue(whereModel?.[1] ?? [], {
+    const where = this.replaceValue(whereModel?.[1] ?? [], {
       context: ctx,
     });
 
     return where;
   }
-  async getModelOrder(
+  getModelOrder(
     modelName: string,
     operationPrefix: Operation,
     authority: string[]
@@ -418,7 +408,7 @@ export class PrismaSchemaGenerator<
   getModelInputFields(modelName: string) {
     return this.modelInputWithoutFields[modelName] ?? [];
   }
-  async getModelInputData(
+  getModelInputData(
     modelName: string,
     operationPrefix: Operation,
     authority: string[],

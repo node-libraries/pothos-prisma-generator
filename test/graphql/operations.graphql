@@ -1,8 +1,13 @@
-query FindManyCategory {
-  findManyCategory {
+query FindManyCategory(
+  $filter: CategoryFilter
+  $orderBy: CategoryOrderBy
+  $postsFilter: PostFilter
+  $postsOrderBy: PostOrderBy
+) {
+  findManyCategory(filter: $filter, orderBy: $orderBy) {
     id
     name
-    posts {
+    posts(filter: $postsFilter, orderBy: $postsOrderBy) {
       id
       published
       title

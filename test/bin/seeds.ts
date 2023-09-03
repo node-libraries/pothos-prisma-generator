@@ -2,6 +2,10 @@ import { PrismaClient } from "@prisma/client";
 
 export const prisma = new PrismaClient();
 
+const formatNumber = (num: number) => {
+  return num.toString().padStart(2, "0");
+};
+
 const main = async () => {
   // add user
   const user = await prisma.user
@@ -21,7 +25,7 @@ const main = async () => {
       await prisma.category.createMany({
         data: Array(10)
           .fill(0)
-          .map((_, i) => ({ name: `Category${i + 1}` })),
+          .map((_, i) => ({ name: `Category${formatNumber(i + 1)}` })),
       });
     }
     return prisma.category.findMany();
@@ -32,8 +36,8 @@ const main = async () => {
       for (let i = 0; i < 30; i++) {
         await prisma.post.create({
           data: {
-            title: `Post${i + 1}`,
-            content: `Post${i + 1} content`,
+            title: `Post${formatNumber(i + 1)}`,
+            content: `Post${formatNumber(i + 1)} content`,
             authorId: user.id,
             published: i % 4 !== 0,
             categories: {

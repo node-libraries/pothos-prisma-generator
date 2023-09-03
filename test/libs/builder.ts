@@ -31,11 +31,10 @@ export const builder = new SchemaBuilder<{
   pothosPrismaGenerator: {
     // Replace the following directives
     // /// @pothos-generator input {data:{author:{connect:{id:"%%USER%%"}}}}
-    replace: { "%%USER%%": async ({ context }) => context.user?.id },
+    replace: { "%%USER%%": ({ context }) => context.user?.id },
 
     // Set the following permissions
     /// @pothos-generator where {include:["query"],where:{},authority:["authenticated"]}
-    authority: async ({ context }) =>
-      context.user?.id ? ["authenticated"] : [],
+    authority: ({ context }) => (context.user?.id ? ["authenticated"] : []),
   },
 });
