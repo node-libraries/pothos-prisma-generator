@@ -36,59 +36,117 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
       fields: (t) => {
         const fields = model.fields
           .filter(({ name }) => selectFields.has(name))
-          .map((field) => {
-            return [
-              field.name,
-              field.isId
-                ? t.exposeID(field.name)
-                : field.kind === "scalar"
-                ? t.expose(field.name, {
+          .flatMap((field) => {
+            if (field.isId) {
+              return [[field.name, t.exposeID(field.name)] as const];
+            }
+            if (field.kind === "scalar") {
+              return [
+                [
+                  field.name,
+                  t.expose(field.name, {
                     type: field.isList ? t.listRef(field.type) : field.type,
                     nullable: !field.isRequired,
-                  })
-                : field.kind === "enum"
-                ? t.expose(field.name, {
+                  }),
+                ] as const,
+              ];
+            }
+            if (field.kind === "enum") {
+              return [
+                [
+                  field.name,
+                  t.expose(field.name, {
                     type: generator.getEnum(field.type)!,
                     nullable: !field.isRequired,
-                  })
-                : (() => {
-                    const operationPrefix = field.isList
-                      ? "findMany"
-                      : "findFirst";
-                    const options = generator.getModelOptions(field.type)[
-                      operationPrefix
-                    ];
-                    return t.relation(field.name, {
-                      ...options,
-                      args: field.isList
-                        ? generator.findManyArgs(field.type)
-                        : undefined,
-                      query: (args, ctx) => {
-                        const authority = generator.getAuthority(ctx);
-                        const modelOrder = generator.getModelOrder(
-                          field.type,
-                          operationPrefix,
-                          authority
-                        );
-                        const modelWhere = generator.getModelWhere(
-                          field.type,
-                          operationPrefix,
-                          authority,
-                          ctx
-                        );
-                        const where = { ...args.filter, ...modelWhere };
-                        if (!field.isList) return { where };
-                        return {
-                          where: Object.keys(where).length ? where : undefined,
-                          orderBy:
-                            args.orderBy && Object.keys(args.orderBy).length
-                              ? args.orderBy
-                              : modelOrder,
-                        };
-                      },
-                    });
-                  })(),
-            ];
+                  }),
+                ] as const,
+              ];
+            }
+
+            const createField = () => {
+              const operationPrefix = field.isList ? "findMany" : "findFirst";
+              const options = generator.getModelOptions(field.type)[
+                operationPrefix
+              ];
+              return t.relation(field.name, {
+                ...options,
+                args: field.isList
+                  ? {
+                      ...generator.findManyArgs(field.type),
+                      ...generator.pagerArgs(),
+                    }
+                  : undefined,
+                query: (args, ctx) => {
+                  const authority = generator.getAuthority(ctx);
+                  const modelOrder = generator.getModelOrder(
+                    field.type,
+                    operationPrefix,
+                    authority
+                  );
+                  const modelWhere = generator.getModelWhere(
+                    field.type,
+                    operationPrefix,
+                    authority,
+                    ctx
+                  );
+                  const modelLimit = generator.getModelLimit(
+                    model.name,
+                    operationPrefix,
+                    authority
+                  );
+                  const take =
+                    modelLimit && args.limit
+                      ? Math.min(modelLimit, args.limit)
+                      : modelLimit ?? args.limit;
+
+                  const where = { ...args.filter, ...modelWhere };
+                  const skip = args.offset;
+                  if (!field.isList) return { where };
+                  return {
+                    where: Object.keys(where).length ? where : undefined,
+                    orderBy:
+                      args.orderBy && Object.keys(args.orderBy).length
+                        ? args.orderBy
+                        : modelOrder,
+                    take,
+                    skip,
+                  };
+                },
+              });
+            };
+
+            const createCount = () => {
+              const operationPrefix = "count";
+              const options = generator.getModelOptions(field.type)[
+                operationPrefix
+              ];
+              return t.relationCount(`${field.name}`, {
+                ...options,
+                args: {
+                  filter: t.arg({
+                    type: generator.getWhere(model.name),
+                    required: false,
+                  }),
+                },
+                where: (args: { filter?: object }, ctx: object) => {
+                  const authority = generator.getAuthority(ctx);
+                  const modelWhere = generator.getModelWhere(
+                    field.type,
+                    operationPrefix,
+                    authority,
+                    ctx
+                  );
+                  return { ...args.filter, ...modelWhere };
+                },
+              });
+            };
+
+            return field.isList
+              ? [
+                  [field.name, createField()] as const,
+                  [`${field.name}Count`, createCount()] as const,
+                ]
+              : [[field.name, createField()] as const];
           });
         return Object.fromEntries(fields);
       },
@@ -184,8 +242,16 @@ export const createModelQuery = (
                 authority,
                 ctx
               );
+              const modelLimit = generator.getModelLimit(
+                model.name,
+                operationPrefix,
+                authority
+              );
               const where = { ...args.filter, ...modelWhere };
-              const take = args.limit;
+              const take =
+                modelLimit && args.limit
+                  ? Math.min(modelLimit, args.limit)
+                  : modelLimit ?? args.limit;
               const skip = args.offset;
               return prisma[lowerFirst(model.name)].findFirst({
                 ...query,

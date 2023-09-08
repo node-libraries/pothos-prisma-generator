@@ -73,7 +73,9 @@ model ModelName {
 
 ### Operation name
 
-- `find` or `query`  
+- `query`  
+  `findFirst`,`findMany`,`count`
+- `find`  
   `findFirst`,`findMany`
 - `create`  
   `createOne`,`createMany`

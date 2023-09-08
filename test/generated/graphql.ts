@@ -45,7 +45,7 @@ export type Category = {
 
 export type CategoryPostsArgs = {
   filter?: InputMaybe<PostFilter>;
-  orderBy?: InputMaybe<PostOrderBy>;
+  orderBy?: InputMaybe<Array<PostOrderBy>>;
 };
 
 export type CategoryCreateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput = {
@@ -223,7 +223,7 @@ export type Post = {
 
 export type PostCategoriesArgs = {
   filter?: InputMaybe<CategoryFilter>;
-  orderBy?: InputMaybe<CategoryOrderBy>;
+  orderBy?: InputMaybe<Array<CategoryOrderBy>>;
 };
 
 export type PostCreateCategoriesRelationInput = {
@@ -314,6 +314,8 @@ export type PostUpdateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtWith
 
 export type Query = {
   __typename?: 'Query';
+  countCategory: Scalars['Int']['output'];
+  countPost: Scalars['Int']['output'];
   findFirstCategory?: Maybe<Category>;
   findFirstPost?: Maybe<Post>;
   findManyCategory: Array<Category>;
@@ -322,31 +324,47 @@ export type Query = {
 };
 
 
+export type QueryCountCategoryArgs = {
+  filter?: InputMaybe<CategoryFilter>;
+};
+
+
+export type QueryCountPostArgs = {
+  filter?: InputMaybe<PostFilter>;
+};
+
+
 export type QueryFindFirstCategoryArgs = {
-  filter: CategoryUniqueFilter;
+  filter?: InputMaybe<CategoryFilter>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Array<CategoryOrderBy>>;
 };
 
 
 export type QueryFindFirstPostArgs = {
-  filter: PostUniqueFilter;
+  filter?: InputMaybe<PostFilter>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Array<PostOrderBy>>;
 };
 
 
 export type QueryFindManyCategoryArgs = {
   filter?: InputMaybe<CategoryFilter>;
-  orderBy?: InputMaybe<CategoryOrderBy>;
+  orderBy?: InputMaybe<Array<CategoryOrderBy>>;
 };
 
 
 export type QueryFindManyPostArgs = {
   filter?: InputMaybe<PostFilter>;
-  orderBy?: InputMaybe<PostOrderBy>;
+  orderBy?: InputMaybe<Array<PostOrderBy>>;
 };
 
 
 export type QueryFindManyUserArgs = {
   filter?: InputMaybe<UserFilter>;
-  orderBy?: InputMaybe<UserOrderBy>;
+  orderBy?: InputMaybe<Array<UserOrderBy>>;
 };
 
 export type StringFilter = {
@@ -377,7 +395,7 @@ export type User = {
 
 export type UserPostsArgs = {
   filter?: InputMaybe<PostFilter>;
-  orderBy?: InputMaybe<PostOrderBy>;
+  orderBy?: InputMaybe<Array<PostOrderBy>>;
 };
 
 export type UserCreateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput = {
@@ -414,9 +432,9 @@ export type UserUpdateWithoutIdWithoutEmailWithoutPostsWithoutCreatedAtWithoutUp
 
 export type FindManyCategoryQueryVariables = Exact<{
   filter?: InputMaybe<CategoryFilter>;
-  orderBy?: InputMaybe<CategoryOrderBy>;
+  orderBy?: InputMaybe<Array<CategoryOrderBy> | CategoryOrderBy>;
   postsFilter?: InputMaybe<PostFilter>;
-  postsOrderBy?: InputMaybe<PostOrderBy>;
+  postsOrderBy?: InputMaybe<Array<PostOrderBy> | PostOrderBy>;
 }>;
 
 
@@ -436,7 +454,7 @@ export type CreateOnePostMutation = { __typename?: 'Mutation', createOnePost: { 
 
 
 export const FindManyCategoryDocument = gql`
-    query FindManyCategory($filter: CategoryFilter, $orderBy: CategoryOrderBy, $postsFilter: PostFilter, $postsOrderBy: PostOrderBy) {
+    query FindManyCategory($filter: CategoryFilter, $orderBy: [CategoryOrderBy!], $postsFilter: PostFilter, $postsOrderBy: [PostOrderBy!]) {
   findManyCategory(filter: $filter, orderBy: $orderBy) {
     id
     name

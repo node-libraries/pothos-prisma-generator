@@ -52,6 +52,11 @@ type ModelDirective = {
     authority?: string[];
   } & FilterOperations &
     DirectiveAuthority;
+  limit?: {
+    limit?: object;
+    authority?: string[];
+  } & FilterOperations &
+    DirectiveAuthority;
   option?: {
     option?: object;
   } & FilterOperations &
@@ -74,7 +79,7 @@ const getSchemaDirectives = (modelName: string, doc?: string) => {
       ?.map((text) => {
         const [, key, json] =
           text.match(
-            /^(operation|select|where|order|option|input-field|input-data)\s*(.*?)$/
+            /^(operation|select|where|limit|order|option|input-field|input-data)\s*(.*?)$/
           ) ?? [];
         if (!key || !json)
           throw new Error(
@@ -123,6 +128,7 @@ type ModelBasicType<T> = {
 };
 
 type ModelWhere = ModelAuthorityType<object>;
+type ModelLimit = ModelAuthorityType<number>;
 type ModelOrder = ModelAuthorityType<object>;
 type ModelInputWithoutFields = ModelBasicType<string[]>;
 type ModelSelections = ModelBasicType<string[]>;
@@ -140,6 +146,7 @@ export class PrismaSchemaGenerator<
     [key: string]: { [key in Operation]: object | undefined };
   } = {};
   modelSelections: ModelSelections = {};
+  modelLimit: ModelLimit = {};
   modelWhere: ModelWhere = {};
   modelOrder: ModelOrder = {};
   modelInputWithoutFields: ModelInputWithoutFields = {};
@@ -171,6 +178,7 @@ export class PrismaSchemaGenerator<
 
     this.createModelOptions();
     this.createModelSelections();
+    this.createModelLimit();
     this.createModelWhere();
     this.createModelOrder();
     this.createModelInputField();
@@ -305,7 +313,22 @@ export class PrismaSchemaGenerator<
       }, {} as ModelWhere[string]);
     });
   }
-
+  protected createModelLimit() {
+    this.getModels().forEach(({ name }) => {
+      const directives = this.getModelDirectives(name, "limit");
+      this.modelLimit[name] = directives.reduce((pre, directive) => {
+        const operations = getOperations(directive ?? {});
+        const { authority = [], limit } = directive ?? {};
+        return operations.reduce(
+          (pre, operation) => ({
+            ...pre,
+            [operation]: [...(pre[operation] ?? []), [authority, limit]],
+          }),
+          pre ?? {}
+        );
+      }, {} as ModelLimit[string]);
+    });
+  }
   protected createModelInputField() {
     this.getModels().forEach(({ name }) => {
       const directives = this.getModelDirectives(name, "input-field");
@@ -396,6 +419,19 @@ export class PrismaSchemaGenerator<
     });
 
     return where;
+  }
+  getModelLimit(
+    modelName: string,
+    operationPrefix: Operation,
+    authority: string[]
+  ) {
+    const values = this.modelLimit[modelName][operationPrefix];
+    const limitModel = values?.find(
+      (value) =>
+        value[0].length === 0 || value[0].some((v) => authority.includes(v))
+    );
+
+    return limitModel?.[1];
   }
   getModelOrder(
     modelName: string,

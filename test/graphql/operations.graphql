@@ -1,8 +1,8 @@
 query FindManyCategory(
   $filter: CategoryFilter
-  $orderBy: CategoryOrderBy
+  $orderBy: [CategoryOrderBy!]
   $postsFilter: PostFilter
-  $postsOrderBy: PostOrderBy
+  $postsOrderBy: [PostOrderBy!]
 ) {
   findManyCategory(filter: $filter, orderBy: $orderBy) {
     id
