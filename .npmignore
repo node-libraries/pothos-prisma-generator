@@ -6,7 +6,7 @@ node_modules
 .gitignore
 yarn.lock
 tsconfig.json
-tsconfig.cjs.json
+tsconfig.esm.json
 jest.config.ts
 .eslintrc.json
 .prettierrc

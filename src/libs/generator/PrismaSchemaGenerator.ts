@@ -1,8 +1,10 @@
 import JSON5 from "json5";
 import traverse from "traverse";
-import { PrismaCrudGenerator } from "./PrismaCrudGenerator.js";
+// @transform-path ./PrismaCrudGenerator.js
+import { PrismaCrudGenerator } from "./PrismaCrudGenerator";
 import type { SchemaTypes } from "@pothos/core";
 
+const countOperations = ["count"] as const;
 const findOperations = ["findFirst", "findMany"] as const;
 const createOperations = ["createOne", "createMany"] as const;
 const updateOperations = ["updateOne", "updateMany"] as const;
@@ -13,16 +15,18 @@ const mutationOperations = [
   ...deleteOperations,
 ] as const;
 
+const queryOperations = [...findOperations, ...countOperations] as const;
+
 const operationMap = {
   find: findOperations,
-  query: findOperations,
+  query: queryOperations,
   create: createOperations,
   update: updateOperations,
   delete: deleteOperations,
   mutation: mutationOperations,
 };
 
-const allOperations = [...findOperations, ...mutationOperations];
+const allOperations = [...queryOperations, ...mutationOperations];
 
 type Operation = (typeof allOperations)[number];
 type ExtendOperation = Operation | "mutation" | "query";

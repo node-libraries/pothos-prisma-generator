@@ -3,13 +3,15 @@ import SchemaBuilder, {
   BuildCache,
   SchemaTypes,
 } from "@pothos/core";
-import "./global-types.js";
+// @transform-path ./global-types.js
+import "./global-types";
 import {
   BigIntResolver,
   ByteResolver,
   DateTimeResolver,
   JSONResolver,
 } from "graphql-scalars";
+// @transform-path ./libs/createPothosSchema.js
 import {
   createModelListQuery,
   createModelMutation,
@@ -20,8 +22,10 @@ import {
   deleteModelMutation,
   updateManyModelMutation,
   updateModelMutation,
-} from "./libs/createPothosSchema.js";
-import { PrismaSchemaGenerator } from "./libs/generator/PrismaSchemaGenerator.js";
+  createModelCountQuery,
+} from "./libs/createPothosSchema";
+// @transform-path ./libs/generator/PrismaSchemaGenerator.js
+import { PrismaSchemaGenerator } from "./libs/generator/PrismaSchemaGenerator";
 
 export class PothosPrismaGeneratorPlugin<
   Types extends SchemaTypes
@@ -60,6 +64,7 @@ export class PothosPrismaGeneratorPlugin<
     }
 
     builder.queryFields((t) => ({
+      ...createModelCountQuery(t, generator),
       ...createModelQuery(t, generator),
       ...createModelListQuery(t, generator),
     }));
@@ -77,60 +82,6 @@ export class PothosPrismaGeneratorPlugin<
       ...deleteManyModelMutation(t, generator),
     }));
   }
-  // wrapResolve(
-  //   resolver: GraphQLFieldResolver<unknown, Types["Context"], object>,
-  //   fieldConfig: PothosOutputFieldConfig<Types>
-  // ): GraphQLFieldResolver<unknown, Types["Context"], object> {
-  //   // const getObjectTypeRef = (type: PothosOutputFieldType<Types>) => {
-  //   //   const isList = type.kind === "List";
-  //   //   const typeConfig = type.kind === "List" ? type.type : type;
-  //   //   return typeConfig.kind === "Object"
-  //   //     ? ([
-  //   //         isList,
-  //   //         this.buildCache.getTypeConfig(typeConfig.ref).name,
-  //   //       ] as const)
-  //   //     : [];
-  //   // };
-
-  //   // const [isList, modelName] = getObjectTypeRef(fieldConfig.type);
-  //   // const generator = this.generator;
-  //   // if (modelName) {
-  //   //   const operationPrefix = isList ? "findMany" : "findFirst";
-  //   //   const orderOperation = generator.modelOrder[modelName][operationPrefix];
-  //   //   const whereOperation = generator.modelWhere[modelName][operationPrefix];
-  //   //   if (orderOperation?.length || whereOperation?.length) {
-  //   //     return async (parent, args, context, info) => {
-  //   //       const authority = await generator.getAuthority(context);
-  //   //       const modelOrder = await generator.getModelOrder(
-  //   //         modelName,
-  //   //         operationPrefix,
-  //   //         authority
-  //   //       );
-  //   //       const modelWhere = await generator.getModelWhere(
-  //   //         modelName,
-  //   //         operationPrefix,
-  //   //         authority,
-  //   //         context
-  //   //       );
-  //   //       const where = {
-  //   //         ...(args as { filter: object }).filter,
-  //   //         ...modelWhere,
-  //   //       };
-  //   //       if (!field.isList) return { where };
-  //   //       return {
-  //   //         where: Object.keys(where).length ? where : undefined,
-  //   //         orderBy:
-  //   //           args.orderBy && Object.keys(args.orderBy).length
-  //   //             ? args.orderBy
-  //   //             : modelOrder,
-  //   //       };
-
-  //   //       return resolver(parent, args, context, info);
-  //   //     };
-  //   //   }
-  //   // }
-  //   return resolver;
-  // }
 }
 
 const pluginName = "pothosPrismaGenerator" as const;

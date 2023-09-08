@@ -50,7 +50,17 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
         required: false,
       }),
       orderBy: t.field({
-        type: this.getOrderBy(modelName),
+        type: [this.getOrderBy(modelName)],
+        required: false,
+      }),
+    }));
+  }
+  pagerArgs() {
+    return this.builder.args((t) => ({
+      limit: t.int({
+        required: false,
+      }),
+      offset: t.int({
         required: false,
       }),
     }));

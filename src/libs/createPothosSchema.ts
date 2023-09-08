@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { PrismaSchemaGenerator } from "./generator/PrismaSchemaGenerator.js";
+// @transform-path ./generator/PrismaSchemaGenerator.js
+import { PrismaSchemaGenerator } from "./generator/PrismaSchemaGenerator";
 import type {
   InputFieldRef,
   InputShapeFromFields,
   SchemaTypes,
 } from "@pothos/core";
-
 type LowerFirst<T extends string> = T extends `${infer F}${infer R}`
   ? `${Lowercase<F>}${R}`
   : T;
@@ -96,6 +96,56 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
   });
 };
 
+export const createModelCountQuery = (
+  t: PothosSchemaTypes.QueryFieldBuilder<any, any>,
+  generator: PrismaSchemaGenerator<any>
+) => {
+  const operationPrefix = "count";
+  return Object.fromEntries(
+    generator
+      .getModels()
+      .filter((model) =>
+        generator.getModelOperations(model.name).includes(operationPrefix)
+      )
+      .map((model) => {
+        const options = generator.getModelOptions(model.name)[operationPrefix];
+        return [
+          `${operationPrefix}${model.name}`,
+          t.int({
+            ...options,
+            args: {
+              filter: t.arg({
+                type: generator.getWhere(model.name),
+                required: false,
+              }),
+            },
+            resolve: async (
+              _root,
+              args: InputShapeFromFields<{
+                filter: InputFieldRef<any, "Arg">;
+              }>,
+              ctx,
+              _info
+            ) => {
+              const prisma = getPrisma(t, ctx);
+              const authority = generator.getAuthority(ctx);
+              const modelWhere = generator.getModelWhere(
+                model.name,
+                operationPrefix,
+                authority,
+                ctx
+              );
+              const where = { ...args.filter, ...modelWhere };
+              return prisma[lowerFirst(model.name)].count({
+                where: Object.keys(where).length ? where : undefined,
+              });
+            },
+          }),
+        ];
+      })
+  );
+};
+
 export const createModelQuery = (
   t: PothosSchemaTypes.QueryFieldBuilder<any, any>,
   generator: PrismaSchemaGenerator<any>
@@ -116,14 +166,18 @@ export const createModelQuery = (
             type: model.name,
             nullable: true,
             args: {
-              filter: t.arg({
-                type: generator.getWhereUnique(model.name),
-                required: true,
-              }),
+              ...generator.findManyArgs(model.name),
+              ...generator.pagerArgs(),
             },
+
             resolve: async (query, _root, args, ctx, _info) => {
               const prisma = getPrisma(t, ctx);
               const authority = generator.getAuthority(ctx);
+              const modelOrder = generator.getModelOrder(
+                model.name,
+                operationPrefix,
+                authority
+              );
               const modelWhere = generator.getModelWhere(
                 model.name,
                 operationPrefix,
@@ -131,9 +185,17 @@ export const createModelQuery = (
                 ctx
               );
               const where = { ...args.filter, ...modelWhere };
-              return prisma[lowerFirst(model.name)].findUnique({
+              const take = args.limit;
+              const skip = args.offset;
+              return prisma[lowerFirst(model.name)].findFirst({
                 ...query,
                 where: Object.keys(where).length ? where : undefined,
+                orderBy:
+                  args.orderBy && Object.keys(args.orderBy).length
+                    ? args.orderBy
+                    : modelOrder,
+                take,
+                skip,
               });
             },
           }),
@@ -160,17 +222,11 @@ export const createModelListQuery = (
           t.prismaField({
             ...options,
             type: [model.name],
-            args: generator.findManyArgs(model.name),
-            resolve: async (
-              query,
-              _root,
-              args: InputShapeFromFields<{
-                filter: InputFieldRef<any, "Arg">;
-                orderBy: InputFieldRef<any, "Arg">;
-              }>,
-              ctx,
-              _info
-            ) => {
+            args: {
+              ...generator.findManyArgs(model.name),
+              ...generator.pagerArgs(),
+            },
+            resolve: async (query, _root, args, ctx, _info) => {
               const prisma = getPrisma(t, ctx);
               const authority = generator.getAuthority(ctx);
               const modelOrder = generator.getModelOrder(
@@ -185,6 +241,8 @@ export const createModelListQuery = (
                 ctx
               );
               const where = { ...args.filter, ...modelWhere };
+              const take = args.limit;
+              const skip = args.offset;
               return prisma[lowerFirst(model.name)].findMany({
                 ...query,
                 where: Object.keys(where).length ? where : undefined,
@@ -192,6 +250,8 @@ export const createModelListQuery = (
                   args.orderBy && Object.keys(args.orderBy).length
                     ? args.orderBy
                     : modelOrder,
+                take,
+                skip,
               });
             },
           }),

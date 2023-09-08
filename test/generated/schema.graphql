@@ -131,14 +131,6 @@ input CategoryOrderBy {
   updatedAt: OrderBy
 }
 
-input PostUniqueFilter {
-  id: String
-}
-
-input CategoryUniqueFilter {
-  id: String
-}
-
 input UserCreateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput {
   email: String!
   name: String
@@ -161,6 +153,10 @@ input CategoryCreateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtWithout
   name: String!
 }
 
+input CategoryUniqueFilter {
+  id: String
+}
+
 input CategoryCreateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput {
   name: String!
 }
@@ -172,6 +168,10 @@ input UserUniqueFilter {
 
 input UserUpdateWithoutIdWithoutEmailWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput {
   name: String
+}
+
+input PostUniqueFilter {
+  id: String
 }
 
 input PostUpdateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput {
@@ -233,7 +233,7 @@ input CategoryUpdateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtWithout
 type User {
   id: ID!
   name: String!
-  posts(filter: PostFilter, orderBy: PostOrderBy): [Post!]!
+  posts(filter: PostFilter, orderBy: [PostOrderBy!]): [Post!]!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -245,7 +245,7 @@ type Post {
   content: String!
   author: User!
   authorId: String
-  categories(filter: CategoryFilter, orderBy: CategoryOrderBy): [Category!]!
+  categories(filter: CategoryFilter, orderBy: [CategoryOrderBy!]): [Category!]!
   createdAt: DateTime!
   updatedAt: DateTime!
   publishedAt: DateTime!
@@ -254,17 +254,19 @@ type Post {
 type Category {
   id: ID!
   name: String!
-  posts(filter: PostFilter, orderBy: PostOrderBy): [Post!]!
+  posts(filter: PostFilter, orderBy: [PostOrderBy!]): [Post!]!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
 
 type Query {
-  findFirstPost(filter: PostUniqueFilter!): Post
-  findFirstCategory(filter: CategoryUniqueFilter!): Category
-  findManyUser(filter: UserFilter, orderBy: UserOrderBy): [User!]!
-  findManyPost(filter: PostFilter, orderBy: PostOrderBy): [Post!]!
-  findManyCategory(filter: CategoryFilter, orderBy: CategoryOrderBy): [Category!]!
+  countPost(filter: PostFilter): Int!
+  countCategory(filter: CategoryFilter): Int!
+  findFirstPost(filter: PostFilter, orderBy: [PostOrderBy!], limit: Int, offset: Int): Post
+  findFirstCategory(filter: CategoryFilter, orderBy: [CategoryOrderBy!], limit: Int, offset: Int): Category
+  findManyUser(filter: UserFilter, orderBy: [UserOrderBy!]): [User!]!
+  findManyPost(filter: PostFilter, orderBy: [PostOrderBy!]): [Post!]!
+  findManyCategory(filter: CategoryFilter, orderBy: [CategoryOrderBy!]): [Category!]!
 }
 
 type Mutation {

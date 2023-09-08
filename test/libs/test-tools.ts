@@ -12,7 +12,7 @@ const createApolloServer = async () => {
   const apolloServer = new ApolloServer<Context>({
     schema: builder.toSchema({}),
   });
-  apolloServer.start();
+  await apolloServer.start();
   return apolloServer;
 };
 

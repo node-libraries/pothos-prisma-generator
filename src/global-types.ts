@@ -1,5 +1,5 @@
 import { SchemaTypes } from "@pothos/core";
-import { PothosPrismaGeneratorPlugin } from ".";
+import { PothosPrismaGeneratorPlugin } from "pothos-prisma-generator";
 
 declare global {
   export namespace PothosSchemaTypes {
