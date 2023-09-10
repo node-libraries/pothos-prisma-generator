@@ -24,9 +24,9 @@ describe("Category", () => {
     await client.FindManyCategory().then((result) => {
       const findManyCategory = result.findManyCategory;
       expect(findManyCategory).not.toHaveLength(0);
-      /// @pothos-generator order {orderBy:{name:"desc"}}
+      /// @pothos-generator order {orderBy:{name:"asc"}}
       const names = findManyCategory.map((category) => category.name);
-      expect(names).toEqual([...names].sort().reverse());
+      expect(names).toEqual([...names].sort());
 
       // published: false is not included
       const posts = findManyCategory.flatMap((category) => category.posts);

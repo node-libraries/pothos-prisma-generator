@@ -18,7 +18,6 @@ query FindManyCategory(
         createdAt
         updatedAt
       }
-      createdAt
       updatedAt
       publishedAt
     }
@@ -46,7 +45,6 @@ query FindManyPost {
       createdAt
       updatedAt
     }
-    createdAt
     updatedAt
     publishedAt
   }
@@ -73,7 +71,6 @@ mutation CreateOnePost(
       createdAt
       updatedAt
     }
-    createdAt
     updatedAt
     publishedAt
   }

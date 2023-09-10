@@ -1,8 +1,12 @@
+-- CreateEnum
+CREATE TYPE "Role" AS ENUM ('ADMIN', 'USER');
+
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "email" TEXT NOT NULL,
     "name" TEXT NOT NULL DEFAULT 'User',
+    "roles" "Role"[] DEFAULT ARRAY['USER']::"Role"[],
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

@@ -10,35 +10,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Unnecessary because automatic generation does not refer to type information
-
-// generator pothos {
-//   provider     = "prisma-pothos-types"
-//   clientOutput = "@prisma/client"
-//   output       = "../src/server/generated/pothos-types.ts"
-// }
-
 /// @pothos-generator operation {include:["createOne","updateOne","findMany"]}
-/// @pothos-generator select {fields:{exclude:["email"]}}
+/// @pothos-generator option {include:["mutation"],option:{authScopes:{ADMIN:true}}}
 /// @pothos-generator input-field {include:["create"],fields:{include:["email","name"]}}
 /// @pothos-generator input-field {include:["update"],fields:{include:["name"]}}
 model User {
   id        String   @id @default(uuid())
+  /// @pothos-generator readable ["ADMIN"]
   email     String   @unique
   name      String   @default("User")
   posts     Post[]
+  /// @pothos-generator readable ["ADMIN"]
+  roles     Role[]   @default([USER])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 /// @pothos-generator operation {exclude:["deleteMany"]}
-/// @pothos-generator option {include:["mutation"],option:{authScopes:{authenticated:true}}}
+/// @pothos-generator executable {include:["mutation"],authority:["USER"]}
 /// @pothos-generator input-field {fields:{exclude:["id","createdAt","updatedAt","author"]}}
 /// @pothos-generator input-data {data:{authorId:"%%USER%%"}}
-/// @pothos-generator where {include:["query"],where:{},authority:["authenticated"]}
+/// @pothos-generator where {include:["query"],where:{},authority:["USER"]}
 /// @pothos-generator where {include:["query"],where:{published:true}}
 /// @pothos-generator where {include:["update","delete"],where:{authorId:"%%USER%%"}}
-/// @pothos-generator order {orderBy:{title:"desc"}}
+/// @pothos-generator order {orderBy:{title:"asc"}}
 model Post {
   id          String     @id @default(uuid())
   published   Boolean    @default(false)
@@ -47,13 +42,13 @@ model Post {
   author      User?      @relation(fields: [authorId], references: [id])
   authorId    String?
   categories  Category[]
+  /// @pothos-generator readable []
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   publishedAt DateTime   @default(now())
 }
 
-/// @pothos-generator order {orderBy:{name:"asc"},authority:["authenticated"]}
-/// @pothos-generator order {orderBy:{name:"desc"}}
+/// @pothos-generator order {orderBy:{name:"asc"}}
 /// @pothos-generator input-field {fields:{exclude:["id","createdAt","updatedAt","posts"]}}
 model Category {
   id        String   @id @default(uuid())
@@ -61,4 +56,9 @@ model Category {
   posts     Post[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  USER
 }

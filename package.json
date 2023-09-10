@@ -1,6 +1,6 @@
 {
   "name": "pothos-prisma-generator",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "main": "./dist/cjs/index.js",
   "types": "./dist/cjs/index.d.ts",
   "exports": {
@@ -16,6 +16,7 @@
     "dev:docker": "docker compose -p pothos-prisma-generator -f test/docker/docker-compose.yml up -d",
     "prisma:generate": "yarn prisma generate --schema=test/prisma/schema.prisma",
     "prisma:format": "yarn prisma format --schema=test/prisma/schema.prisma",
+    "prisma:migrate": "next-exec -c test -- yarn prisma migrate dev --schema=test/prisma/schema.prisma -n migrate",
     "prisma:reset": " next-exec -c test -- prisma migrate reset --schema=test/prisma/schema.prisma -f",
     "prisma:seed": "next-exec -c test -- ts-node -r tsconfig-paths/register test/bin/seeds",
     "pothos:schema": "node --experimental-specifier-resolution=node --no-warnings --loader ts-node/esm test/bin/createSchema",

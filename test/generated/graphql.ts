@@ -39,13 +39,21 @@ export type Category = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   posts: Array<Post>;
+  postsCount: Scalars['Int']['output'];
   updatedAt: Scalars['DateTime']['output'];
 };
 
 
 export type CategoryPostsArgs = {
   filter?: InputMaybe<PostFilter>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<Array<PostOrderBy>>;
+};
+
+
+export type CategoryPostsCountArgs = {
+  filter?: InputMaybe<CategoryFilter>;
 };
 
 export type CategoryCreateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput = {
@@ -153,7 +161,7 @@ export type MutationCreateOnePostArgs = {
 
 
 export type MutationCreateOneUserArgs = {
-  input: UserCreateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput;
+  input: UserCreateWithoutIdWithoutPostsWithoutRolesWithoutCreatedAtWithoutUpdatedAtInput;
 };
 
 
@@ -197,7 +205,7 @@ export type MutationUpdateOnePostArgs = {
 
 
 export type MutationUpdateOneUserArgs = {
-  data: UserUpdateWithoutIdWithoutEmailWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput;
+  data: UserUpdateWithoutIdWithoutEmailWithoutPostsWithoutRolesWithoutCreatedAtWithoutUpdatedAtInput;
   where: UserUniqueFilter;
 };
 
@@ -211,8 +219,8 @@ export type Post = {
   author: User;
   authorId?: Maybe<Scalars['String']['output']>;
   categories: Array<Category>;
+  categoriesCount: Scalars['Int']['output'];
   content: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   published: Scalars['Boolean']['output'];
   publishedAt: Scalars['DateTime']['output'];
@@ -223,7 +231,14 @@ export type Post = {
 
 export type PostCategoriesArgs = {
   filter?: InputMaybe<CategoryFilter>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<Array<CategoryOrderBy>>;
+};
+
+
+export type PostCategoriesCountArgs = {
+  filter?: InputMaybe<PostFilter>;
 };
 
 export type PostCreateCategoriesRelationInput = {
@@ -352,19 +367,38 @@ export type QueryFindFirstPostArgs = {
 
 export type QueryFindManyCategoryArgs = {
   filter?: InputMaybe<CategoryFilter>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<Array<CategoryOrderBy>>;
 };
 
 
 export type QueryFindManyPostArgs = {
   filter?: InputMaybe<PostFilter>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<Array<PostOrderBy>>;
 };
 
 
 export type QueryFindManyUserArgs = {
   filter?: InputMaybe<UserFilter>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<Array<UserOrderBy>>;
+};
+
+export enum Role {
+  Admin = 'ADMIN',
+  User = 'USER'
+}
+
+export type RoleListFilter = {
+  equals?: InputMaybe<Array<Role>>;
+  has?: InputMaybe<Role>;
+  hasEvery?: InputMaybe<Array<Role>>;
+  hasSome?: InputMaybe<Array<Role>>;
+  isEmpty?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type StringFilter = {
@@ -386,19 +420,29 @@ export type StringFilter = {
 export type User = {
   __typename?: 'User';
   createdAt: Scalars['DateTime']['output'];
+  email: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   posts: Array<Post>;
+  postsCount: Scalars['Int']['output'];
+  roles: Array<Role>;
   updatedAt: Scalars['DateTime']['output'];
 };
 
 
 export type UserPostsArgs = {
   filter?: InputMaybe<PostFilter>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<Array<PostOrderBy>>;
 };
 
-export type UserCreateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput = {
+
+export type UserPostsCountArgs = {
+  filter?: InputMaybe<UserFilter>;
+};
+
+export type UserCreateWithoutIdWithoutPostsWithoutRolesWithoutCreatedAtWithoutUpdatedAtInput = {
   email: Scalars['String']['input'];
   name?: InputMaybe<Scalars['String']['input']>;
 };
@@ -409,6 +453,7 @@ export type UserFilter = {
   id?: InputMaybe<StringFilter>;
   name?: InputMaybe<StringFilter>;
   posts?: InputMaybe<PostListFilter>;
+  roles?: InputMaybe<RoleListFilter>;
   updatedAt?: InputMaybe<DateTimeFilter>;
 };
 
@@ -418,6 +463,7 @@ export type UserOrderBy = {
   id?: InputMaybe<OrderBy>;
   name?: InputMaybe<OrderBy>;
   posts?: InputMaybe<PostOrderBy>;
+  roles?: InputMaybe<OrderBy>;
   updatedAt?: InputMaybe<OrderBy>;
 };
 
@@ -426,7 +472,7 @@ export type UserUniqueFilter = {
   id?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type UserUpdateWithoutIdWithoutEmailWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput = {
+export type UserUpdateWithoutIdWithoutEmailWithoutPostsWithoutRolesWithoutCreatedAtWithoutUpdatedAtInput = {
   name?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -438,19 +484,19 @@ export type FindManyCategoryQueryVariables = Exact<{
 }>;
 
 
-export type FindManyCategoryQuery = { __typename?: 'Query', findManyCategory: Array<{ __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string, posts: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, createdAt: string, updatedAt: string, publishedAt: string, author: { __typename?: 'User', id: string, name: string, createdAt: string, updatedAt: string } }> }> };
+export type FindManyCategoryQuery = { __typename?: 'Query', findManyCategory: Array<{ __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string, posts: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, updatedAt: string, publishedAt: string, author: { __typename?: 'User', id: string, name: string, createdAt: string, updatedAt: string } }> }> };
 
 export type FindManyPostQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type FindManyPostQuery = { __typename?: 'Query', findManyPost: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, createdAt: string, updatedAt: string, publishedAt: string, author: { __typename?: 'User', id: string, name: string, createdAt: string, updatedAt: string }, categories: Array<{ __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string }> }> };
+export type FindManyPostQuery = { __typename?: 'Query', findManyPost: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, updatedAt: string, publishedAt: string, author: { __typename?: 'User', id: string, name: string, createdAt: string, updatedAt: string }, categories: Array<{ __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string }> }> };
 
 export type CreateOnePostMutationVariables = Exact<{
   input: PostCreateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput;
 }>;
 
 
-export type CreateOnePostMutation = { __typename?: 'Mutation', createOnePost: { __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, createdAt: string, updatedAt: string, publishedAt: string, author: { __typename?: 'User', id: string, name: string, createdAt: string, updatedAt: string }, categories: Array<{ __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string }> } };
+export type CreateOnePostMutation = { __typename?: 'Mutation', createOnePost: { __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, updatedAt: string, publishedAt: string, author: { __typename?: 'User', id: string, name: string, createdAt: string, updatedAt: string }, categories: Array<{ __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string }> } };
 
 
 export const FindManyCategoryDocument = gql`
@@ -469,7 +515,6 @@ export const FindManyCategoryDocument = gql`
         createdAt
         updatedAt
       }
-      createdAt
       updatedAt
       publishedAt
     }
@@ -498,7 +543,6 @@ export const FindManyPostDocument = gql`
       createdAt
       updatedAt
     }
-    createdAt
     updatedAt
     publishedAt
   }
@@ -524,7 +568,6 @@ export const CreateOnePostDocument = gql`
       createdAt
       updatedAt
     }
-    createdAt
     updatedAt
     publishedAt
   }

@@ -1,10 +1,12 @@
 import SchemaBuilder, {
   BasePlugin,
   BuildCache,
+  PothosOutputFieldConfig,
   SchemaTypes,
 } from "@pothos/core";
 // @transform-path ./global-types.js
 import "./global-types";
+import { GraphQLFieldResolver } from "graphql";
 import {
   BigIntResolver,
   ByteResolver,
@@ -81,6 +83,36 @@ export class PothosPrismaGeneratorPlugin<
       ...deleteModelMutation(t, generator),
       ...deleteManyModelMutation(t, generator),
     }));
+  }
+  wrapResolve(
+    resolver: GraphQLFieldResolver<unknown, Types["Context"], object>,
+    fieldConfig: PothosOutputFieldConfig<Types>
+  ) {
+    const fieldDirectives = Object.values(
+      this.generator.fieldDirectives[fieldConfig.parentType] ?? {}
+    ).filter((v) => Object.keys(v).length);
+    if (fieldDirectives.length) {
+      const readable = this.generator.getFieldReadable(
+        fieldConfig.parentType,
+        fieldConfig.name
+      );
+
+      const newResolver: GraphQLFieldResolver<
+        unknown,
+        Types["Context"],
+        object
+      > = (source, args, context, info) => {
+        const authority = this.generator.getAuthority(context);
+        if (readable) {
+          if (!authority.some((v) => readable.has(v)))
+            throw new Error("No permission");
+        }
+        return resolver(source, args, context, info);
+      };
+      return newResolver;
+    }
+
+    return resolver;
   }
 }
 

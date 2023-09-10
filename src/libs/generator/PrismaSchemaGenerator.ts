@@ -39,22 +39,17 @@ type DirectiveAuthority = { authority?: string[] };
 
 type ModelDirective = {
   operation?: FilterOperations;
-  select?: {
-    fields: { include?: string[]; exclude?: string[] };
-  } & FilterOperations;
+  executable?: FilterOperations & DirectiveAuthority;
   order?: {
     orderBy?: object;
-    authority?: string[];
   } & FilterOperations &
     DirectiveAuthority;
   where?: {
     where?: object;
-    authority?: string[];
   } & FilterOperations &
     DirectiveAuthority;
   limit?: {
     limit?: object;
-    authority?: string[];
   } & FilterOperations &
     DirectiveAuthority;
   option?: {
@@ -70,50 +65,8 @@ type ModelDirective = {
     DirectiveAuthority;
 };
 
-const getSchemaDirectives = (modelName: string, doc?: string) => {
-  const regex = /(?<=@pothos-generator\s).*$/gm;
-  return (
-    doc
-      ?.replace(/\\n/g, "\n")
-      .match(regex)
-      ?.map((text) => {
-        const [, key, json] =
-          text.match(
-            /^(operation|select|where|limit|order|option|input-field|input-data)\s*(.*?)$/
-          ) ?? [];
-        if (!key || !json)
-          throw new Error(
-            `Error parsing schema directive: ${modelName}\n ${text}`
-          );
-        try {
-          return { [key]: JSON5.parse(json) };
-        } catch (e) {
-          throw new Error(
-            `Error parsing schema directive:  ${modelName}\n ${e}\n`
-          );
-        }
-      }) ?? []
-  );
-};
-const expandOperations = (operations: ExtendOperation[]) =>
-  Array.from(
-    new Set(
-      operations.flatMap(
-        (operation) =>
-          operationMap[operation as keyof typeof operationMap] ?? operation
-      )
-    )
-  );
-
-const getOperations = ({ include, exclude }: FilterOperations) => {
-  if (include) {
-    return expandOperations(include);
-  }
-  if (exclude) {
-    const expandExclude = expandOperations(exclude);
-    return allOperations.filter((action) => !expandExclude.includes(action));
-  }
-  return allOperations;
+type FieldDirective = {
+  readable?: string[];
 };
 
 type ModelAuthorityType<T> = {
@@ -126,13 +79,15 @@ type ModelBasicType<T> = {
     [key in Operation]: T;
   };
 };
-
+type ModelExecutable = ModelAuthorityType<void>;
+type ModelOption = ModelBasicType<object>;
 type ModelWhere = ModelAuthorityType<object>;
 type ModelLimit = ModelAuthorityType<number>;
 type ModelOrder = ModelAuthorityType<object>;
 type ModelInputWithoutFields = ModelBasicType<string[]>;
 type ModelSelections = ModelBasicType<string[]>;
 type ModelInputData = ModelAuthorityType<object>;
+
 export class PrismaSchemaGenerator<
   Types extends SchemaTypes
 > extends PrismaCrudGenerator<Types> {
@@ -142,12 +97,24 @@ export class PrismaSchemaGenerator<
       [key in keyof ModelDirective]: Exclude<ModelDirective[key], undefined>[];
     };
   } = {};
+  fieldDirectives: {
+    [key: string]: {
+      [key: string]: {
+        [key in keyof FieldDirective]: Exclude<
+          FieldDirective[key],
+          undefined
+        >[];
+      };
+    };
+  } = {};
+
   modelOptions: {
     [key: string]: { [key in Operation]: object | undefined };
   } = {};
   modelSelections: ModelSelections = {};
   modelLimit: ModelLimit = {};
   modelWhere: ModelWhere = {};
+  modelExecutable: ModelExecutable = {};
   modelOrder: ModelOrder = {};
   modelInputWithoutFields: ModelInputWithoutFields = {};
   modelInputData: ModelInputData = {};
@@ -163,8 +130,8 @@ export class PrismaSchemaGenerator<
     super(builder);
     this._builder = builder;
 
-    this.getModels().map(({ name: modelName, documentation }) => {
-      this.modelDirectives[modelName] = getSchemaDirectives(
+    this.getModels().forEach(({ name: modelName, documentation, fields }) => {
+      this.modelDirectives[modelName] = this.getSchemaDirectives(
         modelName,
         documentation
       ).reduce((pre, value) => {
@@ -174,15 +141,30 @@ export class PrismaSchemaGenerator<
         });
         return pre;
       }, []);
+      this.fieldDirectives[modelName] = {};
+      fields.forEach(({ name: fieldName, documentation }) => {
+        this.fieldDirectives[modelName][fieldName] =
+          this.getSchemaFieldDirectives(
+            modelName,
+            fieldName,
+            documentation
+          ).reduce((pre, value) => {
+            Object.keys(value).forEach((key) => {
+              const directives = pre[key] ?? [];
+              pre[key] = [...directives, value[key]];
+            });
+            return pre;
+          }, []);
+      });
     });
 
     this.createModelOptions();
-    this.createModelSelections();
     this.createModelLimit();
     this.createModelWhere();
     this.createModelOrder();
     this.createModelInputField();
     this.createModelInputData();
+    this.createModelExecutable();
   }
   getBuilder() {
     return this._builder;
@@ -236,56 +218,38 @@ export class PrismaSchemaGenerator<
   protected createModelOptions() {
     this.getModels().forEach(({ name }) => {
       const directives = this.getModelDirectives(name, "option");
-      this.modelOptions[name] = directives.reduce(
-        (pre, option) => {
-          if (!option) return pre;
-          const operations = getOperations(option ?? {});
-          let result = { ...pre };
-          operations.forEach((action) => {
-            result = { ...result, [action]: option?.option };
-          });
-          return result;
-        },
-        {} as {
-          [key in Operation]: object | undefined;
-        }
-      );
+      this.modelOptions[name] = directives.reduce((pre, directive) => {
+        if (!directive) return pre;
+        const operations = this.getFilterOperations(directive ?? {});
+        let result = { ...pre };
+        operations.forEach((action) => {
+          result = { ...result, [action]: directive?.option };
+        });
+        return result;
+      }, {} as ModelOption[string]);
     });
   }
-
-  protected createModelSelections() {
+  protected createModelExecutable() {
     this.getModels().forEach(({ name }) => {
-      const directives = this.getModelDirectives(name, "select");
-      if (!directives.length) {
-        const fields = this.getModelFields(name);
-        const operations = getOperations({});
-        this.modelSelections[name] = Object.fromEntries(
-          operations.map((operation) => [operation, fields])
-        ) as { [key in Operation]: string[] };
-      } else {
-        this.modelSelections[name] = directives.reduce((pre, directive) => {
-          const operations = getOperations(directive ?? {});
-          const { fields } = directive ?? {};
-          return operations.reduce(
-            (pre, operation) => ({
-              ...pre,
-              [operation]: [
-                ...(pre[operation] ?? []),
-                ...this.getModelFields(name, fields),
-              ],
-            }),
-            pre ?? {}
-          );
-        }, {} as ModelSelections[string]);
-      }
+      const directives = this.getModelDirectives(name, "executable");
+      this.modelExecutable[name] = directives.reduce((pre, directive) => {
+        const operations = this.getFilterOperations(directive ?? {});
+        const { authority = [] } = directive ?? {};
+        return operations.reduce(
+          (pre, operation) => ({
+            ...pre,
+            [operation]: [...(pre[operation] ?? []), [authority]],
+          }),
+          pre ?? {}
+        );
+      }, {} as ModelExecutable[string]);
     });
   }
-
   protected createModelOrder() {
     this.getModels().forEach(({ name }) => {
       const directives = this.getModelDirectives(name, "order");
       this.modelOrder[name] = directives.reduce((pre, directive) => {
-        const operations = getOperations(directive ?? {});
+        const operations = this.getFilterOperations(directive ?? {});
         const { authority = [], orderBy } = directive ?? {};
         return operations.reduce(
           (pre, operation) => ({
@@ -301,7 +265,7 @@ export class PrismaSchemaGenerator<
     this.getModels().forEach(({ name }) => {
       const directives = this.getModelDirectives(name, "where");
       this.modelWhere[name] = directives.reduce((pre, directive) => {
-        const operations = getOperations(directive ?? {});
+        const operations = this.getFilterOperations(directive ?? {});
         const { authority = [], where } = directive ?? {};
         return operations.reduce(
           (pre, operation) => ({
@@ -317,7 +281,7 @@ export class PrismaSchemaGenerator<
     this.getModels().forEach(({ name }) => {
       const directives = this.getModelDirectives(name, "limit");
       this.modelLimit[name] = directives.reduce((pre, directive) => {
-        const operations = getOperations(directive ?? {});
+        const operations = this.getFilterOperations(directive ?? {});
         const { authority = [], limit } = directive ?? {};
         return operations.reduce(
           (pre, operation) => ({
@@ -334,7 +298,7 @@ export class PrismaSchemaGenerator<
       const directives = this.getModelDirectives(name, "input-field");
       this.modelInputWithoutFields[name] = directives.reduce(
         (pre, directive) => {
-          const operations = getOperations(directive ?? {});
+          const operations = this.getFilterOperations(directive ?? {});
           const { fields } = directive ?? {};
           return operations.reduce(
             (pre, operation) => ({
@@ -355,7 +319,7 @@ export class PrismaSchemaGenerator<
     this.getModels().forEach(({ name }) => {
       const directives = this.getModelDirectives(name, "input-data");
       this.modelInputData[name] = directives.reduce((pre, directive) => {
-        const operations = getOperations(directive ?? {});
+        const operations = this.getFilterOperations(directive ?? {});
         const { authority = [], data } = directive ?? {};
         return operations.reduce(
           (pre, operation) => ({
@@ -367,6 +331,87 @@ export class PrismaSchemaGenerator<
       }, {} as ModelInputData[string]);
     });
   }
+  getSchemaDirectives = (modelName: string, doc?: string) => {
+    const regex = /(?<=@pothos-generator\s).*$/gm;
+    return (
+      doc
+        ?.replace(/\\n/g, "\n")
+        .match(regex)
+        ?.map((text) => {
+          const [, key, json] =
+            text.match(
+              /^(operation|executable|where|limit|order|option|input-field|input-data)\s*(.*?)$/
+            ) ?? [];
+          if (!key || !json)
+            throw new Error(
+              `Error parsing schema directive: ${modelName}\n ${text}`
+            );
+          try {
+            return { [key]: JSON5.parse(json) };
+          } catch (e) {
+            throw new Error(
+              `Error parsing schema directive:  ${modelName}\n ${e}\n`
+            );
+          }
+        }) ?? []
+    );
+  };
+  getSchemaFieldDirectives = (
+    modelName: string,
+    fieldName: string,
+    doc?: string
+  ) => {
+    const regex = /(?<=@pothos-generator\s).*$/gm;
+    return (
+      doc
+        ?.replace(/\\n/g, "\n")
+        .match(regex)
+        ?.map((text) => {
+          const [, key, json] = text.match(/^(readable)\s*(.*?)$/) ?? [];
+          if (!key || !json)
+            throw new Error(
+              `Error parsing schema directive: ${modelName}.${fieldName}\n ${text}`
+            );
+          try {
+            return { [key]: JSON5.parse(json) };
+          } catch (e) {
+            throw new Error(
+              `Error parsing schema directive:  ${modelName}.${fieldName}\n ${e}\n`
+            );
+          }
+        }) ?? []
+    );
+  };
+  expandOperations = (operations: ExtendOperation[]) =>
+    Array.from(
+      new Set(
+        operations.flatMap(
+          (operation) =>
+            operationMap[operation as keyof typeof operationMap] ?? operation
+        )
+      )
+    );
+
+  getFilterOperations = ({ include, exclude }: FilterOperations) => {
+    if (include) {
+      return this.expandOperations(include);
+    }
+    if (exclude) {
+      const expandExclude = this.expandOperations(exclude);
+      return allOperations.filter((action) => !expandExclude.includes(action));
+    }
+    return allOperations;
+  };
+  getFieldReadable(modelName: string, fieldName: string) {
+    return this.fieldDirectives[modelName][fieldName]?.readable?.reduce(
+      (a, b) => {
+        b.forEach((v) => a.add(v));
+        return a;
+      },
+      new Set<string>()
+    );
+  }
+
   getModelFields(
     modelName: string,
     fields?: { include?: string[]; exclude?: string[] },
@@ -391,17 +436,42 @@ export class PrismaSchemaGenerator<
   getModelOperations(modelName: string) {
     const directives = this.getModelDirectives(modelName, "operation");
     return directives.reduce<string[]>((_, action) => {
-      return getOperations(action);
+      return this.getFilterOperations(action);
     }, allOperations);
   }
 
   getModelOptions(modelName: string) {
     return this.modelOptions[modelName];
   }
-  getModelSelect(modelName: string) {
-    return this.modelSelections[modelName] ?? [];
+  getModelExcludeField(modelName: string) {
+    return Object.entries(this.fieldDirectives[modelName]).flatMap(
+      ([fieldName, directives]) => {
+        const readable = directives.readable?.reduce((a, b) => {
+          b.forEach((v) => a.add(v));
+          return a;
+        }, new Set<string>());
+        if (readable && !readable.size) {
+          return [fieldName];
+        }
+        return [];
+      }
+    );
   }
-
+  checkModelExecutable(
+    modelName: string,
+    operationPrefix: Operation,
+    authority: string[]
+  ) {
+    const values = this.modelExecutable[modelName][operationPrefix];
+    if (!values) return true;
+    const executable = values.reduce((pre, value) => {
+      value[0].forEach((v) => pre.add(v));
+      return pre;
+    }, new Set<string>());
+    if (!authority.some((v) => executable.has(v)))
+      throw new Error("No permission");
+    return true;
+  }
   getModelWhere(
     modelName: string,
     operationPrefix: Operation,

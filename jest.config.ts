@@ -6,18 +6,19 @@ const config: Config = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1",
   },
-  rootDir: "test/tests",
+  rootDir: "./",
+  roots: ["test/tests"],
   testRegex: ".*\\.spec\\.ts$",
   transform: {
     "^.+\\.(t|j)s$": "ts-jest",
   },
-  coverageDirectory: "../coverage",
+  coverageDirectory: "./coverage",
   testEnvironment: "node",
   coveragePathIgnorePatterns: [
-    "./src/backend/libs",
-    "./src/backend/test-tools",
-    "./src/generated",
     "/node_modules/",
+    "test/lib",
+    "generated",
+    "PrismaCrudGenerator",
   ],
 };
 

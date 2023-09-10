@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Role } from "@prisma/client";
 
 export const prisma = new PrismaClient();
 
@@ -8,17 +8,27 @@ const formatNumber = (num: number) => {
 
 const main = async () => {
   // add user
-  const user = await prisma.user
-    .findFirst({
-      where: { email: "example@example.com" },
-    })
-    .then(
-      (user) =>
-        user ??
-        prisma.user.create({
-          data: { name: "example", email: "example@example.com" },
+
+  const users = await prisma.user.count().then(async (count) => {
+    if (!count) {
+      return prisma.$transaction(
+        [
+          {
+            name: "admin",
+            email: "admin@example.com",
+            roles: ["ADMIN", "USER"] satisfies Role[],
+          },
+          { name: "example", email: "example@example.com" },
+        ].map((data) => {
+          return prisma.user.create({
+            data,
+          });
         })
-    );
+      );
+    }
+    return prisma.category.findMany();
+  });
+
   // add category
   const categories = await prisma.category.count().then(async (count) => {
     if (!count) {
@@ -38,7 +48,7 @@ const main = async () => {
           data: {
             title: `Post${formatNumber(i + 1)}`,
             content: `Post${formatNumber(i + 1)} content`,
-            authorId: user.id,
+            authorId: users[1].id,
             published: i % 4 !== 0,
             categories: {
               connect: [

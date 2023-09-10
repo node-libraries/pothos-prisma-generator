@@ -47,6 +47,7 @@ export const builder = new SchemaBuilder<{
     client: prisma,
     dmmf: Prisma.dmmf,
   },
+  // if necessary
   authScopes: async (context) => ({
     authenticated: !!context.user,
   }),
@@ -56,8 +57,8 @@ export const builder = new SchemaBuilder<{
     replace: { "%%USER%%": ({ context }) => context.user?.id },
 
     // Set the following permissions
-    /// @pothos-generator where {include:["query"],where:{},authority:["authenticated"]}
-    authority: ({ context }) => (context.user?.id ? ["authenticated"] : []),
+    /// @pothos-generator any {authority:["ROLE"]}
+    authority: ({ context }) => context.user?.roles ?? [],
   },
 });
 ```
@@ -106,7 +107,9 @@ Example
 /// @pothos-generator operation {exclude:["delete"]}
 ```
 
-### Sets options to be set for Pothos fields.
+### Model directive
+
+#### Sets options to be set for Pothos fields.
 
 `option {include:[...OperationNames],exclude[...OperationNames],option:{OptionName:Params,…}}`
 
@@ -118,35 +121,45 @@ Set auth-plugin's `authScopes` for `createOne`,`createMany`,`updateOne`,`updateM
 /// @pothos-generator option {include:["mutation"],option:{authScopes:{authenticated:true}}}
 ```
 
-### Select the fields to be set for the model type
-
-`select {fields:{include:[...FieldNames],exclude:[...FieldNames]}}`
-
-### Set the fields that are allowed to be entered
+#### Set the fields that are allowed to be entered
 
 `input-field {include:[...OperationNames],exclude[...OperationNames],fields:{include:[...FieldNames],exclude:[...FieldNames]}}`
 
-### Set the data to be interrupted in prisma data
+#### Set the data to be interrupted in prisma data
 
 `input-data {include:[...OperationNames],exclude[...OperationNames],data:InputData,authority:[...Authorities]}`
 
 When authority is set, the first matching `input-data` directive is used.  
 The `replace` option of builder will replace the content.
 
-### Interrupts where to pass to prisma; if authority is set, the first match is used
+#### Interrupts where to pass to prisma; if authority is set, the first match is used
 
 `where {include:[...OperationNames],exclude[...OperationNames],where:Where,authority:[...Authorities]}`
 
 The `replace` option of builder will replace the content.
 
-### Interrupts orderBy to pass to prisma; if authority is set, the first match is used
+#### Interrupts orderBy to pass to prisma; if authority is set, the first match is used
 
 `order {include:[...OperationNames],exclude[...OperationNames],orderBy:order,authority:[...Authorities]}`
+
+#### Authority to execute operations
+
+`executable {include:[...OperationNames],exclude[...OperationNames],authority:[...Authorities]}`
+
+### Field directive
+
+#### Field read permission
+
+`readable [...Authorities]`
+
+If Authorities is empty, it will be removed from the GraphQL Object and will not appear in the Query.
 
 ## Prisma schema settings
 
 The output content is controlled by `@pothos-generator`.  
 Details are omitted since the specification is still under development and is likely to change.
+
+The `authScopes` are written for the option sample, but need not be introduced if executable/readable is used.
 
 ```prisma
 // This is your Prisma schema file,
@@ -161,35 +174,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Unnecessary because automatic generation does not refer to type information
-
-// generator pothos {
-//   provider     = "prisma-pothos-types"
-//   clientOutput = "@prisma/client"
-//   output       = "../src/server/generated/pothos-types.ts"
-// }
-
 /// @pothos-generator operation {include:["createOne","updateOne","findMany"]}
-/// @pothos-generator select {fields:{exclude:["email"]}}
+/// @pothos-generator option {include:["mutation"],option:{authScopes:{ADMIN:true}}}
 /// @pothos-generator input-field {include:["create"],fields:{include:["email","name"]}}
 /// @pothos-generator input-field {include:["update"],fields:{include:["name"]}}
 model User {
   id        String   @id @default(uuid())
+  /// @pothos-generator readable ["ADMIN"]
   email     String   @unique
   name      String   @default("User")
   posts     Post[]
+  /// @pothos-generator readable ["ADMIN"]
+  roles     Role[]   @default([USER])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 /// @pothos-generator operation {exclude:["deleteMany"]}
-/// @pothos-generator option {include:["mutation"],option:{authScopes:{authenticated:true}}}
+/// @pothos-generator executable {include:["mutation"],authority:["USER"]}
 /// @pothos-generator input-field {fields:{exclude:["id","createdAt","updatedAt","author"]}}
-/// @pothos-generator input-data {data:{author:{connect:{id:"%%USER%%"}}}}
-/// @pothos-generator where {include:["query"],where:{},authority:["authenticated"]}
+/// @pothos-generator input-data {data:{authorId:"%%USER%%"}}
+/// @pothos-generator where {include:["query"],where:{},authority:["USER"]}
 /// @pothos-generator where {include:["query"],where:{published:true}}
 /// @pothos-generator where {include:["update","delete"],where:{authorId:"%%USER%%"}}
-/// @pothos-generator order {orderBy:{title:"desc"}}
+/// @pothos-generator order {orderBy:{title:"asc"}}
 model Post {
   id          String     @id @default(uuid())
   published   Boolean    @default(false)
@@ -198,6 +206,7 @@ model Post {
   author      User?      @relation(fields: [authorId], references: [id])
   authorId    String?
   categories  Category[]
+  /// @pothos-generator readable []
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   publishedAt DateTime   @default(now())
@@ -213,6 +222,10 @@ model Category {
   updatedAt DateTime @updatedAt
 }
 
+enum Role {
+  ADMIN
+  USER
+}
 ```
 
 ## Substitution of Input Data
@@ -232,7 +245,7 @@ You can switch where by setting permissions.
 In the following case, the condition `where:{}` is added if you are logged in, and `,where:{published:true}` if you are not logged in.
 
 ```ts
-// Set the following permissions
-/// @pothos-generator where {include:["query"],where:{},authority:["authenticated"]}
-authority: async ({ context }) => (context.user?.id ? ["authenticated"] : []),
+    // Set the following permissions
+    /// @pothos-generator any {authority:["ROLE"]}
+    authority: ({ context }) => context.user?.roles ?? [], // Sample assumes ["ADMIN", "USER"] is set during authentication
 ```

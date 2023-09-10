@@ -25,16 +25,18 @@ export const builder = new SchemaBuilder<{
     client: prisma,
     dmmf: Prisma.dmmf,
   },
-  authScopes: async (context) => ({
-    authenticated: !!context.user,
-  }),
+  authScopes: async (context) =>
+    context.user?.roles.reduce<{ [key: string]: boolean }>((acc, role) => {
+      acc[role] = true;
+      return acc;
+    }, {}) ?? {},
   pothosPrismaGenerator: {
     // Replace the following directives
     // /// @pothos-generator input {data:{author:{connect:{id:"%%USER%%"}}}}
     replace: { "%%USER%%": ({ context }) => context.user?.id },
 
     // Set the following permissions
-    /// @pothos-generator where {include:["query"],where:{},authority:["authenticated"]}
-    authority: ({ context }) => (context.user?.id ? ["authenticated"] : []),
+    /// @pothos-generator any {authority:["ROLE"]}
+    authority: ({ context }) => context.user?.roles ?? [],
   },
 });

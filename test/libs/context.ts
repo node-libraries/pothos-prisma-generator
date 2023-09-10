@@ -3,7 +3,7 @@ import { PrismaClient } from "@prisma/client";
 declare let global: { prisma?: PrismaClient };
 
 export type Context = {
-  user?: { name: string; id: string };
+  user?: { name: string; id: string; roles: string[] };
 };
 
 global.prisma?.$disconnect();

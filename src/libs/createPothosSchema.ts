@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // @transform-path ./generator/PrismaSchemaGenerator.js
 import { PrismaSchemaGenerator } from "./generator/PrismaSchemaGenerator";
@@ -29,13 +28,11 @@ const getPrisma = <T extends SchemaTypes, ParentShape>(
 export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
   const builder = generator.getBuilder();
   generator.getModels().map((model) => {
-    const selectFields = new Set(
-      generator.getModelSelect(model.name)["findFirst"]
-    );
+    const selectFields = new Set(generator.getModelExcludeField(model.name));
     builder.prismaObject(model.name, {
       fields: (t) => {
         const fields = model.fields
-          .filter(({ name }) => selectFields.has(name))
+          .filter(({ name }) => !selectFields.has(name))
           .flatMap((field) => {
             if (field.isId) {
               return [[field.name, t.exposeID(field.name)] as const];
@@ -56,7 +53,9 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                 [
                   field.name,
                   t.expose(field.name, {
-                    type: generator.getEnum(field.type)!,
+                    type: field.isList
+                      ? [generator.getEnum(field.type)]
+                      : generator.getEnum(field.type),
                     nullable: !field.isRequired,
                   }),
                 ] as const,
@@ -187,6 +186,11 @@ export const createModelCountQuery = (
             ) => {
               const prisma = getPrisma(t, ctx);
               const authority = generator.getAuthority(ctx);
+              generator.checkModelExecutable(
+                model.name,
+                operationPrefix,
+                authority
+              );
               const modelWhere = generator.getModelWhere(
                 model.name,
                 operationPrefix,
@@ -231,6 +235,11 @@ export const createModelQuery = (
             resolve: async (query, _root, args, ctx, _info) => {
               const prisma = getPrisma(t, ctx);
               const authority = generator.getAuthority(ctx);
+              generator.checkModelExecutable(
+                model.name,
+                operationPrefix,
+                authority
+              );
               const modelOrder = generator.getModelOrder(
                 model.name,
                 operationPrefix,
@@ -295,6 +304,12 @@ export const createModelListQuery = (
             resolve: async (query, _root, args, ctx, _info) => {
               const prisma = getPrisma(t, ctx);
               const authority = generator.getAuthority(ctx);
+              generator.checkModelExecutable(
+                model.name,
+                operationPrefix,
+                authority
+              );
+
               const modelOrder = generator.getModelOrder(
                 model.name,
                 operationPrefix,
@@ -352,6 +367,7 @@ export const createModelMutation = (
             },
             resolve: async (query, _root, args, ctx, _info) => {
               const authority = generator.getAuthority(ctx);
+              generator.checkModelExecutable(name, operationPrefix, authority);
               const modelInput = generator.getModelInputData(
                 name,
                 operationPrefix,
@@ -395,6 +411,7 @@ export const createManyModelMutation = (
             },
             resolve: async (_root, args, ctx, _info) => {
               const authority = generator.getAuthority(ctx);
+              generator.checkModelExecutable(name, operationPrefix, authority);
               const modelInput = generator.getModelInputData(
                 name,
                 operationPrefix,
@@ -444,6 +461,7 @@ export const updateModelMutation = (
             },
             resolve: async (query, _root, args, ctx, _info) => {
               const authority = generator.getAuthority(ctx);
+              generator.checkModelExecutable(name, operationPrefix, authority);
               const modelWhere = generator.getModelWhere(
                 name,
                 operationPrefix,
@@ -507,6 +525,7 @@ export const updateManyModelMutation = (
             },
             resolve: async (_parent, args, ctx, _info) => {
               const authority = generator.getAuthority(ctx);
+              generator.checkModelExecutable(name, operationPrefix, authority);
               const modelWhere = generator.getModelWhere(
                 name,
                 operationPrefix,
@@ -559,6 +578,11 @@ export const deleteModelMutation = (
             },
             resolve: async (query, _root, args, ctx, _info) => {
               const authority = generator.getAuthority(ctx);
+              generator.checkModelExecutable(
+                model.name,
+                operationPrefix,
+                authority
+              );
               const modelWhere = generator.getModelWhere(
                 model.name,
                 operationPrefix,
@@ -602,6 +626,11 @@ export const deleteManyModelMutation = (
             },
             resolve: async (_parent, args, ctx, _info) => {
               const authority = generator.getAuthority(ctx);
+              generator.checkModelExecutable(
+                model.name,
+                operationPrefix,
+                authority
+              );
               const modelWhere = generator.getModelWhere(
                 model.name,
                 operationPrefix,
