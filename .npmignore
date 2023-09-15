@@ -4,6 +4,7 @@ node_modules
 /.github
 /dist/package.json
 .gitignore
+coverage
 yarn.lock
 tsconfig.json
 tsconfig.esm.json

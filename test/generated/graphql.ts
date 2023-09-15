@@ -216,7 +216,7 @@ export enum OrderBy {
 
 export type Post = {
   __typename?: 'Post';
-  author: User;
+  author?: Maybe<User>;
   authorId?: Maybe<Scalars['String']['output']>;
   categories: Array<Category>;
   categoriesCount: Scalars['Int']['output'];
@@ -336,6 +336,8 @@ export type Query = {
   findManyCategory: Array<Category>;
   findManyPost: Array<Post>;
   findManyUser: Array<User>;
+  findUniqueCategory: Category;
+  findUniquePost: Post;
 };
 
 
@@ -351,16 +353,12 @@ export type QueryCountPostArgs = {
 
 export type QueryFindFirstCategoryArgs = {
   filter?: InputMaybe<CategoryFilter>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<Array<CategoryOrderBy>>;
 };
 
 
 export type QueryFindFirstPostArgs = {
   filter?: InputMaybe<PostFilter>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<Array<PostOrderBy>>;
 };
 
@@ -386,6 +384,16 @@ export type QueryFindManyUserArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<Array<UserOrderBy>>;
+};
+
+
+export type QueryFindUniqueCategoryArgs = {
+  filter: CategoryUniqueFilter;
+};
+
+
+export type QueryFindUniquePostArgs = {
+  filter: PostUniqueFilter;
 };
 
 export enum Role {
@@ -484,19 +492,19 @@ export type FindManyCategoryQueryVariables = Exact<{
 }>;
 
 
-export type FindManyCategoryQuery = { __typename?: 'Query', findManyCategory: Array<{ __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string, posts: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, updatedAt: string, publishedAt: string, author: { __typename?: 'User', id: string, name: string, createdAt: string, updatedAt: string } }> }> };
+export type FindManyCategoryQuery = { __typename?: 'Query', findManyCategory: Array<{ __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string, posts: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, updatedAt: string, publishedAt: string, author?: { __typename?: 'User', id: string, name: string, createdAt: string, updatedAt: string } | null }> }> };
 
 export type FindManyPostQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type FindManyPostQuery = { __typename?: 'Query', findManyPost: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, updatedAt: string, publishedAt: string, author: { __typename?: 'User', id: string, name: string, createdAt: string, updatedAt: string }, categories: Array<{ __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string }> }> };
+export type FindManyPostQuery = { __typename?: 'Query', findManyPost: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, updatedAt: string, publishedAt: string, author?: { __typename?: 'User', id: string, name: string, createdAt: string, updatedAt: string } | null, categories: Array<{ __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string }> }> };
 
 export type CreateOnePostMutationVariables = Exact<{
   input: PostCreateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput;
 }>;
 
 
-export type CreateOnePostMutation = { __typename?: 'Mutation', createOnePost: { __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, updatedAt: string, publishedAt: string, author: { __typename?: 'User', id: string, name: string, createdAt: string, updatedAt: string }, categories: Array<{ __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string }> } };
+export type CreateOnePostMutation = { __typename?: 'Mutation', createOnePost: { __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, updatedAt: string, publishedAt: string, author?: { __typename?: 'User', id: string, name: string, createdAt: string, updatedAt: string } | null, categories: Array<{ __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string }> } };
 
 
 export const FindManyCategoryDocument = gql`

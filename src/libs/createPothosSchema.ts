@@ -69,6 +69,7 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
               ];
               return t.relation(field.name, {
                 ...options,
+                nullable: !field.isRequired,
                 args: field.isList
                   ? {
                       ...generator.findManyArgs(field.type),
@@ -229,7 +230,6 @@ export const createModelQuery = (
             nullable: true,
             args: {
               ...generator.findManyArgs(model.name),
-              ...generator.pagerArgs(),
             },
 
             resolve: async (query, _root, args, ctx, _info) => {
@@ -251,17 +251,7 @@ export const createModelQuery = (
                 authority,
                 ctx
               );
-              const modelLimit = generator.getModelLimit(
-                model.name,
-                operationPrefix,
-                authority
-              );
               const where = { ...args.filter, ...modelWhere };
-              const take =
-                modelLimit && args.limit
-                  ? Math.min(modelLimit, args.limit)
-                  : modelLimit ?? args.limit;
-              const skip = args.offset;
               return prisma[lowerFirst(model.name)].findFirst({
                 ...query,
                 where: Object.keys(where).length ? where : undefined,
@@ -269,8 +259,62 @@ export const createModelQuery = (
                   args.orderBy && Object.keys(args.orderBy).length
                     ? args.orderBy
                     : modelOrder,
-                take,
-                skip,
+              });
+            },
+          }),
+        ];
+      })
+  );
+};
+
+export const createModelUniqueQuery = (
+  t: PothosSchemaTypes.QueryFieldBuilder<any, any>,
+  generator: PrismaSchemaGenerator<any>
+) => {
+  const operationPrefix = "findUnique";
+  return Object.fromEntries(
+    generator
+      .getModels()
+      .filter((model) =>
+        generator.getModelOperations(model.name).includes(operationPrefix)
+      )
+      .map((model) => {
+        const options = generator.getModelOptions(model.name)[operationPrefix];
+        return [
+          `${operationPrefix}${model.name}`,
+          t.prismaField({
+            ...options,
+            type: model.name,
+            args: {
+              filter: t.arg({
+                type: generator.getWhereUnique(model.name),
+                required: true,
+              }),
+            },
+
+            resolve: async (query, _root, args, ctx, _info) => {
+              const prisma = getPrisma(t, ctx);
+              const authority = generator.getAuthority(ctx);
+              generator.checkModelExecutable(
+                model.name,
+                operationPrefix,
+                authority
+              );
+              const modelWhere = generator.getModelWhere(
+                model.name,
+                operationPrefix,
+                authority,
+                ctx
+              );
+              const modelLimit = generator.getModelLimit(
+                model.name,
+                operationPrefix,
+                authority
+              );
+              const where = { ...args.filter, ...modelWhere };
+              return prisma[lowerFirst(model.name)].findUniqueOrThrow({
+                ...query,
+                where: Object.keys(where).length ? where : undefined,
               });
             },
           }),

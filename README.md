@@ -3,7 +3,7 @@
 ## Overview
 
 Automatic generation of GraphQL schema from prisma schema.
-generate `findFirst`,`findMany`,`createOne`,`createMany`,`updateOne`,`updateMany`,`deleteOne`,`deleteMany` for each model.
+generate `count`,`findFirst`,`findMany`,`createOne`,`createMany`,`updateOne`,`updateMany`,`deleteOne`,`deleteMany` for each model.
 
 The schema is generated internally at runtime, so no text output of the code is performed.
 
@@ -11,6 +11,8 @@ The schema is generated internally at runtime, so no text output of the code is 
 
 - Next.js  
   <https://github.com/SoraKumo001/next-pothos>
+- Deployed on Vercel
+  <https://next-pothos.vercel.app/>
 
 ## Builder Settings
 

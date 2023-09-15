@@ -146,6 +146,14 @@ input CategoryOrderBy {
   updatedAt: OrderBy
 }
 
+input PostUniqueFilter {
+  id: String
+}
+
+input CategoryUniqueFilter {
+  id: String
+}
+
 input UserCreateWithoutIdWithoutPostsWithoutRolesWithoutCreatedAtWithoutUpdatedAtInput {
   email: String!
   name: String
@@ -168,10 +176,6 @@ input CategoryCreateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtWithout
   name: String!
 }
 
-input CategoryUniqueFilter {
-  id: String
-}
-
 input CategoryCreateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput {
   name: String!
 }
@@ -183,10 +187,6 @@ input UserUniqueFilter {
 
 input UserUpdateWithoutIdWithoutEmailWithoutPostsWithoutRolesWithoutCreatedAtWithoutUpdatedAtInput {
   name: String
-}
-
-input PostUniqueFilter {
-  id: String
 }
 
 input PostUpdateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput {
@@ -261,7 +261,7 @@ type Post {
   published: Boolean!
   title: String!
   content: String!
-  author: User!
+  author: User
   authorId: String
   categories(filter: CategoryFilter, orderBy: [CategoryOrderBy!], limit: Int, offset: Int): [Category!]!
   categoriesCount(filter: PostFilter): Int!
@@ -281,8 +281,10 @@ type Category {
 type Query {
   countPost(filter: PostFilter): Int!
   countCategory(filter: CategoryFilter): Int!
-  findFirstPost(filter: PostFilter, orderBy: [PostOrderBy!], limit: Int, offset: Int): Post
-  findFirstCategory(filter: CategoryFilter, orderBy: [CategoryOrderBy!], limit: Int, offset: Int): Category
+  findUniquePost(filter: PostUniqueFilter!): Post!
+  findUniqueCategory(filter: CategoryUniqueFilter!): Category!
+  findFirstPost(filter: PostFilter, orderBy: [PostOrderBy!]): Post
+  findFirstCategory(filter: CategoryFilter, orderBy: [CategoryOrderBy!]): Category
   findManyUser(filter: UserFilter, orderBy: [UserOrderBy!], limit: Int, offset: Int): [User!]!
   findManyPost(filter: PostFilter, orderBy: [PostOrderBy!], limit: Int, offset: Int): [Post!]!
   findManyCategory(filter: CategoryFilter, orderBy: [CategoryOrderBy!], limit: Int, offset: Int): [Category!]!

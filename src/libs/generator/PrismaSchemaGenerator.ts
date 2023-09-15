@@ -5,7 +5,7 @@ import { PrismaCrudGenerator } from "./PrismaCrudGenerator";
 import type { SchemaTypes } from "@pothos/core";
 
 const countOperations = ["count"] as const;
-const findOperations = ["findFirst", "findMany"] as const;
+const findOperations = ["findUnique", "findFirst", "findMany"] as const;
 const createOperations = ["createOne", "createMany"] as const;
 const updateOperations = ["updateOne", "updateMany"] as const;
 const deleteOperations = ["deleteOne", "deleteMany"] as const;

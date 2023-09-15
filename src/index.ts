@@ -25,6 +25,7 @@ import {
   updateManyModelMutation,
   updateModelMutation,
   createModelCountQuery,
+  createModelUniqueQuery,
 } from "./libs/createPothosSchema";
 // @transform-path ./libs/generator/PrismaSchemaGenerator.js
 import { PrismaSchemaGenerator } from "./libs/generator/PrismaSchemaGenerator";
@@ -67,6 +68,7 @@ export class PothosPrismaGeneratorPlugin<
 
     builder.queryFields((t) => ({
       ...createModelCountQuery(t, generator),
+      ...createModelUniqueQuery(t, generator),
       ...createModelQuery(t, generator),
       ...createModelListQuery(t, generator),
     }));
