@@ -47,7 +47,7 @@ export class PothosPrismaGeneratorPlugin<
     // Add custom scalar types
     if (builder.options.pothosPrismaGenerator?.autoScalers !== false) {
       builder.addScalarType("BigInt" as never, BigIntResolver, {});
-      builder.addScalarType("Byte" as never, ByteResolver, {});
+      builder.addScalarType("Bytes" as never, ByteResolver, {});
       builder.addScalarType("DateTime" as never, DateTimeResolver, {});
       builder.addScalarType("Json" as never, JSONResolver, {});
     }

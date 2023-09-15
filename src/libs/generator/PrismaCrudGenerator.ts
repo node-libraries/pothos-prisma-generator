@@ -518,11 +518,14 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
 
   private mapScalarType(type: string) {
     switch (type) {
+      case "Bytes":
       case "String":
       case "Boolean":
+      case "BigInt":
       case "Int":
       case "Float":
       case "DateTime":
+      case "Json":
         return type;
       default:
         return null;

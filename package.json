@@ -1,6 +1,6 @@
 {
   "name": "pothos-prisma-generator",
-  "version": "0.0.12",
+  "version": "0.0.13",
   "main": "./dist/cjs/index.js",
   "types": "./dist/cjs/index.d.ts",
   "exports": {
@@ -19,6 +19,7 @@
     "prisma:migrate": "next-exec -c test -- yarn prisma migrate dev --schema=test/prisma/schema.prisma -n migrate",
     "prisma:reset": " next-exec -c test -- prisma migrate reset --schema=test/prisma/schema.prisma -f",
     "prisma:seed": "next-exec -c test -- ts-node -r tsconfig-paths/register test/bin/seeds",
+    "prisma:test": "next-exec -c test -- ts-node -r tsconfig-paths/register test/bin/test",
     "pothos:schema": "node --experimental-specifier-resolution=node --no-warnings --loader ts-node/esm test/bin/createSchema",
     "codegen": "graphql-codegen --config test/codegen/codegen.json",
     "server": "next-exec -c test -- ts-node-dev -r tsconfig-paths/register test/bin/server.ts",
