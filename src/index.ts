@@ -11,6 +11,7 @@ import {
   BigIntResolver,
   ByteResolver,
   DateTimeResolver,
+  HexadecimalResolver,
   JSONResolver,
 } from "graphql-scalars";
 // @transform-path ./libs/createPothosSchema.js
@@ -50,6 +51,7 @@ export class PothosPrismaGeneratorPlugin<
       builder.addScalarType("Bytes" as never, ByteResolver, {});
       builder.addScalarType("DateTime" as never, DateTimeResolver, {});
       builder.addScalarType("Json" as never, JSONResolver, {});
+      builder.addScalarType("Decimal" as never, HexadecimalResolver, {});
     }
 
     const generator = this.generator;

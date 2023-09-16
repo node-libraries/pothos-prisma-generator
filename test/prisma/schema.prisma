@@ -50,6 +50,7 @@ model Post {
 
 /// @pothos-generator order {orderBy:{name:"asc"}}
 /// @pothos-generator input-field {fields:{exclude:["id","createdAt","updatedAt","posts"]}}
+/// @pothos-generator limit {limit:10}
 model Category {
   id        String   @id @default(uuid())
   name      String
