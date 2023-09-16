@@ -161,6 +161,8 @@ The default is all output.
 /// @pothos-generator option {include:["mutation"],option:{authScopes:{authenticated:true}}}
 ```
 
+---
+
 #### Set the fields that are allowed to be entered
 
 - Operator **input-field**
@@ -179,6 +181,8 @@ The default is all output.
 ```prisma
 /// @pothos-generator input-field {include:["create"],fields:{include:["email","name"]}}
 ```
+
+---
 
 #### Set the data to be interrupted in prisma data
 
@@ -203,6 +207,8 @@ The `replace` option of builder will replace the content.
 /// @pothos-generator input-data {data:{authorId:"%%USER%%"}}
 ```
 
+---
+
 #### Interrupts where to pass to prisma; if authority is set, the first match is used
 
 - Operator **where**
@@ -225,6 +231,8 @@ The `replace` option of builder will replace the content.
 /// @pothos-generator where {include:["query"],where:{published:true}}
 ```
 
+---
+
 #### Interrupts orderBy to pass to prisma; if authority is set, the first match is used
 
 - Operator **order**
@@ -245,6 +253,8 @@ The `replace` option of builder will replace the content.
 /// @pothos-generator order {orderBy:{title:"asc"}}
 ```
 
+---
+
 #### Authority to execute operations
 
 - Operator **executable**
@@ -263,6 +273,8 @@ The `replace` option of builder will replace the content.
 ```prisma
 /// @pothos-generator executable {include:["mutation"],authority:["USER"]}
 ```
+
+---
 
 #### limit on the number of events
 
@@ -283,6 +295,8 @@ The `replace` option of builder will replace the content.
 ```prisma
 /// @pothos-generator limit {limit:10}
 ```
+
+---
 
 ### Field directive
 
@@ -309,6 +323,8 @@ If Authorities is empty, it will be removed from the GraphQL Object and will not
 ```prisma
 /// @pothos-generator readable []
 ```
+
+---
 
 ## Prisma schema settings
 
