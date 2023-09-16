@@ -10,7 +10,7 @@ import type { GraphQLResponse } from "@apollo/server/dist/esm/externalTypes/grap
  */
 const createApolloServer = async () => {
   const apolloServer = new ApolloServer<Context>({
-    schema: builder.toSchema({}),
+    schema: builder.toSchema({ sortSchema: false }),
   });
   await apolloServer.start();
   return apolloServer;

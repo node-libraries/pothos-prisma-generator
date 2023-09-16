@@ -13,3 +13,4 @@ jest.config.ts
 .prettierrc
 .env.test
 /esm
+/documents
