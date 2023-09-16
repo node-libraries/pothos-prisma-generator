@@ -4,6 +4,8 @@
 
 Automatic generation of GraphQL schema from prisma schema.
 
+![](https://raw.githubusercontent.com/node-libraries/pothos-prisma-generator/master/documents/screenshot01.png)
+
 - `count`
 - `findUnique`
 - `findFirst`
