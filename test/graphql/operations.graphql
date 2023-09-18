@@ -20,7 +20,6 @@ fragment post on Post {
   title
   content
   authorId
-  categoriesCount
   updatedAt
   publishedAt
 }
@@ -54,7 +53,7 @@ query FindUniqueUser(
     ) {
       ...post
     }
-    postsCount
+    postsCount(filter: $postFilter)
   }
 }
 
@@ -78,6 +77,7 @@ query FindUniquePost(
     ) {
       ...category
     }
+    categoriesCount(filter: $categoryFilter)
   }
 }
 
@@ -98,7 +98,7 @@ query FindUniqueCategory(
     ) {
       ...post
     }
-    postsCount
+    postsCount(filter: $postFilter)
   }
 }
 
@@ -120,7 +120,7 @@ query FindFirstUser(
     ) {
       ...post
     }
-    postsCount
+    postsCount(filter: $postFilter)
   }
 }
 
@@ -145,6 +145,7 @@ query FindFirstPost(
     ) {
       ...category
     }
+    categoriesCount(filter: $categoryFilter)
   }
 }
 
@@ -173,7 +174,7 @@ query FindManyUser(
     ) {
       ...post
     }
-    postsCount
+    postsCount(filter: $postFilter)
   }
 }
 query FindFirstCategory(
@@ -194,7 +195,7 @@ query FindFirstCategory(
     ) {
       ...post
     }
-    postsCount
+    postsCount(filter: $postFilter)
   }
 }
 
@@ -226,6 +227,7 @@ query FindManyPost(
     ) {
       ...category
     }
+    categoriesCount(filter: $categoryFilter)
   }
 }
 
@@ -254,7 +256,7 @@ query FindManyCategory(
     ) {
       ...post
     }
-    postsCount
+    postsCount(filter: $postFilter)
   }
 }
 
