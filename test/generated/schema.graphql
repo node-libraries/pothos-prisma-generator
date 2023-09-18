@@ -175,11 +175,11 @@ input UserCreateInput {
 }
 
 input UserCreatePostsRelationInput {
-  create: [PostCreateWithoutAuthorInput!]
+  create: [PostCreateInput!]
   connect: [PostUniqueFilter!]
 }
 
-input PostCreateWithoutAuthorInput {
+input PostCreateInput {
   id: String
   published: Boolean
   title: String
@@ -191,65 +191,15 @@ input PostCreateWithoutAuthorInput {
 }
 
 input PostCreateCategoriesRelationInput {
-  create: [CategoryCreateWithoutPostsInput!]
+  create: [CategoryCreateInput!]
   connect: [CategoryUniqueFilter!]
-}
-
-input CategoryCreateWithoutPostsInput {
-  id: String
-  name: String!
-  createdAt: DateTime
-  updatedAt: DateTime
-}
-
-input PostCreateInput {
-  id: String
-  published: Boolean
-  title: String
-  content: String
-  author: PostCreateAuthorRelationInput
-  categories: PostCreateCategoriesRelationInput
-  createdAt: DateTime
-  updatedAt: DateTime
-  publishedAt: DateTime
-}
-
-input PostCreateAuthorRelationInput {
-  create: UserCreateWithoutPostsInput
-  connect: UserUniqueFilter
-}
-
-input UserCreateWithoutPostsInput {
-  id: String
-  email: String!
-  name: String
-  roles: [Role!]
-  createdAt: DateTime
-  updatedAt: DateTime
 }
 
 input CategoryCreateInput {
   id: String
   name: String!
-  posts: CategoryCreatePostsRelationInput
   createdAt: DateTime
   updatedAt: DateTime
-}
-
-input CategoryCreatePostsRelationInput {
-  create: [PostCreateWithoutCategoriesInput!]
-  connect: [PostUniqueFilter!]
-}
-
-input PostCreateWithoutCategoriesInput {
-  id: String
-  published: Boolean
-  title: String
-  content: String
-  author: PostCreateAuthorRelationInput
-  createdAt: DateTime
-  updatedAt: DateTime
-  publishedAt: DateTime
 }
 
 input UserUpdateInput {
@@ -263,7 +213,7 @@ input UserUpdateInput {
 }
 
 input UserUpdatePostsRelationInput {
-  create: [PostCreateWithoutAuthorInput!]
+  create: [PostCreateInput!]
   set: [PostUniqueFilter!]
   disconnect: [PostUniqueFilter!]
   delete: [PostUniqueFilter!]
@@ -285,7 +235,7 @@ input PostUpdateWithoutAuthorInput {
 }
 
 input PostUpdateCategoriesRelationInput {
-  create: [CategoryCreateWithoutPostsInput!]
+  create: [CategoryCreateInput!]
   set: [CategoryUniqueFilter!]
   disconnect: [CategoryUniqueFilter!]
   delete: [CategoryUniqueFilter!]
@@ -353,7 +303,7 @@ input PostUpdateInput {
 }
 
 input PostUpdateAuthorRelationInput {
-  create: UserCreateWithoutPostsInput
+  create: UserCreateInput
   update: UserUpdateWithoutPostsInput
   connect: UserUniqueFilter
   disconnect: Boolean
@@ -378,7 +328,7 @@ input CategoryUpdateInput {
 }
 
 input CategoryUpdatePostsRelationInput {
-  create: [PostCreateWithoutCategoriesInput!]
+  create: [PostCreateInput!]
   set: [PostUniqueFilter!]
   disconnect: [PostUniqueFilter!]
   delete: [PostUniqueFilter!]
@@ -426,7 +376,7 @@ type User {
   email: String!
   name: String!
   posts(filter: PostFilter, orderBy: [PostOrderBy!], limit: Int, offset: Int): [Post!]!
-  postsCount(filter: UserFilter): Int!
+  postsCount(filter: PostFilter): Int!
   roles: [Role!]!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -440,7 +390,7 @@ type Post {
   author: User
   authorId: String
   categories(filter: CategoryFilter, orderBy: [CategoryOrderBy!], limit: Int, offset: Int): [Category!]!
-  categoriesCount(filter: PostFilter): Int!
+  categoriesCount(filter: CategoryFilter): Int!
   updatedAt: DateTime!
   publishedAt: DateTime!
 }
@@ -449,7 +399,7 @@ type Category {
   id: ID!
   name: String!
   posts(filter: PostFilter, orderBy: [PostOrderBy!], limit: Int, offset: Int): [Post!]!
-  postsCount(filter: CategoryFilter): Int!
+  postsCount(filter: PostFilter): Int!
   createdAt: DateTime!
   updatedAt: DateTime!
 }

@@ -55,23 +55,10 @@ export type CategoryPostsArgs = {
 
 
 export type CategoryPostsCountArgs = {
-  filter?: InputMaybe<CategoryFilter>;
+  filter?: InputMaybe<PostFilter>;
 };
 
 export type CategoryCreateInput = {
-  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
-  id?: InputMaybe<Scalars['String']['input']>;
-  name: Scalars['String']['input'];
-  posts?: InputMaybe<CategoryCreatePostsRelationInput>;
-  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
-};
-
-export type CategoryCreatePostsRelationInput = {
-  connect?: InputMaybe<Array<PostUniqueFilter>>;
-  create?: InputMaybe<Array<PostCreateWithoutCategoriesInput>>;
-};
-
-export type CategoryCreateWithoutPostsInput = {
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   id?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
@@ -114,7 +101,7 @@ export type CategoryUpdateInput = {
 
 export type CategoryUpdatePostsRelationInput = {
   connect?: InputMaybe<Array<PostUniqueFilter>>;
-  create?: InputMaybe<Array<PostCreateWithoutCategoriesInput>>;
+  create?: InputMaybe<Array<PostCreateInput>>;
   delete?: InputMaybe<Array<PostUniqueFilter>>;
   deleteMany?: InputMaybe<Array<PostWithoutCategoriesFilter>>;
   disconnect?: InputMaybe<Array<PostUniqueFilter>>;
@@ -307,44 +294,16 @@ export type PostCategoriesArgs = {
 
 
 export type PostCategoriesCountArgs = {
-  filter?: InputMaybe<PostFilter>;
-};
-
-export type PostCreateAuthorRelationInput = {
-  connect?: InputMaybe<UserUniqueFilter>;
-  create?: InputMaybe<UserCreateWithoutPostsInput>;
+  filter?: InputMaybe<CategoryFilter>;
 };
 
 export type PostCreateCategoriesRelationInput = {
   connect?: InputMaybe<Array<CategoryUniqueFilter>>;
-  create?: InputMaybe<Array<CategoryCreateWithoutPostsInput>>;
+  create?: InputMaybe<Array<CategoryCreateInput>>;
 };
 
 export type PostCreateInput = {
-  author?: InputMaybe<PostCreateAuthorRelationInput>;
   categories?: InputMaybe<PostCreateCategoriesRelationInput>;
-  content?: InputMaybe<Scalars['String']['input']>;
-  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
-  id?: InputMaybe<Scalars['String']['input']>;
-  published?: InputMaybe<Scalars['Boolean']['input']>;
-  publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
-  title?: InputMaybe<Scalars['String']['input']>;
-  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
-};
-
-export type PostCreateWithoutAuthorInput = {
-  categories?: InputMaybe<PostCreateCategoriesRelationInput>;
-  content?: InputMaybe<Scalars['String']['input']>;
-  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
-  id?: InputMaybe<Scalars['String']['input']>;
-  published?: InputMaybe<Scalars['Boolean']['input']>;
-  publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
-  title?: InputMaybe<Scalars['String']['input']>;
-  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
-};
-
-export type PostCreateWithoutCategoriesInput = {
-  author?: InputMaybe<PostCreateAuthorRelationInput>;
   content?: InputMaybe<Scalars['String']['input']>;
   createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   id?: InputMaybe<Scalars['String']['input']>;
@@ -392,7 +351,7 @@ export type PostUniqueFilter = {
 
 export type PostUpdateAuthorRelationInput = {
   connect?: InputMaybe<UserUniqueFilter>;
-  create?: InputMaybe<UserCreateWithoutPostsInput>;
+  create?: InputMaybe<UserCreateInput>;
   delete?: InputMaybe<Scalars['Boolean']['input']>;
   disconnect?: InputMaybe<Scalars['Boolean']['input']>;
   update?: InputMaybe<UserUpdateWithoutPostsInput>;
@@ -400,7 +359,7 @@ export type PostUpdateAuthorRelationInput = {
 
 export type PostUpdateCategoriesRelationInput = {
   connect?: InputMaybe<Array<CategoryUniqueFilter>>;
-  create?: InputMaybe<Array<CategoryCreateWithoutPostsInput>>;
+  create?: InputMaybe<Array<CategoryCreateInput>>;
   delete?: InputMaybe<Array<CategoryUniqueFilter>>;
   deleteMany?: InputMaybe<Array<CategoryWithoutPostsFilter>>;
   disconnect?: InputMaybe<Array<CategoryUniqueFilter>>;
@@ -615,7 +574,7 @@ export type UserPostsArgs = {
 
 
 export type UserPostsCountArgs = {
-  filter?: InputMaybe<UserFilter>;
+  filter?: InputMaybe<PostFilter>;
 };
 
 export type UserCreateInput = {
@@ -630,16 +589,7 @@ export type UserCreateInput = {
 
 export type UserCreatePostsRelationInput = {
   connect?: InputMaybe<Array<PostUniqueFilter>>;
-  create?: InputMaybe<Array<PostCreateWithoutAuthorInput>>;
-};
-
-export type UserCreateWithoutPostsInput = {
-  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
-  email: Scalars['String']['input'];
-  id?: InputMaybe<Scalars['String']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  roles?: InputMaybe<Array<Role>>;
-  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  create?: InputMaybe<Array<PostCreateInput>>;
 };
 
 export type UserFilter = {
@@ -679,7 +629,7 @@ export type UserUpdateInput = {
 
 export type UserUpdatePostsRelationInput = {
   connect?: InputMaybe<Array<PostUniqueFilter>>;
-  create?: InputMaybe<Array<PostCreateWithoutAuthorInput>>;
+  create?: InputMaybe<Array<PostCreateInput>>;
   delete?: InputMaybe<Array<PostUniqueFilter>>;
   deleteMany?: InputMaybe<Array<PostWithoutAuthorFilter>>;
   disconnect?: InputMaybe<Array<PostUniqueFilter>>;

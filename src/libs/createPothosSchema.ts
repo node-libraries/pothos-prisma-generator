@@ -124,7 +124,7 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                 ...options,
                 args: {
                   filter: t.arg({
-                    type: generator.getWhere(model.name),
+                    type: generator.getWhere(field.type),
                     required: false,
                   }),
                 },
