@@ -4,6 +4,10 @@
 
 Automatic generation of GraphQL schema from prisma schema.
 
+Generate a GraphQL schema from `prisma.schema` that can be queried as follows.
+
+[prisma.schema](https://github.com/node-libraries/pothos-prisma-generator/blob/master/test/prisma/schema.prisma) -> [queries.graphql](https://github.com/node-libraries/pothos-prisma-generator/blob/master/test/graphql/operations.graphql)
+
 ![](https://raw.githubusercontent.com/node-libraries/pothos-prisma-generator/master/documents/screenshot01.png)
 
 - `count`
