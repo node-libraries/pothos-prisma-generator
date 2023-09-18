@@ -18,11 +18,9 @@ const getPrisma = <T extends SchemaTypes, ParentShape>(
   t:
     | PothosSchemaTypes.ObjectFieldBuilder<T, ParentShape>
     | PothosSchemaTypes.QueryFieldBuilder<T, ParentShape>
-    | PothosSchemaTypes.MutationFieldBuilder<T, ParentShape>,
-  ctx = {}
+    | PothosSchemaTypes.MutationFieldBuilder<T, ParentShape>
 ): any => {
-  const prisma = t.builder.options.prisma.client;
-  return typeof prisma === "function" ? prisma(ctx) : prisma;
+  return t.builder.options.prisma.client;
 };
 
 export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
@@ -90,7 +88,7 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                     ctx
                   );
                   const modelLimit = generator.getModelLimit(
-                    model.name,
+                    field.type,
                     operationPrefix,
                     authority
                   );
@@ -185,7 +183,7 @@ export const createModelCountQuery = (
               ctx,
               _info
             ) => {
-              const prisma = getPrisma(t, ctx);
+              const prisma = getPrisma(t);
               const authority = generator.getAuthority(ctx);
               generator.checkModelExecutable(
                 model.name,
@@ -233,7 +231,7 @@ export const createModelQuery = (
             },
 
             resolve: async (query, _root, args, ctx, _info) => {
-              const prisma = getPrisma(t, ctx);
+              const prisma = getPrisma(t);
               const authority = generator.getAuthority(ctx);
               generator.checkModelExecutable(
                 model.name,
@@ -293,7 +291,7 @@ export const createModelUniqueQuery = (
             },
 
             resolve: async (query, _root, args, ctx, _info) => {
-              const prisma = getPrisma(t, ctx);
+              const prisma = getPrisma(t);
               const authority = generator.getAuthority(ctx);
               generator.checkModelExecutable(
                 model.name,
@@ -314,7 +312,7 @@ export const createModelUniqueQuery = (
               const where = { ...args.filter, ...modelWhere };
               return prisma[lowerFirst(model.name)].findUniqueOrThrow({
                 ...query,
-                where: Object.keys(where).length ? where : undefined,
+                where: where,
               });
             },
           }),
@@ -346,7 +344,7 @@ export const createModelListQuery = (
               ...generator.pagerArgs(),
             },
             resolve: async (query, _root, args, ctx, _info) => {
-              const prisma = getPrisma(t, ctx);
+              const prisma = getPrisma(t);
               const authority = generator.getAuthority(ctx);
               generator.checkModelExecutable(
                 model.name,
@@ -365,8 +363,17 @@ export const createModelListQuery = (
                 authority,
                 ctx
               );
+              const modelLimit = generator.getModelLimit(
+                model.name,
+                operationPrefix,
+                authority
+              );
+
               const where = { ...args.filter, ...modelWhere };
-              const take = args.limit;
+              const take =
+                modelLimit && args.limit
+                  ? Math.min(modelLimit, args.limit)
+                  : modelLimit ?? args.limit;
               const skip = args.offset;
               return prisma[lowerFirst(model.name)].findMany({
                 ...query,
@@ -418,7 +425,7 @@ export const createModelMutation = (
                 authority,
                 ctx
               );
-              const prisma = getPrisma(t, ctx);
+              const prisma = getPrisma(t);
               return prisma[lowerFirst(name)].create({
                 ...query,
                 data: { ...args.input, ...modelInput },
@@ -462,7 +469,7 @@ export const createManyModelMutation = (
                 authority,
                 ctx
               );
-              const prisma = getPrisma(t, ctx);
+              const prisma = getPrisma(t);
               return prisma[lowerFirst(name)]
                 .createMany({
                   data: args.input.map((v) => ({ ...v, ...modelInput })),
@@ -518,7 +525,7 @@ export const updateModelMutation = (
                 authority,
                 ctx
               );
-              const prisma = getPrisma(t, ctx);
+              const prisma = getPrisma(t);
               return prisma[lowerFirst(name)].update({
                 ...query,
                 where: {
@@ -582,7 +589,7 @@ export const updateManyModelMutation = (
                 authority,
                 ctx
               );
-              const prisma = getPrisma(t, ctx);
+              const prisma = getPrisma(t);
               return prisma[lowerFirst(name)]
                 .updateMany({
                   where: { ...args.where, ...modelWhere },
@@ -633,7 +640,7 @@ export const deleteModelMutation = (
                 authority,
                 ctx
               );
-              const prisma = getPrisma(t, ctx);
+              const prisma = getPrisma(t);
               return prisma[lowerFirst(model.name)].delete({
                 ...query,
                 where: { ...args.where, ...modelWhere },
@@ -681,7 +688,7 @@ export const deleteManyModelMutation = (
                 authority,
                 ctx
               );
-              const prisma = getPrisma(t, ctx);
+              const prisma = getPrisma(t);
               return prisma[lowerFirst(model.name)]
                 .deleteMany({
                   where: { ...args.where, ...modelWhere },

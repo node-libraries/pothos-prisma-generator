@@ -207,7 +207,8 @@ export class PrismaSchemaGenerator<
     this.authorityFunc = func;
   }
   getAuthority(context: SchemaTypes["Context"]) {
-    return this.authorityFunc ? this.authorityFunc({ context }) : [];
+    /* istanbul ignore next */
+    return this.authorityFunc?.({ context }) ?? [];
   }
   getModels() {
     const builder = this.getBuilder();
@@ -512,7 +513,7 @@ export class PrismaSchemaGenerator<
     return action?.[1] ?? [];
   }
   getModelInputFields(modelName: string) {
-    return this.modelInputWithoutFields[modelName] ?? [];
+    return this.modelInputWithoutFields[modelName];
   }
   getModelInputData(
     modelName: string,

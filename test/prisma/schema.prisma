@@ -45,3 +45,10 @@ enum Role {
   ADMIN
   USER
 }
+
+// This model is only here to test the scalar list functionality
+model TypeTest {
+  id         String   @id @default(uuid())
+  scalarList String[]
+  role       Role
+}

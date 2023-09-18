@@ -114,17 +114,17 @@ model ModelName {
 If no operation is specified on the directive, it is applied to all.
 
 - query  
-  `findUnique`,`findFirst`,`findMany`,`count`
+  `findUnique`, `findFirst`, `findMany`, `count`
 - find  
-  `findUnique`,`findFirst`,`findMany`
+  `findUnique`, `findFirst`,`findMany`
 - create  
-  `createOne`,`createMany`
+  `createOne`, `createMany`
 - update  
-  `updateOne`,`updateMany`
+  `updateOne`, `updateMany`
 - delete  
-  `deleteOne`,`deleteMany`
+  `deleteOne`, `deleteMany`
 - mutation  
-  `createOne`,`createMany`,`updateOne`,`updateMany`,`deleteOne`,`deleteMany`
+  `createOne`, `createMany`, `updateOne`, `updateMany`, `deleteOne`, `deleteMany`
 
 ### Select the operation to output
 

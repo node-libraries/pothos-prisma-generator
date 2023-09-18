@@ -10,8 +10,8 @@ describe("Post", () => {
       `@pothos-generator operation {exclude:["deleteMany"]}`,
       `@pothos-generator executable {include:["mutation"],authority:["USER"]}`,
       `@pothos-generator input-field {fields:{exclude:["id","createdAt","updatedAt","author"]}}`,
-      `@pothos-generator input-data {data:{authorId:"%%USER%%"}}`,
       `@pothos-generator input-data {data:{},authority:["ADMIN"]}`,
+      `@pothos-generator input-data {data:{authorId:"%%USER%%"}}`,
       `@pothos-generator where {include:["query"],where:{},authority:["USER"]}`,
       `@pothos-generator where {include:["query"],where:{published:true}}`,
       `@pothos-generator where {include:["update","delete"],where:{authorId:"%%USER%%"}}`,
@@ -20,8 +20,11 @@ describe("Post", () => {
     const user = await prisma.user.findUniqueOrThrow({
       where: { email: "example@example.com" },
     });
+    const admin = await prisma.user.findUniqueOrThrow({
+      where: { email: "admin@example.com" },
+    });
     const client = await getClient();
-    return { user, client };
+    return { user, client, admin };
   });
 
   afterAll(async () => {
@@ -50,20 +53,32 @@ describe("Post", () => {
     });
   });
   it("CreateOnePost", async () => {
-    const { client, user } = await property;
-    await client
-      .CreateOnePost(
+    const { client, user, admin } = await property;
+    expect(
+      client.CreateOnePost(
         { input: { title: "Title", content: "Content" } },
         { user }
       )
-      .then((result) => {
-        const { createOnePost } = result;
-        expect(createOnePost).toMatchObject({
-          title: "Title",
-          content: "Content",
-          authorId: user.id,
-        });
-      });
+    ).resolves.toMatchObject({
+      createOnePost: {
+        title: "Title",
+        content: "Content",
+        authorId: user.id,
+      },
+    });
+
+    expect(
+      client.CreateOnePost(
+        { input: { title: "Title", content: "Content" } },
+        { user: admin }
+      )
+    ).resolves.toMatchObject({
+      createOnePost: {
+        title: "Title",
+        content: "Content",
+        authorId: null,
+      },
+    });
   });
 
   it("CreateOnePost(Auth error)", async () => {

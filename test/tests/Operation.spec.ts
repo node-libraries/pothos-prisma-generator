@@ -109,7 +109,26 @@ describe("Post2", () => {
       const { findFirstPost } = result;
       expect(findFirstPost).not.toBeNull();
     });
+
+    const post = await prisma.post.findFirstOrThrow();
+    await client
+      .FindFirstPost({ filter: { id: { equals: post.id } } })
+      .then((result) => {
+        const { findFirstPost } = result;
+        expect(findFirstPost?.id).toBe(post.id);
+      });
+
+    const descPost = await prisma.post.findFirstOrThrow({
+      orderBy: { id: "desc" },
+    });
+    await client
+      .FindFirstPost({ orderBy: { id: OrderBy.Desc } })
+      .then((result) => {
+        const { findFirstPost } = result;
+        expect(findFirstPost?.id).toBe(descPost.id);
+      });
   });
+
   it("findUniquePost", async () => {
     const { client } = await property;
     const post = await prisma.post.findFirstOrThrow();
@@ -118,6 +137,7 @@ describe("Post2", () => {
       expect(findUniquePost).not.toBeNull();
     });
   });
+
   it("createOnePost", async () => {
     const { client } = await property;
     await client
