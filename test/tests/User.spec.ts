@@ -16,7 +16,7 @@ describe("User", () => {
       `@pothos-generator input-field {include:["create"],fields:{include:["email","name"]}}`,
       `@pothos-generator input-field {include:["update"],fields:{include:["name"]}}`,
     ]);
-    setFieldDirective("User", "Roles", [
+    setFieldDirective("User", "roles", [
       ` @pothos-generator readable ["ADMIN"]`,
     ]);
     const user = await prisma.user.findUniqueOrThrow({

@@ -1,10 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { beforeAllAsync } from "jest-async";
-import {
-  getApolloServer,
-  getClient,
-  setModelDirective,
-} from "../libs/test-tools";
+import { getClient, setModelDirective } from "../libs/test-tools";
 
 describe("Post", () => {
   const prisma = new PrismaClient({});
@@ -15,17 +11,17 @@ describe("Post", () => {
       `@pothos-generator executable {include:["mutation"],authority:["USER"]}`,
       `@pothos-generator input-field {fields:{exclude:["id","createdAt","updatedAt","author"]}}`,
       `@pothos-generator input-data {data:{authorId:"%%USER%%"}}`,
+      `@pothos-generator input-data {data:{},authority:["ADMIN"]}`,
       `@pothos-generator where {include:["query"],where:{},authority:["USER"]}`,
       `@pothos-generator where {include:["query"],where:{published:true}}`,
       `@pothos-generator where {include:["update","delete"],where:{authorId:"%%USER%%"}}`,
       `@pothos-generator order {orderBy:{title:"asc"}}`,
     ]);
-    const server = await getApolloServer();
     const user = await prisma.user.findUniqueOrThrow({
       where: { email: "example@example.com" },
     });
     const client = await getClient();
-    return { server, user, client };
+    return { user, client };
   });
 
   afterAll(async () => {
@@ -62,9 +58,11 @@ describe("Post", () => {
       )
       .then((result) => {
         const { createOnePost } = result;
-        expect(createOnePost).toHaveProperty("title", "Title");
-        expect(createOnePost).toHaveProperty("content", "Content");
-        expect(createOnePost).toHaveProperty("authorId", user.id);
+        expect(createOnePost).toMatchObject({
+          title: "Title",
+          content: "Content",
+          authorId: user.id,
+        });
       });
   });
 

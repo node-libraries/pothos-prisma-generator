@@ -58,13 +58,13 @@ query FindUniqueUser(
 }
 
 query FindUniquePost(
-  $postFilter: PostUniqueFilter!
+  $filter: PostUniqueFilter!
   $categoryFilter: CategoryFilter
   $categoryOrderBy: [CategoryOrderBy!]
   $categoryLimit: Int
   $categoryOffset: Int
 ) {
-  findUniquePost(filter: $postFilter) {
+  findUniquePost(filter: $filter) {
     ...post
     author {
       ...user
@@ -82,13 +82,13 @@ query FindUniquePost(
 }
 
 query FindUniqueCategory(
-  $categoryFilter: CategoryUniqueFilter!
+  $filter: CategoryUniqueFilter!
   $postFilter: PostFilter
   $postOrderBy: [PostOrderBy!]
   $postLimit: Int
   $postOffset: Int
 ) {
-  findUniqueCategory(filter: $categoryFilter) {
+  findUniqueCategory(filter: $filter) {
     ...category
     posts(
       filter: $postFilter
@@ -103,14 +103,14 @@ query FindUniqueCategory(
 }
 
 query FindFirstUser(
-  $userFilter: UserFilter
-  $userOrderBy: [UserOrderBy!]
+  $filter: UserFilter
+  $orderBy: [UserOrderBy!]
   $postFilter: PostFilter
   $postOrderBy: [PostOrderBy!]
   $postLimit: Int
   $postOffset: Int
 ) {
-  findFirstUser(filter: $userFilter, orderBy: $userOrderBy) {
+  findFirstUser(filter: $filter, orderBy: $orderBy) {
     ...user
     posts(
       filter: $postFilter
@@ -125,14 +125,14 @@ query FindFirstUser(
 }
 
 query FindFirstPost(
-  $postFilter: PostFilter
-  $postOrderBy: [PostOrderBy!]
+  $filter: PostFilter
+  $orderBy: [PostOrderBy!]
   $categoryFilter: CategoryFilter
   $categoryOrderBy: [CategoryOrderBy!]
   $categoryLimit: Int
   $categoryOffset: Int
 ) {
-  findFirstPost(filter: $postFilter, orderBy: $postOrderBy) {
+  findFirstPost(filter: $filter, orderBy: $orderBy) {
     ...post
     author {
       ...user
@@ -149,43 +149,15 @@ query FindFirstPost(
   }
 }
 
-query FindManyUser(
-  $userFilter: UserFilter
-  $userOrderBy: [UserOrderBy!]
-  $userLimit: Int
-  $userOffset: Int
-  $postFilter: PostFilter
-  $postOrderBy: [PostOrderBy!]
-  $postLimit: Int
-  $postOffset: Int
-) {
-  findManyUser(
-    filter: $userFilter
-    orderBy: $userOrderBy
-    limit: $userLimit
-    offset: $userOffset
-  ) {
-    ...user
-    posts(
-      filter: $postFilter
-      orderBy: $postOrderBy
-      limit: $postLimit
-      offset: $postOffset
-    ) {
-      ...post
-    }
-    postsCount(filter: $postFilter)
-  }
-}
 query FindFirstCategory(
-  $categoryFilter: CategoryFilter
-  $categoryOrderBy: [CategoryOrderBy!]
+  $filter: CategoryFilter
+  $orderBy: [CategoryOrderBy!]
   $postFilter: PostFilter
   $postOrderBy: [PostOrderBy!]
   $postLimit: Int
   $postOffset: Int
 ) {
-  findFirstCategory(filter: $categoryFilter, orderBy: $categoryOrderBy) {
+  findFirstCategory(filter: $filter, orderBy: $orderBy) {
     ...category
     posts(
       filter: $postFilter
@@ -199,21 +171,50 @@ query FindFirstCategory(
   }
 }
 
-query FindManyPost(
+query FindManyUser(
+  $filter: UserFilter
+  $orderBy: [UserOrderBy!]
+  $limit: Int
+  $offset: Int
   $postFilter: PostFilter
+  $postOrderBy: [PostOrderBy!]
   $postLimit: Int
   $postOffset: Int
-  $postOrderBy: [PostOrderBy!]
+) {
+  findManyUser(
+    filter: $filter
+    orderBy: $orderBy
+    limit: $limit
+    offset: $offset
+  ) {
+    ...user
+    posts(
+      filter: $postFilter
+      orderBy: $postOrderBy
+      limit: $postLimit
+      offset: $postOffset
+    ) {
+      ...post
+    }
+    postsCount(filter: $postFilter)
+  }
+}
+
+query FindManyPost(
+  $filter: PostFilter
+  $limit: Int
+  $offset: Int
+  $orderBy: [PostOrderBy!]
   $categoryFilter: CategoryFilter
   $categoryOrderBy: [CategoryOrderBy!]
   $categoryLimit: Int
   $categoryOffset: Int
 ) {
   findManyPost(
-    filter: $postFilter
-    orderBy: $postOrderBy
-    limit: $postLimit
-    offset: $postOffset
+    filter: $filter
+    orderBy: $orderBy
+    limit: $limit
+    offset: $offset
   ) {
     ...post
     author {
@@ -232,20 +233,20 @@ query FindManyPost(
 }
 
 query FindManyCategory(
-  $categoryFilter: CategoryFilter
-  $categoryOrderBy: [CategoryOrderBy!]
-  $categoryLimit: Int
-  $categoryOffset: Int
+  $filter: CategoryFilter
+  $orderBy: [CategoryOrderBy!]
+  $limit: Int
+  $offset: Int
   $postFilter: PostFilter
   $postOrderBy: [PostOrderBy!]
   $postLimit: Int
   $postOffset: Int
 ) {
   findManyCategory(
-    filter: $categoryFilter
-    orderBy: $categoryOrderBy
-    limit: $categoryLimit
-    offset: $categoryOffset
+    filter: $filter
+    orderBy: $orderBy
+    limit: $limit
+    offset: $offset
   ) {
     ...category
     posts(

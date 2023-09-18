@@ -61,9 +61,9 @@ describe("Category", () => {
     const { client } = await property;
     await client
       .FindManyCategory({
-        categoryFilter: { name: { equals: "Category01" } },
+        filter: { name: { equals: "Category01" } },
         postFilter: { title: { equals: "Post03" } },
-        categoryOrderBy: { id: OrderBy.Desc },
+        orderBy: { id: OrderBy.Desc },
       })
       .then((result) => {
         const findManyCategory = result.findManyCategory;

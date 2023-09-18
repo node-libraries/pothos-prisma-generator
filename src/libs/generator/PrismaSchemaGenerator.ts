@@ -219,8 +219,7 @@ export class PrismaSchemaGenerator<
     this.getModels().forEach(({ name }) => {
       const directives = this.getModelDirectives(name, "option");
       this.modelOptions[name] = directives.reduce((pre, directive) => {
-        if (!directive) return pre;
-        const operations = this.getFilterOperations(directive ?? {});
+        const operations = this.getFilterOperations(directive);
         let result = { ...pre };
         operations.forEach((action) => {
           result = { ...result, [action]: directive?.option };
@@ -233,14 +232,14 @@ export class PrismaSchemaGenerator<
     this.getModels().forEach(({ name }) => {
       const directives = this.getModelDirectives(name, "executable");
       this.modelExecutable[name] = directives.reduce((pre, directive) => {
-        const operations = this.getFilterOperations(directive ?? {});
-        const { authority = [] } = directive ?? {};
+        const operations = this.getFilterOperations(directive);
+        const { authority } = directive;
         return operations.reduce(
           (pre, operation) => ({
             ...pre,
             [operation]: [...(pre[operation] ?? []), [authority]],
           }),
-          pre ?? {}
+          pre
         );
       }, {} as ModelExecutable[string]);
     });
@@ -249,14 +248,14 @@ export class PrismaSchemaGenerator<
     this.getModels().forEach(({ name }) => {
       const directives = this.getModelDirectives(name, "order");
       this.modelOrder[name] = directives.reduce((pre, directive) => {
-        const operations = this.getFilterOperations(directive ?? {});
-        const { authority = [], orderBy } = directive ?? {};
+        const operations = this.getFilterOperations(directive);
+        const { authority = [], orderBy } = directive;
         return operations.reduce(
           (pre, operation) => ({
             ...pre,
             [operation]: [...(pre[operation] ?? []), [authority, orderBy]],
           }),
-          pre ?? {}
+          pre
         );
       }, {} as ModelOrder[string]);
     });
@@ -265,14 +264,14 @@ export class PrismaSchemaGenerator<
     this.getModels().forEach(({ name }) => {
       const directives = this.getModelDirectives(name, "where");
       this.modelWhere[name] = directives.reduce((pre, directive) => {
-        const operations = this.getFilterOperations(directive ?? {});
-        const { authority = [], where } = directive ?? {};
+        const operations = this.getFilterOperations(directive);
+        const { authority = [], where } = directive;
         return operations.reduce(
           (pre, operation) => ({
             ...pre,
             [operation]: [...(pre[operation] ?? []), [authority, where]],
           }),
-          pre ?? {}
+          pre
         );
       }, {} as ModelWhere[string]);
     });
@@ -281,14 +280,14 @@ export class PrismaSchemaGenerator<
     this.getModels().forEach(({ name }) => {
       const directives = this.getModelDirectives(name, "limit");
       this.modelLimit[name] = directives.reduce((pre, directive) => {
-        const operations = this.getFilterOperations(directive ?? {});
-        const { authority = [], limit } = directive ?? {};
+        const operations = this.getFilterOperations(directive);
+        const { authority = [], limit } = directive;
         return operations.reduce(
           (pre, operation) => ({
             ...pre,
             [operation]: [...(pre[operation] ?? []), [authority, limit]],
           }),
-          pre ?? {}
+          pre
         );
       }, {} as ModelLimit[string]);
     });
@@ -298,17 +297,17 @@ export class PrismaSchemaGenerator<
       const directives = this.getModelDirectives(name, "input-field");
       this.modelInputWithoutFields[name] = directives.reduce(
         (pre, directive) => {
-          const operations = this.getFilterOperations(directive ?? {});
-          const { fields } = directive ?? {};
+          const operations = this.getFilterOperations(directive);
+          const { fields } = directive;
           return operations.reduce(
             (pre, operation) => ({
               ...pre,
               [operation]: [
                 ...(pre[operation] ?? []),
-                ...this.getModelFields(name, fields, true),
+                ...this.getModelFields(name, fields),
               ],
             }),
-            pre ?? {}
+            pre
           );
         },
         {} as ModelInputWithoutFields[string]
@@ -319,14 +318,14 @@ export class PrismaSchemaGenerator<
     this.getModels().forEach(({ name }) => {
       const directives = this.getModelDirectives(name, "input-data");
       this.modelInputData[name] = directives.reduce((pre, directive) => {
-        const operations = this.getFilterOperations(directive ?? {});
-        const { authority = [], data } = directive ?? {};
+        const operations = this.getFilterOperations(directive);
+        const { authority = [], data } = directive;
         return operations.reduce(
           (pre, operation) => ({
             ...pre,
             [operation]: [...(pre[operation] ?? []), [authority, data]],
           }),
-          pre ?? {}
+          pre
         );
       }, {} as ModelInputData[string]);
     });
@@ -340,7 +339,7 @@ export class PrismaSchemaGenerator<
         ?.map((text) => {
           const [, key, json] =
             text.match(
-              /^(operation|executable|where|limit|order|option|input-field|input-data)\s*(.*?)$/
+              /^(operation|executable|where|limit|order|option|input-field|input-data)\s+(.*?)$/
             ) ?? [];
           if (!key || !json)
             throw new Error(
@@ -367,7 +366,7 @@ export class PrismaSchemaGenerator<
         ?.replace(/\\n/g, "\n")
         .match(regex)
         ?.map((text) => {
-          const [, key, json] = text.match(/^(readable)\s*(.*?)$/) ?? [];
+          const [, key, json] = text.match(/^(readable)\s+(.*?)$/) ?? [];
           if (!key || !json)
             throw new Error(
               `Error parsing schema directive: ${modelName}.${fieldName}\n ${text}`
@@ -414,17 +413,14 @@ export class PrismaSchemaGenerator<
 
   getModelFields(
     modelName: string,
-    fields?: { include?: string[]; exclude?: string[] },
-    inversion = false
+    fields?: { include?: string[]; exclude?: string[] }
   ) {
     const model = this.getModels().find(({ name }) => name === modelName);
-    const modelFields = model?.fields.map(({ name }) => name) ?? [];
+    const modelFields = model!.fields.map(({ name }) => name);
     const include = fields?.include ?? modelFields;
     const exclude = fields?.exclude ?? [];
     const result = include.filter((field) => !exclude.includes(field));
-    return inversion
-      ? modelFields.filter((field) => !result.includes(field))
-      : result;
+    return modelFields.filter((field) => !result.includes(field));
   }
 
   getModelDirectives<T extends keyof ModelDirective>(

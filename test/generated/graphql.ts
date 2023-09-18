@@ -696,7 +696,7 @@ export type FindUniqueUserQueryVariables = Exact<{
 export type FindUniqueUserQuery = { __typename?: 'Query', findUniqueUser: { __typename?: 'User', postsCount: number, id: string, email: string, name: string, roles: Array<Role>, createdAt: string, updatedAt: string, posts: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, updatedAt: string, publishedAt: string }> } };
 
 export type FindUniquePostQueryVariables = Exact<{
-  postFilter: PostUniqueFilter;
+  filter: PostUniqueFilter;
   categoryFilter?: InputMaybe<CategoryFilter>;
   categoryOrderBy?: InputMaybe<Array<CategoryOrderBy> | CategoryOrderBy>;
   categoryLimit?: InputMaybe<Scalars['Int']['input']>;
@@ -707,7 +707,7 @@ export type FindUniquePostQueryVariables = Exact<{
 export type FindUniquePostQuery = { __typename?: 'Query', findUniquePost: { __typename?: 'Post', categoriesCount: number, id: string, published: boolean, title: string, content: string, authorId?: string | null, updatedAt: string, publishedAt: string, author?: { __typename?: 'User', id: string, email: string, name: string, roles: Array<Role>, createdAt: string, updatedAt: string } | null, categories: Array<{ __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string }> } };
 
 export type FindUniqueCategoryQueryVariables = Exact<{
-  categoryFilter: CategoryUniqueFilter;
+  filter: CategoryUniqueFilter;
   postFilter?: InputMaybe<PostFilter>;
   postOrderBy?: InputMaybe<Array<PostOrderBy> | PostOrderBy>;
   postLimit?: InputMaybe<Scalars['Int']['input']>;
@@ -718,8 +718,8 @@ export type FindUniqueCategoryQueryVariables = Exact<{
 export type FindUniqueCategoryQuery = { __typename?: 'Query', findUniqueCategory: { __typename?: 'Category', postsCount: number, id: string, name: string, createdAt: string, updatedAt: string, posts: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, updatedAt: string, publishedAt: string }> } };
 
 export type FindFirstUserQueryVariables = Exact<{
-  userFilter?: InputMaybe<UserFilter>;
-  userOrderBy?: InputMaybe<Array<UserOrderBy> | UserOrderBy>;
+  filter?: InputMaybe<UserFilter>;
+  orderBy?: InputMaybe<Array<UserOrderBy> | UserOrderBy>;
   postFilter?: InputMaybe<PostFilter>;
   postOrderBy?: InputMaybe<Array<PostOrderBy> | PostOrderBy>;
   postLimit?: InputMaybe<Scalars['Int']['input']>;
@@ -730,8 +730,8 @@ export type FindFirstUserQueryVariables = Exact<{
 export type FindFirstUserQuery = { __typename?: 'Query', findFirstUser?: { __typename?: 'User', postsCount: number, id: string, email: string, name: string, roles: Array<Role>, createdAt: string, updatedAt: string, posts: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, updatedAt: string, publishedAt: string }> } | null };
 
 export type FindFirstPostQueryVariables = Exact<{
-  postFilter?: InputMaybe<PostFilter>;
-  postOrderBy?: InputMaybe<Array<PostOrderBy> | PostOrderBy>;
+  filter?: InputMaybe<PostFilter>;
+  orderBy?: InputMaybe<Array<PostOrderBy> | PostOrderBy>;
   categoryFilter?: InputMaybe<CategoryFilter>;
   categoryOrderBy?: InputMaybe<Array<CategoryOrderBy> | CategoryOrderBy>;
   categoryLimit?: InputMaybe<Scalars['Int']['input']>;
@@ -741,23 +741,9 @@ export type FindFirstPostQueryVariables = Exact<{
 
 export type FindFirstPostQuery = { __typename?: 'Query', findFirstPost?: { __typename?: 'Post', categoriesCount: number, id: string, published: boolean, title: string, content: string, authorId?: string | null, updatedAt: string, publishedAt: string, author?: { __typename?: 'User', id: string, email: string, name: string, roles: Array<Role>, createdAt: string, updatedAt: string } | null, categories: Array<{ __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string }> } | null };
 
-export type FindManyUserQueryVariables = Exact<{
-  userFilter?: InputMaybe<UserFilter>;
-  userOrderBy?: InputMaybe<Array<UserOrderBy> | UserOrderBy>;
-  userLimit?: InputMaybe<Scalars['Int']['input']>;
-  userOffset?: InputMaybe<Scalars['Int']['input']>;
-  postFilter?: InputMaybe<PostFilter>;
-  postOrderBy?: InputMaybe<Array<PostOrderBy> | PostOrderBy>;
-  postLimit?: InputMaybe<Scalars['Int']['input']>;
-  postOffset?: InputMaybe<Scalars['Int']['input']>;
-}>;
-
-
-export type FindManyUserQuery = { __typename?: 'Query', findManyUser: Array<{ __typename?: 'User', postsCount: number, id: string, email: string, name: string, roles: Array<Role>, createdAt: string, updatedAt: string, posts: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, updatedAt: string, publishedAt: string }> }> };
-
 export type FindFirstCategoryQueryVariables = Exact<{
-  categoryFilter?: InputMaybe<CategoryFilter>;
-  categoryOrderBy?: InputMaybe<Array<CategoryOrderBy> | CategoryOrderBy>;
+  filter?: InputMaybe<CategoryFilter>;
+  orderBy?: InputMaybe<Array<CategoryOrderBy> | CategoryOrderBy>;
   postFilter?: InputMaybe<PostFilter>;
   postOrderBy?: InputMaybe<Array<PostOrderBy> | PostOrderBy>;
   postLimit?: InputMaybe<Scalars['Int']['input']>;
@@ -767,11 +753,25 @@ export type FindFirstCategoryQueryVariables = Exact<{
 
 export type FindFirstCategoryQuery = { __typename?: 'Query', findFirstCategory?: { __typename?: 'Category', postsCount: number, id: string, name: string, createdAt: string, updatedAt: string, posts: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, updatedAt: string, publishedAt: string }> } | null };
 
-export type FindManyPostQueryVariables = Exact<{
+export type FindManyUserQueryVariables = Exact<{
+  filter?: InputMaybe<UserFilter>;
+  orderBy?: InputMaybe<Array<UserOrderBy> | UserOrderBy>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
   postFilter?: InputMaybe<PostFilter>;
+  postOrderBy?: InputMaybe<Array<PostOrderBy> | PostOrderBy>;
   postLimit?: InputMaybe<Scalars['Int']['input']>;
   postOffset?: InputMaybe<Scalars['Int']['input']>;
-  postOrderBy?: InputMaybe<Array<PostOrderBy> | PostOrderBy>;
+}>;
+
+
+export type FindManyUserQuery = { __typename?: 'Query', findManyUser: Array<{ __typename?: 'User', postsCount: number, id: string, email: string, name: string, roles: Array<Role>, createdAt: string, updatedAt: string, posts: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, updatedAt: string, publishedAt: string }> }> };
+
+export type FindManyPostQueryVariables = Exact<{
+  filter?: InputMaybe<PostFilter>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Array<PostOrderBy> | PostOrderBy>;
   categoryFilter?: InputMaybe<CategoryFilter>;
   categoryOrderBy?: InputMaybe<Array<CategoryOrderBy> | CategoryOrderBy>;
   categoryLimit?: InputMaybe<Scalars['Int']['input']>;
@@ -782,10 +782,10 @@ export type FindManyPostQueryVariables = Exact<{
 export type FindManyPostQuery = { __typename?: 'Query', findManyPost: Array<{ __typename?: 'Post', categoriesCount: number, id: string, published: boolean, title: string, content: string, authorId?: string | null, updatedAt: string, publishedAt: string, author?: { __typename?: 'User', id: string, email: string, name: string, roles: Array<Role>, createdAt: string, updatedAt: string } | null, categories: Array<{ __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string }> }> };
 
 export type FindManyCategoryQueryVariables = Exact<{
-  categoryFilter?: InputMaybe<CategoryFilter>;
-  categoryOrderBy?: InputMaybe<Array<CategoryOrderBy> | CategoryOrderBy>;
-  categoryLimit?: InputMaybe<Scalars['Int']['input']>;
-  categoryOffset?: InputMaybe<Scalars['Int']['input']>;
+  filter?: InputMaybe<CategoryFilter>;
+  orderBy?: InputMaybe<Array<CategoryOrderBy> | CategoryOrderBy>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
   postFilter?: InputMaybe<PostFilter>;
   postOrderBy?: InputMaybe<Array<PostOrderBy> | PostOrderBy>;
   postLimit?: InputMaybe<Scalars['Int']['input']>;
@@ -989,8 +989,8 @@ export const FindUniqueUserDocument = gql`
     ${UserFragmentDoc}
 ${PostFragmentDoc}`;
 export const FindUniquePostDocument = gql`
-    query FindUniquePost($postFilter: PostUniqueFilter!, $categoryFilter: CategoryFilter, $categoryOrderBy: [CategoryOrderBy!], $categoryLimit: Int, $categoryOffset: Int) {
-  findUniquePost(filter: $postFilter) {
+    query FindUniquePost($filter: PostUniqueFilter!, $categoryFilter: CategoryFilter, $categoryOrderBy: [CategoryOrderBy!], $categoryLimit: Int, $categoryOffset: Int) {
+  findUniquePost(filter: $filter) {
     ...post
     author {
       ...user
@@ -1010,8 +1010,8 @@ export const FindUniquePostDocument = gql`
 ${UserFragmentDoc}
 ${CategoryFragmentDoc}`;
 export const FindUniqueCategoryDocument = gql`
-    query FindUniqueCategory($categoryFilter: CategoryUniqueFilter!, $postFilter: PostFilter, $postOrderBy: [PostOrderBy!], $postLimit: Int, $postOffset: Int) {
-  findUniqueCategory(filter: $categoryFilter) {
+    query FindUniqueCategory($filter: CategoryUniqueFilter!, $postFilter: PostFilter, $postOrderBy: [PostOrderBy!], $postLimit: Int, $postOffset: Int) {
+  findUniqueCategory(filter: $filter) {
     ...category
     posts(
       filter: $postFilter
@@ -1027,8 +1027,8 @@ export const FindUniqueCategoryDocument = gql`
     ${CategoryFragmentDoc}
 ${PostFragmentDoc}`;
 export const FindFirstUserDocument = gql`
-    query FindFirstUser($userFilter: UserFilter, $userOrderBy: [UserOrderBy!], $postFilter: PostFilter, $postOrderBy: [PostOrderBy!], $postLimit: Int, $postOffset: Int) {
-  findFirstUser(filter: $userFilter, orderBy: $userOrderBy) {
+    query FindFirstUser($filter: UserFilter, $orderBy: [UserOrderBy!], $postFilter: PostFilter, $postOrderBy: [PostOrderBy!], $postLimit: Int, $postOffset: Int) {
+  findFirstUser(filter: $filter, orderBy: $orderBy) {
     ...user
     posts(
       filter: $postFilter
@@ -1044,8 +1044,8 @@ export const FindFirstUserDocument = gql`
     ${UserFragmentDoc}
 ${PostFragmentDoc}`;
 export const FindFirstPostDocument = gql`
-    query FindFirstPost($postFilter: PostFilter, $postOrderBy: [PostOrderBy!], $categoryFilter: CategoryFilter, $categoryOrderBy: [CategoryOrderBy!], $categoryLimit: Int, $categoryOffset: Int) {
-  findFirstPost(filter: $postFilter, orderBy: $postOrderBy) {
+    query FindFirstPost($filter: PostFilter, $orderBy: [PostOrderBy!], $categoryFilter: CategoryFilter, $categoryOrderBy: [CategoryOrderBy!], $categoryLimit: Int, $categoryOffset: Int) {
+  findFirstPost(filter: $filter, orderBy: $orderBy) {
     ...post
     author {
       ...user
@@ -1064,31 +1064,9 @@ export const FindFirstPostDocument = gql`
     ${PostFragmentDoc}
 ${UserFragmentDoc}
 ${CategoryFragmentDoc}`;
-export const FindManyUserDocument = gql`
-    query FindManyUser($userFilter: UserFilter, $userOrderBy: [UserOrderBy!], $userLimit: Int, $userOffset: Int, $postFilter: PostFilter, $postOrderBy: [PostOrderBy!], $postLimit: Int, $postOffset: Int) {
-  findManyUser(
-    filter: $userFilter
-    orderBy: $userOrderBy
-    limit: $userLimit
-    offset: $userOffset
-  ) {
-    ...user
-    posts(
-      filter: $postFilter
-      orderBy: $postOrderBy
-      limit: $postLimit
-      offset: $postOffset
-    ) {
-      ...post
-    }
-    postsCount(filter: $postFilter)
-  }
-}
-    ${UserFragmentDoc}
-${PostFragmentDoc}`;
 export const FindFirstCategoryDocument = gql`
-    query FindFirstCategory($categoryFilter: CategoryFilter, $categoryOrderBy: [CategoryOrderBy!], $postFilter: PostFilter, $postOrderBy: [PostOrderBy!], $postLimit: Int, $postOffset: Int) {
-  findFirstCategory(filter: $categoryFilter, orderBy: $categoryOrderBy) {
+    query FindFirstCategory($filter: CategoryFilter, $orderBy: [CategoryOrderBy!], $postFilter: PostFilter, $postOrderBy: [PostOrderBy!], $postLimit: Int, $postOffset: Int) {
+  findFirstCategory(filter: $filter, orderBy: $orderBy) {
     ...category
     posts(
       filter: $postFilter
@@ -1103,14 +1081,26 @@ export const FindFirstCategoryDocument = gql`
 }
     ${CategoryFragmentDoc}
 ${PostFragmentDoc}`;
+export const FindManyUserDocument = gql`
+    query FindManyUser($filter: UserFilter, $orderBy: [UserOrderBy!], $limit: Int, $offset: Int, $postFilter: PostFilter, $postOrderBy: [PostOrderBy!], $postLimit: Int, $postOffset: Int) {
+  findManyUser(filter: $filter, orderBy: $orderBy, limit: $limit, offset: $offset) {
+    ...user
+    posts(
+      filter: $postFilter
+      orderBy: $postOrderBy
+      limit: $postLimit
+      offset: $postOffset
+    ) {
+      ...post
+    }
+    postsCount(filter: $postFilter)
+  }
+}
+    ${UserFragmentDoc}
+${PostFragmentDoc}`;
 export const FindManyPostDocument = gql`
-    query FindManyPost($postFilter: PostFilter, $postLimit: Int, $postOffset: Int, $postOrderBy: [PostOrderBy!], $categoryFilter: CategoryFilter, $categoryOrderBy: [CategoryOrderBy!], $categoryLimit: Int, $categoryOffset: Int) {
-  findManyPost(
-    filter: $postFilter
-    orderBy: $postOrderBy
-    limit: $postLimit
-    offset: $postOffset
-  ) {
+    query FindManyPost($filter: PostFilter, $limit: Int, $offset: Int, $orderBy: [PostOrderBy!], $categoryFilter: CategoryFilter, $categoryOrderBy: [CategoryOrderBy!], $categoryLimit: Int, $categoryOffset: Int) {
+  findManyPost(filter: $filter, orderBy: $orderBy, limit: $limit, offset: $offset) {
     ...post
     author {
       ...user
@@ -1130,12 +1120,12 @@ export const FindManyPostDocument = gql`
 ${UserFragmentDoc}
 ${CategoryFragmentDoc}`;
 export const FindManyCategoryDocument = gql`
-    query FindManyCategory($categoryFilter: CategoryFilter, $categoryOrderBy: [CategoryOrderBy!], $categoryLimit: Int, $categoryOffset: Int, $postFilter: PostFilter, $postOrderBy: [PostOrderBy!], $postLimit: Int, $postOffset: Int) {
+    query FindManyCategory($filter: CategoryFilter, $orderBy: [CategoryOrderBy!], $limit: Int, $offset: Int, $postFilter: PostFilter, $postOrderBy: [PostOrderBy!], $postLimit: Int, $postOffset: Int) {
   findManyCategory(
-    filter: $categoryFilter
-    orderBy: $categoryOrderBy
-    limit: $categoryLimit
-    offset: $categoryOffset
+    filter: $filter
+    orderBy: $orderBy
+    limit: $limit
+    offset: $offset
   ) {
     ...category
     posts(
@@ -1286,11 +1276,11 @@ export function getSdk<C, E>(requester: Requester<C, E>) {
     FindFirstPost(variables?: FindFirstPostQueryVariables, options?: C): Promise<FindFirstPostQuery> {
       return requester<FindFirstPostQuery, FindFirstPostQueryVariables>(FindFirstPostDocument, variables, options) as Promise<FindFirstPostQuery>;
     },
-    FindManyUser(variables?: FindManyUserQueryVariables, options?: C): Promise<FindManyUserQuery> {
-      return requester<FindManyUserQuery, FindManyUserQueryVariables>(FindManyUserDocument, variables, options) as Promise<FindManyUserQuery>;
-    },
     FindFirstCategory(variables?: FindFirstCategoryQueryVariables, options?: C): Promise<FindFirstCategoryQuery> {
       return requester<FindFirstCategoryQuery, FindFirstCategoryQueryVariables>(FindFirstCategoryDocument, variables, options) as Promise<FindFirstCategoryQuery>;
+    },
+    FindManyUser(variables?: FindManyUserQueryVariables, options?: C): Promise<FindManyUserQuery> {
+      return requester<FindManyUserQuery, FindManyUserQueryVariables>(FindManyUserDocument, variables, options) as Promise<FindManyUserQuery>;
     },
     FindManyPost(variables?: FindManyPostQueryVariables, options?: C): Promise<FindManyPostQuery> {
       return requester<FindManyPostQuery, FindManyPostQueryVariables>(FindManyPostDocument, variables, options) as Promise<FindManyPostQuery>;

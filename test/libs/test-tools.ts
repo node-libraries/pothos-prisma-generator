@@ -2,7 +2,7 @@ import { ApolloServer } from "@apollo/server";
 import { PrismaClient } from "@prisma/client";
 import { RuntimeDataModel } from "@prisma/client/runtime/library";
 import { DocumentNode } from "graphql";
-import { builder } from "./builder";
+import { createBuilder } from "./builder";
 import { getSdk } from "../generated/graphql";
 import type { Context } from "./context";
 import type { GraphQLResponse } from "@apollo/server/dist/esm/externalTypes/graphql";
@@ -10,18 +10,11 @@ import type { GraphQLResponse } from "@apollo/server/dist/esm/externalTypes/grap
 /**
  * apolloServer
  */
-const createApolloServer = async () => {
+export const createApolloServer = async () => {
   const apolloServer = new ApolloServer<Context>({
-    schema: builder.toSchema({ sortSchema: false }),
+    schema: createBuilder().toSchema({ sortSchema: false }),
   });
   await apolloServer.start();
-  return apolloServer;
-};
-
-let apolloServer: ApolloServer<Context>;
-
-export const getApolloServer = async () => {
-  if (!apolloServer) apolloServer = await createApolloServer();
   return apolloServer;
 };
 
@@ -35,7 +28,7 @@ export const getBodyData = <T>(result: GraphQLResponse<T>) => {
 };
 
 export const getClient = async () => {
-  const server = await getApolloServer();
+  const server = await createApolloServer();
   return getSdk(
     async <R, V>(doc: DocumentNode, vars: V, context?: Context): Promise<R> => {
       const result = await server.executeOperation(
@@ -55,12 +48,17 @@ export const getClient = async () => {
 };
 
 export const setModelDirective = (model: string, directive: string[]) => {
+  const prisma = new PrismaClient();
   const { models } = (
-    builder.options.prisma.client as PrismaClient & {
+    prisma as PrismaClient & {
       _runtimeDataModel: RuntimeDataModel;
     }
   )._runtimeDataModel;
+  const document = models[model].documentation;
   models[model].documentation = directive.join("\\n");
+  return () => {
+    models[model].documentation = document;
+  };
 };
 
 export const setFieldDirective = (
@@ -68,11 +66,16 @@ export const setFieldDirective = (
   field: string,
   directive: string[]
 ) => {
+  const prisma = new PrismaClient();
   const { models } = (
-    builder.options.prisma.client as PrismaClient & {
+    prisma as PrismaClient & {
       _runtimeDataModel: RuntimeDataModel;
     }
   )._runtimeDataModel;
-  models["User"].fields.find((v) => v.name === "email")!.documentation =
-    directive.join("\\n");
+  const modelField = models[model].fields.find((v) => v.name === field)!;
+  const document = modelField.documentation;
+  modelField.documentation = directive.join("\\n");
+  return () => {
+    modelField.documentation = document;
+  };
 };
