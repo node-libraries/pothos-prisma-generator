@@ -1,77 +1,355 @@
+fragment user on User {
+  id
+  email
+  name
+  roles
+  createdAt
+  updatedAt
+}
+
+fragment category on Category {
+  id
+  name
+  createdAt
+  updatedAt
+}
+
+fragment post on Post {
+  id
+  published
+  title
+  content
+  authorId
+  categoriesCount
+  updatedAt
+  publishedAt
+}
+
+query CountUser($filter: UserFilter) {
+  countUser(filter: $filter)
+}
+
+query CountPost($filter: PostFilter) {
+  countPost(filter: $filter)
+}
+
+query CountCategory($filter: CategoryFilter) {
+  countCategory(filter: $filter)
+}
+
+query FindUniqueUser(
+  $filter: UserUniqueFilter!
+  $postFilter: PostFilter
+  $postOrderBy: [PostOrderBy!]
+  $postLimit: Int
+  $postOffset: Int
+) {
+  findUniqueUser(filter: $filter) {
+    ...user
+    posts(
+      filter: $postFilter
+      orderBy: $postOrderBy
+      limit: $postLimit
+      offset: $postOffset
+    ) {
+      ...post
+    }
+    postsCount
+  }
+}
+
+query FindUniquePost(
+  $postFilter: PostUniqueFilter!
+  $categoryFilter: CategoryFilter
+  $categoryOrderBy: [CategoryOrderBy!]
+  $categoryLimit: Int
+  $categoryOffset: Int
+) {
+  findUniquePost(filter: $postFilter) {
+    ...post
+    author {
+      ...user
+    }
+    categories(
+      filter: $categoryFilter
+      orderBy: $categoryOrderBy
+      limit: $categoryLimit
+      offset: $categoryOffset
+    ) {
+      ...category
+    }
+  }
+}
+
+query FindUniqueCategory(
+  $categoryFilter: CategoryUniqueFilter!
+  $postFilter: PostFilter
+  $postOrderBy: [PostOrderBy!]
+  $postLimit: Int
+  $postOffset: Int
+) {
+  findUniqueCategory(filter: $categoryFilter) {
+    ...category
+    posts(
+      filter: $postFilter
+      orderBy: $postOrderBy
+      limit: $postLimit
+      offset: $postOffset
+    ) {
+      ...post
+    }
+    postsCount
+  }
+}
+
+query FindFirstUser(
+  $userFilter: UserFilter
+  $userOrderBy: [UserOrderBy!]
+  $postFilter: PostFilter
+  $postOrderBy: [PostOrderBy!]
+  $postLimit: Int
+  $postOffset: Int
+) {
+  findFirstUser(filter: $userFilter, orderBy: $userOrderBy) {
+    ...user
+    posts(
+      filter: $postFilter
+      orderBy: $postOrderBy
+      limit: $postLimit
+      offset: $postOffset
+    ) {
+      ...post
+    }
+    postsCount
+  }
+}
+
+query FindFirstPost(
+  $postFilter: PostFilter
+  $postOrderBy: [PostOrderBy!]
+  $categoryFilter: CategoryFilter
+  $categoryOrderBy: [CategoryOrderBy!]
+  $categoryLimit: Int
+  $categoryOffset: Int
+) {
+  findFirstPost(filter: $postFilter, orderBy: $postOrderBy) {
+    ...post
+    author {
+      ...user
+    }
+    categories(
+      filter: $categoryFilter
+      orderBy: $categoryOrderBy
+      limit: $categoryLimit
+      offset: $categoryOffset
+    ) {
+      ...category
+    }
+  }
+}
+
+query FindManyUser(
+  $userFilter: UserFilter
+  $userOrderBy: [UserOrderBy!]
+  $userLimit: Int
+  $userOffset: Int
+  $postFilter: PostFilter
+  $postOrderBy: [PostOrderBy!]
+  $postLimit: Int
+  $postOffset: Int
+) {
+  findManyUser(
+    filter: $userFilter
+    orderBy: $userOrderBy
+    limit: $userLimit
+    offset: $userOffset
+  ) {
+    ...user
+    posts(
+      filter: $postFilter
+      orderBy: $postOrderBy
+      limit: $postLimit
+      offset: $postOffset
+    ) {
+      ...post
+    }
+    postsCount
+  }
+}
+query FindFirstCategory(
+  $categoryFilter: CategoryFilter
+  $categoryOrderBy: [CategoryOrderBy!]
+  $postFilter: PostFilter
+  $postOrderBy: [PostOrderBy!]
+  $postLimit: Int
+  $postOffset: Int
+) {
+  findFirstCategory(filter: $categoryFilter, orderBy: $categoryOrderBy) {
+    ...category
+    posts(
+      filter: $postFilter
+      orderBy: $postOrderBy
+      limit: $postLimit
+      offset: $postOffset
+    ) {
+      ...post
+    }
+    postsCount
+  }
+}
+
+query FindManyPost(
+  $postFilter: PostFilter
+  $postLimit: Int
+  $postOffset: Int
+  $postOrderBy: [PostOrderBy!]
+  $categoryFilter: CategoryFilter
+  $categoryOrderBy: [CategoryOrderBy!]
+  $categoryLimit: Int
+  $categoryOffset: Int
+) {
+  findManyPost(
+    filter: $postFilter
+    orderBy: $postOrderBy
+    limit: $postLimit
+    offset: $postOffset
+  ) {
+    ...post
+    author {
+      ...user
+    }
+    categories(
+      filter: $categoryFilter
+      orderBy: $categoryOrderBy
+      limit: $categoryLimit
+      offset: $categoryOffset
+    ) {
+      ...category
+    }
+  }
+}
+
 query FindManyCategory(
-  $filter: CategoryFilter
-  $orderBy: [CategoryOrderBy!]
-  $postsFilter: PostFilter
-  $postsOrderBy: [PostOrderBy!]
+  $categoryFilter: CategoryFilter
+  $categoryOrderBy: [CategoryOrderBy!]
+  $categoryLimit: Int
+  $categoryOffset: Int
+  $postFilter: PostFilter
+  $postOrderBy: [PostOrderBy!]
+  $postLimit: Int
+  $postOffset: Int
 ) {
-  findManyCategory(filter: $filter, orderBy: $orderBy) {
-    id
-    name
-    posts(filter: $postsFilter, orderBy: $postsOrderBy) {
-      id
-      published
-      title
-      content
-      author {
-        id
-        name
-        createdAt
-        updatedAt
-      }
-      updatedAt
-      publishedAt
+  findManyCategory(
+    filter: $categoryFilter
+    orderBy: $categoryOrderBy
+    limit: $categoryLimit
+    offset: $categoryOffset
+  ) {
+    ...category
+    posts(
+      filter: $postFilter
+      orderBy: $postOrderBy
+      limit: $postLimit
+      offset: $postOffset
+    ) {
+      ...post
     }
-    createdAt
-    updatedAt
+    postsCount
   }
 }
 
-query FindManyPost {
-  findManyPost {
-    id
-    published
-    title
-    content
-    author {
-      id
-      name
-      createdAt
-      updatedAt
-    }
-    authorId
-    categories {
-      id
-      name
-      createdAt
-      updatedAt
-    }
-    updatedAt
-    publishedAt
+mutation CreateOneUser($input: UserCreateInput!) {
+  createOneUser(input: $input) {
+    ...user
   }
 }
 
-mutation CreateOnePost(
-  $input: PostCreateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput!
-) {
+mutation CreateOnePost($input: PostCreateInput!) {
   createOnePost(input: $input) {
-    id
-    published
-    title
-    content
-    author {
-      id
-      name
-      createdAt
-      updatedAt
-    }
-    authorId
-    categories {
-      id
-      name
-      createdAt
-      updatedAt
-    }
-    updatedAt
-    publishedAt
+    ...post
   }
+}
+
+mutation CreateOneCategory($input: CategoryCreateInput!) {
+  createOneCategory(input: $input) {
+    ...category
+  }
+}
+
+mutation CreateManyUser($input: [UserCreateInput!]!) {
+  createManyUser(input: $input)
+}
+
+mutation CreateManyPost($input: [PostCreateInput!]!) {
+  createManyPost(input: $input)
+}
+
+mutation CreateManyCategory($input: [CategoryCreateInput!]!) {
+  createManyCategory(input: $input)
+}
+
+mutation UpdateOneUser($where: UserUniqueFilter!, $data: UserUpdateInput!) {
+  updateOneUser(where: $where, data: $data) {
+    ...user
+  }
+}
+
+mutation UpdateOnePost($where: PostUniqueFilter!, $data: PostUpdateInput!) {
+  updateOnePost(where: $where, data: $data) {
+    ...post
+  }
+}
+
+mutation UpdateOneCategory(
+  $where: CategoryUniqueFilter!
+  $data: CategoryUpdateInput!
+) {
+  updateOneCategory(where: $where, data: $data) {
+    ...category
+  }
+}
+
+mutation UpdateManyUser($where: UserFilter!, $data: UserUpdateInput!) {
+  updateManyUser(where: $where, data: $data)
+}
+
+mutation UpdateManyPost($where: PostFilter!, $data: PostUpdateInput!) {
+  updateManyPost(where: $where, data: $data)
+}
+
+mutation UpdateManyCategory(
+  $where: CategoryFilter!
+  $data: CategoryUpdateInput!
+) {
+  updateManyCategory(where: $where, data: $data)
+}
+
+mutation DeleteOneUser($where: UserUniqueFilter!) {
+  deleteOneUser(where: $where) {
+    ...user
+  }
+}
+
+mutation DeleteOnePost($where: PostUniqueFilter!) {
+  deleteOnePost(where: $where) {
+    ...post
+  }
+}
+
+mutation DeleteOneCategory($where: CategoryUniqueFilter!) {
+  deleteOneCategory(where: $where) {
+    ...category
+  }
+}
+
+mutation DeleteManyUser($where: UserFilter!) {
+  deleteManyUser(where: $where)
+}
+
+mutation DeleteManyPost($where: PostFilter!) {
+  deleteManyPost(where: $where)
+}
+
+mutation DeleteManyCategory($where: CategoryFilter!) {
+  deleteManyCategory(where: $where)
 }

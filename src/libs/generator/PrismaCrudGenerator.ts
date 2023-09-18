@@ -233,12 +233,15 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
 
   getCreateInput<Name extends keyof Types["PrismaTypes"] & string>(
     modelName: Name,
-    without?: string[]
+    without?: string[],
+    isCustomName?: false
   ) {
     const withoutName = (without ?? [])
       .map((name) => `Without${capitalize(name)}`)
       .join("");
-    const fullName = `${modelName}Create${withoutName}Input`;
+    const fullName = `${modelName}Create${
+      isCustomName === false ? "" : withoutName
+    }Input`;
 
     return this.getRef(modelName, fullName, () => {
       const model = getModel(modelName, this.builder);

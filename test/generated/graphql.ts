@@ -58,12 +58,24 @@ export type CategoryPostsCountArgs = {
   filter?: InputMaybe<CategoryFilter>;
 };
 
-export type CategoryCreateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput = {
+export type CategoryCreateInput = {
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
+  posts?: InputMaybe<CategoryCreatePostsRelationInput>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
-export type CategoryCreateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtWithoutPostsInput = {
+export type CategoryCreatePostsRelationInput = {
+  connect?: InputMaybe<Array<PostUniqueFilter>>;
+  create?: InputMaybe<Array<PostCreateWithoutCategoriesInput>>;
+};
+
+export type CategoryCreateWithoutPostsInput = {
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type CategoryFilter = {
@@ -92,16 +104,40 @@ export type CategoryUniqueFilter = {
   id?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type CategoryUpdateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput = {
+export type CategoryUpdateInput = {
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  posts?: InputMaybe<CategoryUpdatePostsRelationInput>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
-export type CategoryUpdateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput = {
-  name?: InputMaybe<Scalars['String']['input']>;
+export type CategoryUpdatePostsRelationInput = {
+  connect?: InputMaybe<Array<PostUniqueFilter>>;
+  create?: InputMaybe<Array<PostCreateWithoutCategoriesInput>>;
+  delete?: InputMaybe<Array<PostUniqueFilter>>;
+  deleteMany?: InputMaybe<Array<PostWithoutCategoriesFilter>>;
+  disconnect?: InputMaybe<Array<PostUniqueFilter>>;
+  set?: InputMaybe<Array<PostUniqueFilter>>;
+  update?: InputMaybe<Array<CategoryUpdatePostsRelationInputUpdate>>;
+  updateMany?: InputMaybe<Array<CategoryUpdatePostsRelationInputUpdateMany>>;
 };
 
-export type CategoryUpdateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtWithoutPostsInput = {
+export type CategoryUpdatePostsRelationInputUpdate = {
+  data?: InputMaybe<PostUpdateWithoutCategoriesInput>;
+  where?: InputMaybe<PostUniqueFilter>;
+};
+
+export type CategoryUpdatePostsRelationInputUpdateMany = {
+  data?: InputMaybe<PostUpdateWithoutCategoriesInput>;
+  where?: InputMaybe<PostWithoutCategoriesFilter>;
+};
+
+export type CategoryUpdateWithoutPostsInput = {
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type CategoryWithoutPostsFilter = {
@@ -128,14 +164,19 @@ export type Mutation = {
   __typename?: 'Mutation';
   createManyCategory: Scalars['Int']['output'];
   createManyPost: Scalars['Int']['output'];
+  createManyUser: Scalars['Int']['output'];
   createOneCategory: Category;
   createOnePost: Post;
   createOneUser: User;
   deleteManyCategory: Scalars['Int']['output'];
+  deleteManyPost: Scalars['Int']['output'];
+  deleteManyUser: Scalars['Int']['output'];
   deleteOneCategory: Category;
   deleteOnePost: Post;
+  deleteOneUser: User;
   updateManyCategory: Scalars['Int']['output'];
   updateManyPost: Scalars['Int']['output'];
+  updateManyUser: Scalars['Int']['output'];
   updateOneCategory: Category;
   updateOnePost: Post;
   updateOneUser: User;
@@ -143,32 +184,47 @@ export type Mutation = {
 
 
 export type MutationCreateManyCategoryArgs = {
-  input: Array<CategoryCreateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput>;
+  input: Array<CategoryCreateInput>;
 };
 
 
 export type MutationCreateManyPostArgs = {
-  input: Array<PostCreateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput>;
+  input: Array<PostCreateInput>;
+};
+
+
+export type MutationCreateManyUserArgs = {
+  input: Array<UserCreateInput>;
 };
 
 
 export type MutationCreateOneCategoryArgs = {
-  input: CategoryCreateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput;
+  input: CategoryCreateInput;
 };
 
 
 export type MutationCreateOnePostArgs = {
-  input: PostCreateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput;
+  input: PostCreateInput;
 };
 
 
 export type MutationCreateOneUserArgs = {
-  input: UserCreateWithoutIdWithoutPostsWithoutRolesWithoutCreatedAtWithoutUpdatedAtInput;
+  input: UserCreateInput;
 };
 
 
 export type MutationDeleteManyCategoryArgs = {
   where: CategoryFilter;
+};
+
+
+export type MutationDeleteManyPostArgs = {
+  where: PostFilter;
+};
+
+
+export type MutationDeleteManyUserArgs = {
+  where: UserFilter;
 };
 
 
@@ -182,32 +238,43 @@ export type MutationDeleteOnePostArgs = {
 };
 
 
+export type MutationDeleteOneUserArgs = {
+  where: UserUniqueFilter;
+};
+
+
 export type MutationUpdateManyCategoryArgs = {
-  data: CategoryUpdateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput;
+  data: CategoryUpdateInput;
   where: CategoryFilter;
 };
 
 
 export type MutationUpdateManyPostArgs = {
-  data: PostUpdateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput;
+  data: PostUpdateInput;
   where: PostFilter;
 };
 
 
+export type MutationUpdateManyUserArgs = {
+  data: UserUpdateInput;
+  where: UserFilter;
+};
+
+
 export type MutationUpdateOneCategoryArgs = {
-  data: CategoryUpdateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput;
+  data: CategoryUpdateInput;
   where: CategoryUniqueFilter;
 };
 
 
 export type MutationUpdateOnePostArgs = {
-  data: PostUpdateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput;
+  data: PostUpdateInput;
   where: PostUniqueFilter;
 };
 
 
 export type MutationUpdateOneUserArgs = {
-  data: UserUpdateWithoutIdWithoutEmailWithoutPostsWithoutRolesWithoutCreatedAtWithoutUpdatedAtInput;
+  data: UserUpdateInput;
   where: UserUniqueFilter;
 };
 
@@ -243,17 +310,48 @@ export type PostCategoriesCountArgs = {
   filter?: InputMaybe<PostFilter>;
 };
 
-export type PostCreateCategoriesRelationInput = {
-  connect?: InputMaybe<Array<CategoryUniqueFilter>>;
-  create?: InputMaybe<Array<CategoryCreateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtWithoutPostsInput>>;
+export type PostCreateAuthorRelationInput = {
+  connect?: InputMaybe<UserUniqueFilter>;
+  create?: InputMaybe<UserCreateWithoutPostsInput>;
 };
 
-export type PostCreateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput = {
+export type PostCreateCategoriesRelationInput = {
+  connect?: InputMaybe<Array<CategoryUniqueFilter>>;
+  create?: InputMaybe<Array<CategoryCreateWithoutPostsInput>>;
+};
+
+export type PostCreateInput = {
+  author?: InputMaybe<PostCreateAuthorRelationInput>;
   categories?: InputMaybe<PostCreateCategoriesRelationInput>;
   content?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
   published?: InputMaybe<Scalars['Boolean']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type PostCreateWithoutAuthorInput = {
+  categories?: InputMaybe<PostCreateCategoriesRelationInput>;
+  content?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  published?: InputMaybe<Scalars['Boolean']['input']>;
+  publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type PostCreateWithoutCategoriesInput = {
+  author?: InputMaybe<PostCreateAuthorRelationInput>;
+  content?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  published?: InputMaybe<Scalars['Boolean']['input']>;
+  publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type PostFilter = {
@@ -292,9 +390,17 @@ export type PostUniqueFilter = {
   id?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type PostUpdateAuthorRelationInput = {
+  connect?: InputMaybe<UserUniqueFilter>;
+  create?: InputMaybe<UserCreateWithoutPostsInput>;
+  delete?: InputMaybe<Scalars['Boolean']['input']>;
+  disconnect?: InputMaybe<Scalars['Boolean']['input']>;
+  update?: InputMaybe<UserUpdateWithoutPostsInput>;
+};
+
 export type PostUpdateCategoriesRelationInput = {
   connect?: InputMaybe<Array<CategoryUniqueFilter>>;
-  create?: InputMaybe<Array<CategoryCreateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtWithoutPostsInput>>;
+  create?: InputMaybe<Array<CategoryCreateWithoutPostsInput>>;
   delete?: InputMaybe<Array<CategoryUniqueFilter>>;
   deleteMany?: InputMaybe<Array<CategoryWithoutPostsFilter>>;
   disconnect?: InputMaybe<Array<CategoryUniqueFilter>>;
@@ -304,42 +410,86 @@ export type PostUpdateCategoriesRelationInput = {
 };
 
 export type PostUpdateCategoriesRelationInputUpdate = {
-  data?: InputMaybe<CategoryUpdateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtWithoutPostsInput>;
+  data?: InputMaybe<CategoryUpdateWithoutPostsInput>;
   where?: InputMaybe<CategoryUniqueFilter>;
 };
 
 export type PostUpdateCategoriesRelationInputUpdateMany = {
-  data?: InputMaybe<CategoryUpdateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtWithoutPostsInput>;
+  data?: InputMaybe<CategoryUpdateWithoutPostsInput>;
   where?: InputMaybe<CategoryWithoutPostsFilter>;
 };
 
-export type PostUpdateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput = {
+export type PostUpdateInput = {
+  author?: InputMaybe<PostUpdateAuthorRelationInput>;
   categories?: InputMaybe<PostUpdateCategoriesRelationInput>;
   content?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
   published?: InputMaybe<Scalars['Boolean']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
-export type PostUpdateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput = {
+export type PostUpdateWithoutAuthorInput = {
   categories?: InputMaybe<PostUpdateCategoriesRelationInput>;
   content?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
   published?: InputMaybe<Scalars['Boolean']['input']>;
   publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
   title?: InputMaybe<Scalars['String']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type PostUpdateWithoutCategoriesInput = {
+  author?: InputMaybe<PostUpdateAuthorRelationInput>;
+  content?: InputMaybe<Scalars['String']['input']>;
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  published?: InputMaybe<Scalars['Boolean']['input']>;
+  publishedAt?: InputMaybe<Scalars['DateTime']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type PostWithoutAuthorFilter = {
+  categories?: InputMaybe<CategoryListFilter>;
+  content?: InputMaybe<StringFilter>;
+  createdAt?: InputMaybe<DateTimeFilter>;
+  id?: InputMaybe<StringFilter>;
+  published?: InputMaybe<BooleanFilter>;
+  publishedAt?: InputMaybe<DateTimeFilter>;
+  title?: InputMaybe<StringFilter>;
+  updatedAt?: InputMaybe<DateTimeFilter>;
+};
+
+export type PostWithoutCategoriesFilter = {
+  author?: InputMaybe<UserFilter>;
+  authorId?: InputMaybe<StringFilter>;
+  content?: InputMaybe<StringFilter>;
+  createdAt?: InputMaybe<DateTimeFilter>;
+  id?: InputMaybe<StringFilter>;
+  published?: InputMaybe<BooleanFilter>;
+  publishedAt?: InputMaybe<DateTimeFilter>;
+  title?: InputMaybe<StringFilter>;
+  updatedAt?: InputMaybe<DateTimeFilter>;
 };
 
 export type Query = {
   __typename?: 'Query';
   countCategory: Scalars['Int']['output'];
   countPost: Scalars['Int']['output'];
+  countUser: Scalars['Int']['output'];
   findFirstCategory?: Maybe<Category>;
   findFirstPost?: Maybe<Post>;
+  findFirstUser?: Maybe<User>;
   findManyCategory: Array<Category>;
   findManyPost: Array<Post>;
   findManyUser: Array<User>;
   findUniqueCategory: Category;
   findUniquePost: Post;
+  findUniqueUser: User;
 };
 
 
@@ -353,6 +503,11 @@ export type QueryCountPostArgs = {
 };
 
 
+export type QueryCountUserArgs = {
+  filter?: InputMaybe<UserFilter>;
+};
+
+
 export type QueryFindFirstCategoryArgs = {
   filter?: InputMaybe<CategoryFilter>;
   orderBy?: InputMaybe<Array<CategoryOrderBy>>;
@@ -362,6 +517,12 @@ export type QueryFindFirstCategoryArgs = {
 export type QueryFindFirstPostArgs = {
   filter?: InputMaybe<PostFilter>;
   orderBy?: InputMaybe<Array<PostOrderBy>>;
+};
+
+
+export type QueryFindFirstUserArgs = {
+  filter?: InputMaybe<UserFilter>;
+  orderBy?: InputMaybe<Array<UserOrderBy>>;
 };
 
 
@@ -396,6 +557,11 @@ export type QueryFindUniqueCategoryArgs = {
 
 export type QueryFindUniquePostArgs = {
   filter: PostUniqueFilter;
+};
+
+
+export type QueryFindUniqueUserArgs = {
+  filter: UserUniqueFilter;
 };
 
 export enum Role {
@@ -452,9 +618,28 @@ export type UserPostsCountArgs = {
   filter?: InputMaybe<UserFilter>;
 };
 
-export type UserCreateWithoutIdWithoutPostsWithoutRolesWithoutCreatedAtWithoutUpdatedAtInput = {
+export type UserCreateInput = {
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
   email: Scalars['String']['input'];
+  id?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  posts?: InputMaybe<UserCreatePostsRelationInput>;
+  roles?: InputMaybe<Array<Role>>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type UserCreatePostsRelationInput = {
+  connect?: InputMaybe<Array<PostUniqueFilter>>;
+  create?: InputMaybe<Array<PostCreateWithoutAuthorInput>>;
+};
+
+export type UserCreateWithoutPostsInput = {
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  email: Scalars['String']['input'];
+  id?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  roles?: InputMaybe<Array<Role>>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
 export type UserFilter = {
@@ -482,118 +667,738 @@ export type UserUniqueFilter = {
   id?: InputMaybe<Scalars['String']['input']>;
 };
 
-export type UserUpdateWithoutIdWithoutEmailWithoutPostsWithoutRolesWithoutCreatedAtWithoutUpdatedAtInput = {
+export type UserUpdateInput = {
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  posts?: InputMaybe<UserUpdatePostsRelationInput>;
+  roles?: InputMaybe<Array<Role>>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
 };
 
-export type FindManyCategoryQueryVariables = Exact<{
-  filter?: InputMaybe<CategoryFilter>;
-  orderBy?: InputMaybe<Array<CategoryOrderBy> | CategoryOrderBy>;
-  postsFilter?: InputMaybe<PostFilter>;
-  postsOrderBy?: InputMaybe<Array<PostOrderBy> | PostOrderBy>;
+export type UserUpdatePostsRelationInput = {
+  connect?: InputMaybe<Array<PostUniqueFilter>>;
+  create?: InputMaybe<Array<PostCreateWithoutAuthorInput>>;
+  delete?: InputMaybe<Array<PostUniqueFilter>>;
+  deleteMany?: InputMaybe<Array<PostWithoutAuthorFilter>>;
+  disconnect?: InputMaybe<Array<PostUniqueFilter>>;
+  set?: InputMaybe<Array<PostUniqueFilter>>;
+  update?: InputMaybe<Array<UserUpdatePostsRelationInputUpdate>>;
+  updateMany?: InputMaybe<Array<UserUpdatePostsRelationInputUpdateMany>>;
+};
+
+export type UserUpdatePostsRelationInputUpdate = {
+  data?: InputMaybe<PostUpdateWithoutAuthorInput>;
+  where?: InputMaybe<PostUniqueFilter>;
+};
+
+export type UserUpdatePostsRelationInputUpdateMany = {
+  data?: InputMaybe<PostUpdateWithoutAuthorInput>;
+  where?: InputMaybe<PostWithoutAuthorFilter>;
+};
+
+export type UserUpdateWithoutPostsInput = {
+  createdAt?: InputMaybe<Scalars['DateTime']['input']>;
+  email?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  roles?: InputMaybe<Array<Role>>;
+  updatedAt?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type UserFragment = { __typename?: 'User', id: string, email: string, name: string, roles: Array<Role>, createdAt: string, updatedAt: string };
+
+export type CategoryFragment = { __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string };
+
+export type PostFragment = { __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, categoriesCount: number, updatedAt: string, publishedAt: string };
+
+export type CountUserQueryVariables = Exact<{
+  filter?: InputMaybe<UserFilter>;
 }>;
 
 
-export type FindManyCategoryQuery = { __typename?: 'Query', findManyCategory: Array<{ __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string, posts: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, updatedAt: string, publishedAt: string, author?: { __typename?: 'User', id: string, name: string, createdAt: string, updatedAt: string } | null }> }> };
+export type CountUserQuery = { __typename?: 'Query', countUser: number };
 
-export type FindManyPostQueryVariables = Exact<{ [key: string]: never; }>;
+export type CountPostQueryVariables = Exact<{
+  filter?: InputMaybe<PostFilter>;
+}>;
 
 
-export type FindManyPostQuery = { __typename?: 'Query', findManyPost: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, updatedAt: string, publishedAt: string, author?: { __typename?: 'User', id: string, name: string, createdAt: string, updatedAt: string } | null, categories: Array<{ __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string }> }> };
+export type CountPostQuery = { __typename?: 'Query', countPost: number };
+
+export type CountCategoryQueryVariables = Exact<{
+  filter?: InputMaybe<CategoryFilter>;
+}>;
+
+
+export type CountCategoryQuery = { __typename?: 'Query', countCategory: number };
+
+export type FindUniqueUserQueryVariables = Exact<{
+  filter: UserUniqueFilter;
+  postFilter?: InputMaybe<PostFilter>;
+  postOrderBy?: InputMaybe<Array<PostOrderBy> | PostOrderBy>;
+  postLimit?: InputMaybe<Scalars['Int']['input']>;
+  postOffset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type FindUniqueUserQuery = { __typename?: 'Query', findUniqueUser: { __typename?: 'User', postsCount: number, id: string, email: string, name: string, roles: Array<Role>, createdAt: string, updatedAt: string, posts: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, categoriesCount: number, updatedAt: string, publishedAt: string }> } };
+
+export type FindUniquePostQueryVariables = Exact<{
+  postFilter: PostUniqueFilter;
+  categoryFilter?: InputMaybe<CategoryFilter>;
+  categoryOrderBy?: InputMaybe<Array<CategoryOrderBy> | CategoryOrderBy>;
+  categoryLimit?: InputMaybe<Scalars['Int']['input']>;
+  categoryOffset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type FindUniquePostQuery = { __typename?: 'Query', findUniquePost: { __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, categoriesCount: number, updatedAt: string, publishedAt: string, author?: { __typename?: 'User', id: string, email: string, name: string, roles: Array<Role>, createdAt: string, updatedAt: string } | null, categories: Array<{ __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string }> } };
+
+export type FindUniqueCategoryQueryVariables = Exact<{
+  categoryFilter: CategoryUniqueFilter;
+  postFilter?: InputMaybe<PostFilter>;
+  postOrderBy?: InputMaybe<Array<PostOrderBy> | PostOrderBy>;
+  postLimit?: InputMaybe<Scalars['Int']['input']>;
+  postOffset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type FindUniqueCategoryQuery = { __typename?: 'Query', findUniqueCategory: { __typename?: 'Category', postsCount: number, id: string, name: string, createdAt: string, updatedAt: string, posts: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, categoriesCount: number, updatedAt: string, publishedAt: string }> } };
+
+export type FindFirstUserQueryVariables = Exact<{
+  userFilter?: InputMaybe<UserFilter>;
+  userOrderBy?: InputMaybe<Array<UserOrderBy> | UserOrderBy>;
+  postFilter?: InputMaybe<PostFilter>;
+  postOrderBy?: InputMaybe<Array<PostOrderBy> | PostOrderBy>;
+  postLimit?: InputMaybe<Scalars['Int']['input']>;
+  postOffset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type FindFirstUserQuery = { __typename?: 'Query', findFirstUser?: { __typename?: 'User', postsCount: number, id: string, email: string, name: string, roles: Array<Role>, createdAt: string, updatedAt: string, posts: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, categoriesCount: number, updatedAt: string, publishedAt: string }> } | null };
+
+export type FindFirstPostQueryVariables = Exact<{
+  postFilter?: InputMaybe<PostFilter>;
+  postOrderBy?: InputMaybe<Array<PostOrderBy> | PostOrderBy>;
+  categoryFilter?: InputMaybe<CategoryFilter>;
+  categoryOrderBy?: InputMaybe<Array<CategoryOrderBy> | CategoryOrderBy>;
+  categoryLimit?: InputMaybe<Scalars['Int']['input']>;
+  categoryOffset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type FindFirstPostQuery = { __typename?: 'Query', findFirstPost?: { __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, categoriesCount: number, updatedAt: string, publishedAt: string, author?: { __typename?: 'User', id: string, email: string, name: string, roles: Array<Role>, createdAt: string, updatedAt: string } | null, categories: Array<{ __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string }> } | null };
+
+export type FindManyUserQueryVariables = Exact<{
+  userFilter?: InputMaybe<UserFilter>;
+  userOrderBy?: InputMaybe<Array<UserOrderBy> | UserOrderBy>;
+  userLimit?: InputMaybe<Scalars['Int']['input']>;
+  userOffset?: InputMaybe<Scalars['Int']['input']>;
+  postFilter?: InputMaybe<PostFilter>;
+  postOrderBy?: InputMaybe<Array<PostOrderBy> | PostOrderBy>;
+  postLimit?: InputMaybe<Scalars['Int']['input']>;
+  postOffset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type FindManyUserQuery = { __typename?: 'Query', findManyUser: Array<{ __typename?: 'User', postsCount: number, id: string, email: string, name: string, roles: Array<Role>, createdAt: string, updatedAt: string, posts: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, categoriesCount: number, updatedAt: string, publishedAt: string }> }> };
+
+export type FindFirstCategoryQueryVariables = Exact<{
+  categoryFilter?: InputMaybe<CategoryFilter>;
+  categoryOrderBy?: InputMaybe<Array<CategoryOrderBy> | CategoryOrderBy>;
+  postFilter?: InputMaybe<PostFilter>;
+  postOrderBy?: InputMaybe<Array<PostOrderBy> | PostOrderBy>;
+  postLimit?: InputMaybe<Scalars['Int']['input']>;
+  postOffset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type FindFirstCategoryQuery = { __typename?: 'Query', findFirstCategory?: { __typename?: 'Category', postsCount: number, id: string, name: string, createdAt: string, updatedAt: string, posts: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, categoriesCount: number, updatedAt: string, publishedAt: string }> } | null };
+
+export type FindManyPostQueryVariables = Exact<{
+  postFilter?: InputMaybe<PostFilter>;
+  postLimit?: InputMaybe<Scalars['Int']['input']>;
+  postOffset?: InputMaybe<Scalars['Int']['input']>;
+  postOrderBy?: InputMaybe<Array<PostOrderBy> | PostOrderBy>;
+  categoryFilter?: InputMaybe<CategoryFilter>;
+  categoryOrderBy?: InputMaybe<Array<CategoryOrderBy> | CategoryOrderBy>;
+  categoryLimit?: InputMaybe<Scalars['Int']['input']>;
+  categoryOffset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type FindManyPostQuery = { __typename?: 'Query', findManyPost: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, categoriesCount: number, updatedAt: string, publishedAt: string, author?: { __typename?: 'User', id: string, email: string, name: string, roles: Array<Role>, createdAt: string, updatedAt: string } | null, categories: Array<{ __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string }> }> };
+
+export type FindManyCategoryQueryVariables = Exact<{
+  categoryFilter?: InputMaybe<CategoryFilter>;
+  categoryOrderBy?: InputMaybe<Array<CategoryOrderBy> | CategoryOrderBy>;
+  categoryLimit?: InputMaybe<Scalars['Int']['input']>;
+  categoryOffset?: InputMaybe<Scalars['Int']['input']>;
+  postFilter?: InputMaybe<PostFilter>;
+  postOrderBy?: InputMaybe<Array<PostOrderBy> | PostOrderBy>;
+  postLimit?: InputMaybe<Scalars['Int']['input']>;
+  postOffset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type FindManyCategoryQuery = { __typename?: 'Query', findManyCategory: Array<{ __typename?: 'Category', postsCount: number, id: string, name: string, createdAt: string, updatedAt: string, posts: Array<{ __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, categoriesCount: number, updatedAt: string, publishedAt: string }> }> };
+
+export type CreateOneUserMutationVariables = Exact<{
+  input: UserCreateInput;
+}>;
+
+
+export type CreateOneUserMutation = { __typename?: 'Mutation', createOneUser: { __typename?: 'User', id: string, email: string, name: string, roles: Array<Role>, createdAt: string, updatedAt: string } };
 
 export type CreateOnePostMutationVariables = Exact<{
-  input: PostCreateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput;
+  input: PostCreateInput;
 }>;
 
 
-export type CreateOnePostMutation = { __typename?: 'Mutation', createOnePost: { __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, updatedAt: string, publishedAt: string, author?: { __typename?: 'User', id: string, name: string, createdAt: string, updatedAt: string } | null, categories: Array<{ __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string }> } };
+export type CreateOnePostMutation = { __typename?: 'Mutation', createOnePost: { __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, categoriesCount: number, updatedAt: string, publishedAt: string } };
+
+export type CreateOneCategoryMutationVariables = Exact<{
+  input: CategoryCreateInput;
+}>;
 
 
-export const FindManyCategoryDocument = gql`
-    query FindManyCategory($filter: CategoryFilter, $orderBy: [CategoryOrderBy!], $postsFilter: PostFilter, $postsOrderBy: [PostOrderBy!]) {
-  findManyCategory(filter: $filter, orderBy: $orderBy) {
-    id
-    name
-    posts(filter: $postsFilter, orderBy: $postsOrderBy) {
-      id
-      published
-      title
-      content
-      author {
-        id
-        name
-        createdAt
-        updatedAt
-      }
-      updatedAt
-      publishedAt
-    }
-    createdAt
-    updatedAt
-  }
+export type CreateOneCategoryMutation = { __typename?: 'Mutation', createOneCategory: { __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string } };
+
+export type CreateManyUserMutationVariables = Exact<{
+  input: Array<UserCreateInput> | UserCreateInput;
+}>;
+
+
+export type CreateManyUserMutation = { __typename?: 'Mutation', createManyUser: number };
+
+export type CreateManyPostMutationVariables = Exact<{
+  input: Array<PostCreateInput> | PostCreateInput;
+}>;
+
+
+export type CreateManyPostMutation = { __typename?: 'Mutation', createManyPost: number };
+
+export type CreateManyCategoryMutationVariables = Exact<{
+  input: Array<CategoryCreateInput> | CategoryCreateInput;
+}>;
+
+
+export type CreateManyCategoryMutation = { __typename?: 'Mutation', createManyCategory: number };
+
+export type UpdateOneUserMutationVariables = Exact<{
+  where: UserUniqueFilter;
+  data: UserUpdateInput;
+}>;
+
+
+export type UpdateOneUserMutation = { __typename?: 'Mutation', updateOneUser: { __typename?: 'User', id: string, email: string, name: string, roles: Array<Role>, createdAt: string, updatedAt: string } };
+
+export type UpdateOnePostMutationVariables = Exact<{
+  where: PostUniqueFilter;
+  data: PostUpdateInput;
+}>;
+
+
+export type UpdateOnePostMutation = { __typename?: 'Mutation', updateOnePost: { __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, categoriesCount: number, updatedAt: string, publishedAt: string } };
+
+export type UpdateOneCategoryMutationVariables = Exact<{
+  where: CategoryUniqueFilter;
+  data: CategoryUpdateInput;
+}>;
+
+
+export type UpdateOneCategoryMutation = { __typename?: 'Mutation', updateOneCategory: { __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string } };
+
+export type UpdateManyUserMutationVariables = Exact<{
+  where: UserFilter;
+  data: UserUpdateInput;
+}>;
+
+
+export type UpdateManyUserMutation = { __typename?: 'Mutation', updateManyUser: number };
+
+export type UpdateManyPostMutationVariables = Exact<{
+  where: PostFilter;
+  data: PostUpdateInput;
+}>;
+
+
+export type UpdateManyPostMutation = { __typename?: 'Mutation', updateManyPost: number };
+
+export type UpdateManyCategoryMutationVariables = Exact<{
+  where: CategoryFilter;
+  data: CategoryUpdateInput;
+}>;
+
+
+export type UpdateManyCategoryMutation = { __typename?: 'Mutation', updateManyCategory: number };
+
+export type DeleteOneUserMutationVariables = Exact<{
+  where: UserUniqueFilter;
+}>;
+
+
+export type DeleteOneUserMutation = { __typename?: 'Mutation', deleteOneUser: { __typename?: 'User', id: string, email: string, name: string, roles: Array<Role>, createdAt: string, updatedAt: string } };
+
+export type DeleteOnePostMutationVariables = Exact<{
+  where: PostUniqueFilter;
+}>;
+
+
+export type DeleteOnePostMutation = { __typename?: 'Mutation', deleteOnePost: { __typename?: 'Post', id: string, published: boolean, title: string, content: string, authorId?: string | null, categoriesCount: number, updatedAt: string, publishedAt: string } };
+
+export type DeleteOneCategoryMutationVariables = Exact<{
+  where: CategoryUniqueFilter;
+}>;
+
+
+export type DeleteOneCategoryMutation = { __typename?: 'Mutation', deleteOneCategory: { __typename?: 'Category', id: string, name: string, createdAt: string, updatedAt: string } };
+
+export type DeleteManyUserMutationVariables = Exact<{
+  where: UserFilter;
+}>;
+
+
+export type DeleteManyUserMutation = { __typename?: 'Mutation', deleteManyUser: number };
+
+export type DeleteManyPostMutationVariables = Exact<{
+  where: PostFilter;
+}>;
+
+
+export type DeleteManyPostMutation = { __typename?: 'Mutation', deleteManyPost: number };
+
+export type DeleteManyCategoryMutationVariables = Exact<{
+  where: CategoryFilter;
+}>;
+
+
+export type DeleteManyCategoryMutation = { __typename?: 'Mutation', deleteManyCategory: number };
+
+export const UserFragmentDoc = gql`
+    fragment user on User {
+  id
+  email
+  name
+  roles
+  createdAt
+  updatedAt
 }
     `;
+export const CategoryFragmentDoc = gql`
+    fragment category on Category {
+  id
+  name
+  createdAt
+  updatedAt
+}
+    `;
+export const PostFragmentDoc = gql`
+    fragment post on Post {
+  id
+  published
+  title
+  content
+  authorId
+  categoriesCount
+  updatedAt
+  publishedAt
+}
+    `;
+export const CountUserDocument = gql`
+    query CountUser($filter: UserFilter) {
+  countUser(filter: $filter)
+}
+    `;
+export const CountPostDocument = gql`
+    query CountPost($filter: PostFilter) {
+  countPost(filter: $filter)
+}
+    `;
+export const CountCategoryDocument = gql`
+    query CountCategory($filter: CategoryFilter) {
+  countCategory(filter: $filter)
+}
+    `;
+export const FindUniqueUserDocument = gql`
+    query FindUniqueUser($filter: UserUniqueFilter!, $postFilter: PostFilter, $postOrderBy: [PostOrderBy!], $postLimit: Int, $postOffset: Int) {
+  findUniqueUser(filter: $filter) {
+    ...user
+    posts(
+      filter: $postFilter
+      orderBy: $postOrderBy
+      limit: $postLimit
+      offset: $postOffset
+    ) {
+      ...post
+    }
+    postsCount
+  }
+}
+    ${UserFragmentDoc}
+${PostFragmentDoc}`;
+export const FindUniquePostDocument = gql`
+    query FindUniquePost($postFilter: PostUniqueFilter!, $categoryFilter: CategoryFilter, $categoryOrderBy: [CategoryOrderBy!], $categoryLimit: Int, $categoryOffset: Int) {
+  findUniquePost(filter: $postFilter) {
+    ...post
+    author {
+      ...user
+    }
+    categories(
+      filter: $categoryFilter
+      orderBy: $categoryOrderBy
+      limit: $categoryLimit
+      offset: $categoryOffset
+    ) {
+      ...category
+    }
+  }
+}
+    ${PostFragmentDoc}
+${UserFragmentDoc}
+${CategoryFragmentDoc}`;
+export const FindUniqueCategoryDocument = gql`
+    query FindUniqueCategory($categoryFilter: CategoryUniqueFilter!, $postFilter: PostFilter, $postOrderBy: [PostOrderBy!], $postLimit: Int, $postOffset: Int) {
+  findUniqueCategory(filter: $categoryFilter) {
+    ...category
+    posts(
+      filter: $postFilter
+      orderBy: $postOrderBy
+      limit: $postLimit
+      offset: $postOffset
+    ) {
+      ...post
+    }
+    postsCount
+  }
+}
+    ${CategoryFragmentDoc}
+${PostFragmentDoc}`;
+export const FindFirstUserDocument = gql`
+    query FindFirstUser($userFilter: UserFilter, $userOrderBy: [UserOrderBy!], $postFilter: PostFilter, $postOrderBy: [PostOrderBy!], $postLimit: Int, $postOffset: Int) {
+  findFirstUser(filter: $userFilter, orderBy: $userOrderBy) {
+    ...user
+    posts(
+      filter: $postFilter
+      orderBy: $postOrderBy
+      limit: $postLimit
+      offset: $postOffset
+    ) {
+      ...post
+    }
+    postsCount
+  }
+}
+    ${UserFragmentDoc}
+${PostFragmentDoc}`;
+export const FindFirstPostDocument = gql`
+    query FindFirstPost($postFilter: PostFilter, $postOrderBy: [PostOrderBy!], $categoryFilter: CategoryFilter, $categoryOrderBy: [CategoryOrderBy!], $categoryLimit: Int, $categoryOffset: Int) {
+  findFirstPost(filter: $postFilter, orderBy: $postOrderBy) {
+    ...post
+    author {
+      ...user
+    }
+    categories(
+      filter: $categoryFilter
+      orderBy: $categoryOrderBy
+      limit: $categoryLimit
+      offset: $categoryOffset
+    ) {
+      ...category
+    }
+  }
+}
+    ${PostFragmentDoc}
+${UserFragmentDoc}
+${CategoryFragmentDoc}`;
+export const FindManyUserDocument = gql`
+    query FindManyUser($userFilter: UserFilter, $userOrderBy: [UserOrderBy!], $userLimit: Int, $userOffset: Int, $postFilter: PostFilter, $postOrderBy: [PostOrderBy!], $postLimit: Int, $postOffset: Int) {
+  findManyUser(
+    filter: $userFilter
+    orderBy: $userOrderBy
+    limit: $userLimit
+    offset: $userOffset
+  ) {
+    ...user
+    posts(
+      filter: $postFilter
+      orderBy: $postOrderBy
+      limit: $postLimit
+      offset: $postOffset
+    ) {
+      ...post
+    }
+    postsCount
+  }
+}
+    ${UserFragmentDoc}
+${PostFragmentDoc}`;
+export const FindFirstCategoryDocument = gql`
+    query FindFirstCategory($categoryFilter: CategoryFilter, $categoryOrderBy: [CategoryOrderBy!], $postFilter: PostFilter, $postOrderBy: [PostOrderBy!], $postLimit: Int, $postOffset: Int) {
+  findFirstCategory(filter: $categoryFilter, orderBy: $categoryOrderBy) {
+    ...category
+    posts(
+      filter: $postFilter
+      orderBy: $postOrderBy
+      limit: $postLimit
+      offset: $postOffset
+    ) {
+      ...post
+    }
+    postsCount
+  }
+}
+    ${CategoryFragmentDoc}
+${PostFragmentDoc}`;
 export const FindManyPostDocument = gql`
-    query FindManyPost {
-  findManyPost {
-    id
-    published
-    title
-    content
+    query FindManyPost($postFilter: PostFilter, $postLimit: Int, $postOffset: Int, $postOrderBy: [PostOrderBy!], $categoryFilter: CategoryFilter, $categoryOrderBy: [CategoryOrderBy!], $categoryLimit: Int, $categoryOffset: Int) {
+  findManyPost(
+    filter: $postFilter
+    orderBy: $postOrderBy
+    limit: $postLimit
+    offset: $postOffset
+  ) {
+    ...post
     author {
-      id
-      name
-      createdAt
-      updatedAt
+      ...user
     }
-    authorId
-    categories {
-      id
-      name
-      createdAt
-      updatedAt
+    categories(
+      filter: $categoryFilter
+      orderBy: $categoryOrderBy
+      limit: $categoryLimit
+      offset: $categoryOffset
+    ) {
+      ...category
     }
-    updatedAt
-    publishedAt
   }
 }
-    `;
-export const CreateOnePostDocument = gql`
-    mutation CreateOnePost($input: PostCreateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput!) {
-  createOnePost(input: $input) {
-    id
-    published
-    title
-    content
-    author {
-      id
-      name
-      createdAt
-      updatedAt
+    ${PostFragmentDoc}
+${UserFragmentDoc}
+${CategoryFragmentDoc}`;
+export const FindManyCategoryDocument = gql`
+    query FindManyCategory($categoryFilter: CategoryFilter, $categoryOrderBy: [CategoryOrderBy!], $categoryLimit: Int, $categoryOffset: Int, $postFilter: PostFilter, $postOrderBy: [PostOrderBy!], $postLimit: Int, $postOffset: Int) {
+  findManyCategory(
+    filter: $categoryFilter
+    orderBy: $categoryOrderBy
+    limit: $categoryLimit
+    offset: $categoryOffset
+  ) {
+    ...category
+    posts(
+      filter: $postFilter
+      orderBy: $postOrderBy
+      limit: $postLimit
+      offset: $postOffset
+    ) {
+      ...post
     }
-    authorId
-    categories {
-      id
-      name
-      createdAt
-      updatedAt
-    }
-    updatedAt
-    publishedAt
+    postsCount
   }
+}
+    ${CategoryFragmentDoc}
+${PostFragmentDoc}`;
+export const CreateOneUserDocument = gql`
+    mutation CreateOneUser($input: UserCreateInput!) {
+  createOneUser(input: $input) {
+    ...user
+  }
+}
+    ${UserFragmentDoc}`;
+export const CreateOnePostDocument = gql`
+    mutation CreateOnePost($input: PostCreateInput!) {
+  createOnePost(input: $input) {
+    ...post
+  }
+}
+    ${PostFragmentDoc}`;
+export const CreateOneCategoryDocument = gql`
+    mutation CreateOneCategory($input: CategoryCreateInput!) {
+  createOneCategory(input: $input) {
+    ...category
+  }
+}
+    ${CategoryFragmentDoc}`;
+export const CreateManyUserDocument = gql`
+    mutation CreateManyUser($input: [UserCreateInput!]!) {
+  createManyUser(input: $input)
+}
+    `;
+export const CreateManyPostDocument = gql`
+    mutation CreateManyPost($input: [PostCreateInput!]!) {
+  createManyPost(input: $input)
+}
+    `;
+export const CreateManyCategoryDocument = gql`
+    mutation CreateManyCategory($input: [CategoryCreateInput!]!) {
+  createManyCategory(input: $input)
+}
+    `;
+export const UpdateOneUserDocument = gql`
+    mutation UpdateOneUser($where: UserUniqueFilter!, $data: UserUpdateInput!) {
+  updateOneUser(where: $where, data: $data) {
+    ...user
+  }
+}
+    ${UserFragmentDoc}`;
+export const UpdateOnePostDocument = gql`
+    mutation UpdateOnePost($where: PostUniqueFilter!, $data: PostUpdateInput!) {
+  updateOnePost(where: $where, data: $data) {
+    ...post
+  }
+}
+    ${PostFragmentDoc}`;
+export const UpdateOneCategoryDocument = gql`
+    mutation UpdateOneCategory($where: CategoryUniqueFilter!, $data: CategoryUpdateInput!) {
+  updateOneCategory(where: $where, data: $data) {
+    ...category
+  }
+}
+    ${CategoryFragmentDoc}`;
+export const UpdateManyUserDocument = gql`
+    mutation UpdateManyUser($where: UserFilter!, $data: UserUpdateInput!) {
+  updateManyUser(where: $where, data: $data)
+}
+    `;
+export const UpdateManyPostDocument = gql`
+    mutation UpdateManyPost($where: PostFilter!, $data: PostUpdateInput!) {
+  updateManyPost(where: $where, data: $data)
+}
+    `;
+export const UpdateManyCategoryDocument = gql`
+    mutation UpdateManyCategory($where: CategoryFilter!, $data: CategoryUpdateInput!) {
+  updateManyCategory(where: $where, data: $data)
+}
+    `;
+export const DeleteOneUserDocument = gql`
+    mutation DeleteOneUser($where: UserUniqueFilter!) {
+  deleteOneUser(where: $where) {
+    ...user
+  }
+}
+    ${UserFragmentDoc}`;
+export const DeleteOnePostDocument = gql`
+    mutation DeleteOnePost($where: PostUniqueFilter!) {
+  deleteOnePost(where: $where) {
+    ...post
+  }
+}
+    ${PostFragmentDoc}`;
+export const DeleteOneCategoryDocument = gql`
+    mutation DeleteOneCategory($where: CategoryUniqueFilter!) {
+  deleteOneCategory(where: $where) {
+    ...category
+  }
+}
+    ${CategoryFragmentDoc}`;
+export const DeleteManyUserDocument = gql`
+    mutation DeleteManyUser($where: UserFilter!) {
+  deleteManyUser(where: $where)
+}
+    `;
+export const DeleteManyPostDocument = gql`
+    mutation DeleteManyPost($where: PostFilter!) {
+  deleteManyPost(where: $where)
+}
+    `;
+export const DeleteManyCategoryDocument = gql`
+    mutation DeleteManyCategory($where: CategoryFilter!) {
+  deleteManyCategory(where: $where)
 }
     `;
 export type Requester<C = {}, E = unknown> = <R, V>(doc: DocumentNode, vars?: V, options?: C) => Promise<R> | AsyncIterable<R>
 export function getSdk<C, E>(requester: Requester<C, E>) {
   return {
-    FindManyCategory(variables?: FindManyCategoryQueryVariables, options?: C): Promise<FindManyCategoryQuery> {
-      return requester<FindManyCategoryQuery, FindManyCategoryQueryVariables>(FindManyCategoryDocument, variables, options) as Promise<FindManyCategoryQuery>;
+    CountUser(variables?: CountUserQueryVariables, options?: C): Promise<CountUserQuery> {
+      return requester<CountUserQuery, CountUserQueryVariables>(CountUserDocument, variables, options) as Promise<CountUserQuery>;
+    },
+    CountPost(variables?: CountPostQueryVariables, options?: C): Promise<CountPostQuery> {
+      return requester<CountPostQuery, CountPostQueryVariables>(CountPostDocument, variables, options) as Promise<CountPostQuery>;
+    },
+    CountCategory(variables?: CountCategoryQueryVariables, options?: C): Promise<CountCategoryQuery> {
+      return requester<CountCategoryQuery, CountCategoryQueryVariables>(CountCategoryDocument, variables, options) as Promise<CountCategoryQuery>;
+    },
+    FindUniqueUser(variables: FindUniqueUserQueryVariables, options?: C): Promise<FindUniqueUserQuery> {
+      return requester<FindUniqueUserQuery, FindUniqueUserQueryVariables>(FindUniqueUserDocument, variables, options) as Promise<FindUniqueUserQuery>;
+    },
+    FindUniquePost(variables: FindUniquePostQueryVariables, options?: C): Promise<FindUniquePostQuery> {
+      return requester<FindUniquePostQuery, FindUniquePostQueryVariables>(FindUniquePostDocument, variables, options) as Promise<FindUniquePostQuery>;
+    },
+    FindUniqueCategory(variables: FindUniqueCategoryQueryVariables, options?: C): Promise<FindUniqueCategoryQuery> {
+      return requester<FindUniqueCategoryQuery, FindUniqueCategoryQueryVariables>(FindUniqueCategoryDocument, variables, options) as Promise<FindUniqueCategoryQuery>;
+    },
+    FindFirstUser(variables?: FindFirstUserQueryVariables, options?: C): Promise<FindFirstUserQuery> {
+      return requester<FindFirstUserQuery, FindFirstUserQueryVariables>(FindFirstUserDocument, variables, options) as Promise<FindFirstUserQuery>;
+    },
+    FindFirstPost(variables?: FindFirstPostQueryVariables, options?: C): Promise<FindFirstPostQuery> {
+      return requester<FindFirstPostQuery, FindFirstPostQueryVariables>(FindFirstPostDocument, variables, options) as Promise<FindFirstPostQuery>;
+    },
+    FindManyUser(variables?: FindManyUserQueryVariables, options?: C): Promise<FindManyUserQuery> {
+      return requester<FindManyUserQuery, FindManyUserQueryVariables>(FindManyUserDocument, variables, options) as Promise<FindManyUserQuery>;
+    },
+    FindFirstCategory(variables?: FindFirstCategoryQueryVariables, options?: C): Promise<FindFirstCategoryQuery> {
+      return requester<FindFirstCategoryQuery, FindFirstCategoryQueryVariables>(FindFirstCategoryDocument, variables, options) as Promise<FindFirstCategoryQuery>;
     },
     FindManyPost(variables?: FindManyPostQueryVariables, options?: C): Promise<FindManyPostQuery> {
       return requester<FindManyPostQuery, FindManyPostQueryVariables>(FindManyPostDocument, variables, options) as Promise<FindManyPostQuery>;
     },
+    FindManyCategory(variables?: FindManyCategoryQueryVariables, options?: C): Promise<FindManyCategoryQuery> {
+      return requester<FindManyCategoryQuery, FindManyCategoryQueryVariables>(FindManyCategoryDocument, variables, options) as Promise<FindManyCategoryQuery>;
+    },
+    CreateOneUser(variables: CreateOneUserMutationVariables, options?: C): Promise<CreateOneUserMutation> {
+      return requester<CreateOneUserMutation, CreateOneUserMutationVariables>(CreateOneUserDocument, variables, options) as Promise<CreateOneUserMutation>;
+    },
     CreateOnePost(variables: CreateOnePostMutationVariables, options?: C): Promise<CreateOnePostMutation> {
       return requester<CreateOnePostMutation, CreateOnePostMutationVariables>(CreateOnePostDocument, variables, options) as Promise<CreateOnePostMutation>;
+    },
+    CreateOneCategory(variables: CreateOneCategoryMutationVariables, options?: C): Promise<CreateOneCategoryMutation> {
+      return requester<CreateOneCategoryMutation, CreateOneCategoryMutationVariables>(CreateOneCategoryDocument, variables, options) as Promise<CreateOneCategoryMutation>;
+    },
+    CreateManyUser(variables: CreateManyUserMutationVariables, options?: C): Promise<CreateManyUserMutation> {
+      return requester<CreateManyUserMutation, CreateManyUserMutationVariables>(CreateManyUserDocument, variables, options) as Promise<CreateManyUserMutation>;
+    },
+    CreateManyPost(variables: CreateManyPostMutationVariables, options?: C): Promise<CreateManyPostMutation> {
+      return requester<CreateManyPostMutation, CreateManyPostMutationVariables>(CreateManyPostDocument, variables, options) as Promise<CreateManyPostMutation>;
+    },
+    CreateManyCategory(variables: CreateManyCategoryMutationVariables, options?: C): Promise<CreateManyCategoryMutation> {
+      return requester<CreateManyCategoryMutation, CreateManyCategoryMutationVariables>(CreateManyCategoryDocument, variables, options) as Promise<CreateManyCategoryMutation>;
+    },
+    UpdateOneUser(variables: UpdateOneUserMutationVariables, options?: C): Promise<UpdateOneUserMutation> {
+      return requester<UpdateOneUserMutation, UpdateOneUserMutationVariables>(UpdateOneUserDocument, variables, options) as Promise<UpdateOneUserMutation>;
+    },
+    UpdateOnePost(variables: UpdateOnePostMutationVariables, options?: C): Promise<UpdateOnePostMutation> {
+      return requester<UpdateOnePostMutation, UpdateOnePostMutationVariables>(UpdateOnePostDocument, variables, options) as Promise<UpdateOnePostMutation>;
+    },
+    UpdateOneCategory(variables: UpdateOneCategoryMutationVariables, options?: C): Promise<UpdateOneCategoryMutation> {
+      return requester<UpdateOneCategoryMutation, UpdateOneCategoryMutationVariables>(UpdateOneCategoryDocument, variables, options) as Promise<UpdateOneCategoryMutation>;
+    },
+    UpdateManyUser(variables: UpdateManyUserMutationVariables, options?: C): Promise<UpdateManyUserMutation> {
+      return requester<UpdateManyUserMutation, UpdateManyUserMutationVariables>(UpdateManyUserDocument, variables, options) as Promise<UpdateManyUserMutation>;
+    },
+    UpdateManyPost(variables: UpdateManyPostMutationVariables, options?: C): Promise<UpdateManyPostMutation> {
+      return requester<UpdateManyPostMutation, UpdateManyPostMutationVariables>(UpdateManyPostDocument, variables, options) as Promise<UpdateManyPostMutation>;
+    },
+    UpdateManyCategory(variables: UpdateManyCategoryMutationVariables, options?: C): Promise<UpdateManyCategoryMutation> {
+      return requester<UpdateManyCategoryMutation, UpdateManyCategoryMutationVariables>(UpdateManyCategoryDocument, variables, options) as Promise<UpdateManyCategoryMutation>;
+    },
+    DeleteOneUser(variables: DeleteOneUserMutationVariables, options?: C): Promise<DeleteOneUserMutation> {
+      return requester<DeleteOneUserMutation, DeleteOneUserMutationVariables>(DeleteOneUserDocument, variables, options) as Promise<DeleteOneUserMutation>;
+    },
+    DeleteOnePost(variables: DeleteOnePostMutationVariables, options?: C): Promise<DeleteOnePostMutation> {
+      return requester<DeleteOnePostMutation, DeleteOnePostMutationVariables>(DeleteOnePostDocument, variables, options) as Promise<DeleteOnePostMutation>;
+    },
+    DeleteOneCategory(variables: DeleteOneCategoryMutationVariables, options?: C): Promise<DeleteOneCategoryMutation> {
+      return requester<DeleteOneCategoryMutation, DeleteOneCategoryMutationVariables>(DeleteOneCategoryDocument, variables, options) as Promise<DeleteOneCategoryMutation>;
+    },
+    DeleteManyUser(variables: DeleteManyUserMutationVariables, options?: C): Promise<DeleteManyUserMutation> {
+      return requester<DeleteManyUserMutation, DeleteManyUserMutationVariables>(DeleteManyUserDocument, variables, options) as Promise<DeleteManyUserMutation>;
+    },
+    DeleteManyPost(variables: DeleteManyPostMutationVariables, options?: C): Promise<DeleteManyPostMutation> {
+      return requester<DeleteManyPostMutation, DeleteManyPostMutationVariables>(DeleteManyPostDocument, variables, options) as Promise<DeleteManyPostMutation>;
+    },
+    DeleteManyCategory(variables: DeleteManyCategoryMutationVariables, options?: C): Promise<DeleteManyCategoryMutation> {
+      return requester<DeleteManyCategoryMutation, DeleteManyCategoryMutationVariables>(DeleteManyCategoryDocument, variables, options) as Promise<DeleteManyCategoryMutation>;
     }
   };
 }

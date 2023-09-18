@@ -539,7 +539,11 @@ export class PrismaSchemaGenerator<
     without?: string[]
   ) {
     const fields = this.getModelInputFields(modelName)["createOne"] ?? [];
-    return super.getCreateInput(modelName, [...fields, ...(without ?? [])]);
+    return super.getCreateInput(
+      modelName,
+      [...fields, ...(without ?? [])],
+      false
+    );
   }
   getUpdateInput<Name extends keyof Types["PrismaTypes"] & string>(
     modelName: Name,

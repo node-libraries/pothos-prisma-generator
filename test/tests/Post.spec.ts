@@ -1,11 +1,25 @@
 import { PrismaClient } from "@prisma/client";
 import { beforeAllAsync } from "jest-async";
-import { getApolloServer, getClient } from "../libs/test-tools";
+import {
+  getApolloServer,
+  getClient,
+  setModelDirective,
+} from "../libs/test-tools";
 
 describe("Post", () => {
   const prisma = new PrismaClient({});
 
   const property = beforeAllAsync(async () => {
+    setModelDirective("Post", [
+      `@pothos-generator operation {exclude:["deleteMany"]}`,
+      `@pothos-generator executable {include:["mutation"],authority:["USER"]}`,
+      `@pothos-generator input-field {fields:{exclude:["id","createdAt","updatedAt","author"]}}`,
+      `@pothos-generator input-data {data:{authorId:"%%USER%%"}}`,
+      `@pothos-generator where {include:["query"],where:{},authority:["USER"]}`,
+      `@pothos-generator where {include:["query"],where:{published:true}}`,
+      `@pothos-generator where {include:["update","delete"],where:{authorId:"%%USER%%"}}`,
+      `@pothos-generator order {orderBy:{title:"asc"}}`,
+    ]);
     const server = await getApolloServer();
     const user = await prisma.user.findUniqueOrThrow({
       where: { email: "example@example.com" },

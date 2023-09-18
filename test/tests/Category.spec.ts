@@ -1,18 +1,27 @@
 import { PrismaClient } from "@prisma/client";
 import { beforeAllAsync } from "jest-async";
 import { OrderBy } from "../generated/graphql";
-import { getApolloServer, getClient } from "../libs/test-tools";
+import { getClient, setModelDirective } from "../libs/test-tools";
 
 describe("Category", () => {
+  setModelDirective("Post", [
+    `@pothos-generator where {include:["query"],where:{},authority:["USER"]}`,
+    `@pothos-generator where {include:["query"],where:{published:true}}`,
+  ]);
+  setModelDirective("Category", [
+    `@pothos-generator order {orderBy:{name:"asc"}}`,
+    `@pothos-generator input-field {fields:{exclude:["id","createdAt","updatedAt","posts"]}}`,
+    `@pothos-generator limit {limit:10}`,
+  ]);
+
   const prisma = new PrismaClient({});
 
   const property = beforeAllAsync(async () => {
-    const server = await getApolloServer();
     const user = await prisma.user.findUniqueOrThrow({
       where: { email: "example@example.com" },
     });
     const client = await getClient();
-    return { server, user, client };
+    return { user, client };
   });
 
   afterAll(async () => {
@@ -52,9 +61,9 @@ describe("Category", () => {
     const { client } = await property;
     await client
       .FindManyCategory({
-        filter: { name: { equals: "Category01" } },
-        postsFilter: { title: { equals: "Post03" } },
-        orderBy: { id: OrderBy.Desc },
+        categoryFilter: { name: { equals: "Category01" } },
+        postFilter: { title: { equals: "Post03" } },
+        categoryOrderBy: { id: OrderBy.Desc },
       })
       .then((result) => {
         const findManyCategory = result.findManyCategory;

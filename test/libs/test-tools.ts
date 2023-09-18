@@ -1,4 +1,6 @@
 import { ApolloServer } from "@apollo/server";
+import { PrismaClient } from "@prisma/client";
+import { RuntimeDataModel } from "@prisma/client/runtime/library";
 import { DocumentNode } from "graphql";
 import { builder } from "./builder";
 import { getSdk } from "../generated/graphql";
@@ -16,9 +18,12 @@ const createApolloServer = async () => {
   return apolloServer;
 };
 
-const apolloServer = createApolloServer();
+let apolloServer: ApolloServer<Context>;
 
-export const getApolloServer = async () => apolloServer;
+export const getApolloServer = async () => {
+  if (!apolloServer) apolloServer = await createApolloServer();
+  return apolloServer;
+};
 
 export type Server = ApolloServer<Context>;
 
@@ -30,7 +35,7 @@ export const getBodyData = <T>(result: GraphQLResponse<T>) => {
 };
 
 export const getClient = async () => {
-  const server = await apolloServer;
+  const server = await getApolloServer();
   return getSdk(
     async <R, V>(doc: DocumentNode, vars: V, context?: Context): Promise<R> => {
       const result = await server.executeOperation(
@@ -47,4 +52,27 @@ export const getClient = async () => {
       return data as R;
     }
   );
+};
+
+export const setModelDirective = (model: string, directive: string[]) => {
+  const { models } = (
+    builder.options.prisma.client as PrismaClient & {
+      _runtimeDataModel: RuntimeDataModel;
+    }
+  )._runtimeDataModel;
+  models[model].documentation = directive.join("\\n");
+};
+
+export const setFieldDirective = (
+  model: string,
+  field: string,
+  directive: string[]
+) => {
+  const { models } = (
+    builder.options.prisma.client as PrismaClient & {
+      _runtimeDataModel: RuntimeDataModel;
+    }
+  )._runtimeDataModel;
+  models["User"].fields.find((v) => v.name === "email")!.documentation =
+    directive.join("\\n");
 };
