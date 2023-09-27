@@ -151,21 +151,27 @@ export type Mutation = {
   __typename?: 'Mutation';
   createManyCategory: Scalars['Int']['output'];
   createManyPost: Scalars['Int']['output'];
+  createManyTypeTest: Scalars['Int']['output'];
   createManyUser: Scalars['Int']['output'];
   createOneCategory: Category;
   createOnePost: Post;
+  createOneTypeTest: TypeTest;
   createOneUser: User;
   deleteManyCategory: Scalars['Int']['output'];
   deleteManyPost: Scalars['Int']['output'];
+  deleteManyTypeTest: Scalars['Int']['output'];
   deleteManyUser: Scalars['Int']['output'];
   deleteOneCategory: Category;
   deleteOnePost: Post;
+  deleteOneTypeTest: TypeTest;
   deleteOneUser: User;
   updateManyCategory: Scalars['Int']['output'];
   updateManyPost: Scalars['Int']['output'];
+  updateManyTypeTest: Scalars['Int']['output'];
   updateManyUser: Scalars['Int']['output'];
   updateOneCategory: Category;
   updateOnePost: Post;
+  updateOneTypeTest: TypeTest;
   updateOneUser: User;
 };
 
@@ -177,6 +183,11 @@ export type MutationCreateManyCategoryArgs = {
 
 export type MutationCreateManyPostArgs = {
   input: Array<PostCreateInput>;
+};
+
+
+export type MutationCreateManyTypeTestArgs = {
+  input: Array<TypeTestCreateInput>;
 };
 
 
@@ -195,6 +206,11 @@ export type MutationCreateOnePostArgs = {
 };
 
 
+export type MutationCreateOneTypeTestArgs = {
+  input: TypeTestCreateInput;
+};
+
+
 export type MutationCreateOneUserArgs = {
   input: UserCreateInput;
 };
@@ -207,6 +223,11 @@ export type MutationDeleteManyCategoryArgs = {
 
 export type MutationDeleteManyPostArgs = {
   where: PostFilter;
+};
+
+
+export type MutationDeleteManyTypeTestArgs = {
+  where: TypeTestFilter;
 };
 
 
@@ -225,6 +246,11 @@ export type MutationDeleteOnePostArgs = {
 };
 
 
+export type MutationDeleteOneTypeTestArgs = {
+  where: TypeTestUniqueFilter;
+};
+
+
 export type MutationDeleteOneUserArgs = {
   where: UserUniqueFilter;
 };
@@ -239,6 +265,12 @@ export type MutationUpdateManyCategoryArgs = {
 export type MutationUpdateManyPostArgs = {
   data: PostUpdateInput;
   where: PostFilter;
+};
+
+
+export type MutationUpdateManyTypeTestArgs = {
+  data: TypeTestUpdateInput;
+  where: TypeTestFilter;
 };
 
 
@@ -260,6 +292,12 @@ export type MutationUpdateOnePostArgs = {
 };
 
 
+export type MutationUpdateOneTypeTestArgs = {
+  data: TypeTestUpdateInput;
+  where: TypeTestUniqueFilter;
+};
+
+
 export type MutationUpdateOneUserArgs = {
   data: UserUpdateInput;
   where: UserUniqueFilter;
@@ -277,6 +315,7 @@ export type Post = {
   categories: Array<Category>;
   categoriesCount: Scalars['Int']['output'];
   content: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
   id: Scalars['ID']['output'];
   published: Scalars['Boolean']['output'];
   publishedAt: Scalars['DateTime']['output'];
@@ -439,15 +478,19 @@ export type Query = {
   __typename?: 'Query';
   countCategory: Scalars['Int']['output'];
   countPost: Scalars['Int']['output'];
+  countTypeTest: Scalars['Int']['output'];
   countUser: Scalars['Int']['output'];
   findFirstCategory?: Maybe<Category>;
   findFirstPost?: Maybe<Post>;
+  findFirstTypeTest?: Maybe<TypeTest>;
   findFirstUser?: Maybe<User>;
   findManyCategory: Array<Category>;
   findManyPost: Array<Post>;
+  findManyTypeTest: Array<TypeTest>;
   findManyUser: Array<User>;
   findUniqueCategory: Category;
   findUniquePost: Post;
+  findUniqueTypeTest: TypeTest;
   findUniqueUser: User;
 };
 
@@ -459,6 +502,11 @@ export type QueryCountCategoryArgs = {
 
 export type QueryCountPostArgs = {
   filter?: InputMaybe<PostFilter>;
+};
+
+
+export type QueryCountTypeTestArgs = {
+  filter?: InputMaybe<TypeTestFilter>;
 };
 
 
@@ -476,6 +524,12 @@ export type QueryFindFirstCategoryArgs = {
 export type QueryFindFirstPostArgs = {
   filter?: InputMaybe<PostFilter>;
   orderBy?: InputMaybe<Array<PostOrderBy>>;
+};
+
+
+export type QueryFindFirstTypeTestArgs = {
+  filter?: InputMaybe<TypeTestFilter>;
+  orderBy?: InputMaybe<Array<TypeTestOrderBy>>;
 };
 
 
@@ -501,6 +555,14 @@ export type QueryFindManyPostArgs = {
 };
 
 
+export type QueryFindManyTypeTestArgs = {
+  filter?: InputMaybe<TypeTestFilter>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Array<TypeTestOrderBy>>;
+};
+
+
 export type QueryFindManyUserArgs = {
   filter?: InputMaybe<UserFilter>;
   limit?: InputMaybe<Scalars['Int']['input']>;
@@ -519,6 +581,11 @@ export type QueryFindUniquePostArgs = {
 };
 
 
+export type QueryFindUniqueTypeTestArgs = {
+  filter: TypeTestUniqueFilter;
+};
+
+
 export type QueryFindUniqueUserArgs = {
   filter: UserUniqueFilter;
 };
@@ -527,6 +594,15 @@ export enum Role {
   Admin = 'ADMIN',
   User = 'USER'
 }
+
+export type RoleFilter = {
+  equals?: InputMaybe<Role>;
+  in?: InputMaybe<Array<Role>>;
+  is?: InputMaybe<Role>;
+  isNot?: InputMaybe<Role>;
+  not?: InputMaybe<RoleFilter>;
+  notIn?: InputMaybe<Array<Role>>;
+};
 
 export type RoleListFilter = {
   equals?: InputMaybe<Array<Role>>;
@@ -550,6 +626,49 @@ export type StringFilter = {
   not?: InputMaybe<StringFilter>;
   notIn?: InputMaybe<Array<Scalars['String']['input']>>;
   startsWith?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type StringListFilter = {
+  equals?: InputMaybe<Array<Scalars['String']['input']>>;
+  has?: InputMaybe<Scalars['String']['input']>;
+  hasEvery?: InputMaybe<Array<Scalars['String']['input']>>;
+  hasSome?: InputMaybe<Array<Scalars['String']['input']>>;
+  isEmpty?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type TypeTest = {
+  __typename?: 'TypeTest';
+  id: Scalars['ID']['output'];
+  role: Role;
+  scalarList: Array<Scalars['String']['output']>;
+};
+
+export type TypeTestCreateInput = {
+  id?: InputMaybe<Scalars['String']['input']>;
+  role: Role;
+  scalarList?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+export type TypeTestFilter = {
+  id?: InputMaybe<StringFilter>;
+  role?: InputMaybe<RoleFilter>;
+  scalarList?: InputMaybe<StringListFilter>;
+};
+
+export type TypeTestOrderBy = {
+  id?: InputMaybe<OrderBy>;
+  role?: InputMaybe<OrderBy>;
+  scalarList?: InputMaybe<OrderBy>;
+};
+
+export type TypeTestUniqueFilter = {
+  id?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type TypeTestUpdateInput = {
+  id?: InputMaybe<Scalars['String']['input']>;
+  role?: InputMaybe<Role>;
+  scalarList?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type User = {

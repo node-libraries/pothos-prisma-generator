@@ -151,6 +151,29 @@ input CategoryOrderBy {
   updatedAt: OrderBy
 }
 
+input TypeTestFilter {
+  id: StringFilter
+  scalarList: StringListFilter
+  role: RoleFilter
+}
+
+input StringListFilter {
+  has: String
+  hasSome: [String!]
+  hasEvery: [String!]
+  isEmpty: Boolean
+  equals: [String!]
+}
+
+input RoleFilter {
+  equals: Role
+  in: [Role!]
+  notIn: [Role!]
+  not: RoleFilter
+  is: Role
+  isNot: Role
+}
+
 input UserUniqueFilter {
   id: String
   email: String
@@ -162,6 +185,16 @@ input PostUniqueFilter {
 
 input CategoryUniqueFilter {
   id: String
+}
+
+input TypeTestUniqueFilter {
+  id: String
+}
+
+input TypeTestOrderBy {
+  id: OrderBy
+  scalarList: OrderBy
+  role: OrderBy
 }
 
 input UserCreateInput {
@@ -200,6 +233,12 @@ input CategoryCreateInput {
   name: String!
   createdAt: DateTime
   updatedAt: DateTime
+}
+
+input TypeTestCreateInput {
+  id: String
+  scalarList: [String!]
+  role: Role!
 }
 
 input UserUpdateInput {
@@ -371,6 +410,12 @@ input CategoryUpdatePostsRelationInputUpdateMany {
   data: PostUpdateWithoutCategoriesInput
 }
 
+input TypeTestUpdateInput {
+  id: String
+  scalarList: [String!]
+  role: Role
+}
+
 type User {
   id: ID!
   email: String!
@@ -391,6 +436,7 @@ type Post {
   authorId: String
   categories(filter: CategoryFilter, orderBy: [CategoryOrderBy!], limit: Int, offset: Int): [Category!]!
   categoriesCount(filter: CategoryFilter): Int!
+  createdAt: DateTime!
   updatedAt: DateTime!
   publishedAt: DateTime!
 }
@@ -404,38 +450,54 @@ type Category {
   updatedAt: DateTime!
 }
 
+type TypeTest {
+  id: ID!
+  scalarList: [String!]!
+  role: Role!
+}
+
 type Query {
   countUser(filter: UserFilter): Int!
   countPost(filter: PostFilter): Int!
   countCategory(filter: CategoryFilter): Int!
+  countTypeTest(filter: TypeTestFilter): Int!
   findUniqueUser(filter: UserUniqueFilter!): User!
   findUniquePost(filter: PostUniqueFilter!): Post!
   findUniqueCategory(filter: CategoryUniqueFilter!): Category!
+  findUniqueTypeTest(filter: TypeTestUniqueFilter!): TypeTest!
   findFirstUser(filter: UserFilter, orderBy: [UserOrderBy!]): User
   findFirstPost(filter: PostFilter, orderBy: [PostOrderBy!]): Post
   findFirstCategory(filter: CategoryFilter, orderBy: [CategoryOrderBy!]): Category
+  findFirstTypeTest(filter: TypeTestFilter, orderBy: [TypeTestOrderBy!]): TypeTest
   findManyUser(filter: UserFilter, orderBy: [UserOrderBy!], limit: Int, offset: Int): [User!]!
   findManyPost(filter: PostFilter, orderBy: [PostOrderBy!], limit: Int, offset: Int): [Post!]!
   findManyCategory(filter: CategoryFilter, orderBy: [CategoryOrderBy!], limit: Int, offset: Int): [Category!]!
+  findManyTypeTest(filter: TypeTestFilter, orderBy: [TypeTestOrderBy!], limit: Int, offset: Int): [TypeTest!]!
 }
 
 type Mutation {
   createOneUser(input: UserCreateInput!): User!
   createOnePost(input: PostCreateInput!): Post!
   createOneCategory(input: CategoryCreateInput!): Category!
+  createOneTypeTest(input: TypeTestCreateInput!): TypeTest!
   createManyUser(input: [UserCreateInput!]!): Int!
   createManyPost(input: [PostCreateInput!]!): Int!
   createManyCategory(input: [CategoryCreateInput!]!): Int!
+  createManyTypeTest(input: [TypeTestCreateInput!]!): Int!
   updateOneUser(where: UserUniqueFilter!, data: UserUpdateInput!): User!
   updateOnePost(where: PostUniqueFilter!, data: PostUpdateInput!): Post!
   updateOneCategory(where: CategoryUniqueFilter!, data: CategoryUpdateInput!): Category!
+  updateOneTypeTest(where: TypeTestUniqueFilter!, data: TypeTestUpdateInput!): TypeTest!
   updateManyUser(where: UserFilter!, data: UserUpdateInput!): Int!
   updateManyPost(where: PostFilter!, data: PostUpdateInput!): Int!
   updateManyCategory(where: CategoryFilter!, data: CategoryUpdateInput!): Int!
+  updateManyTypeTest(where: TypeTestFilter!, data: TypeTestUpdateInput!): Int!
   deleteOneUser(where: UserUniqueFilter!): User!
   deleteOnePost(where: PostUniqueFilter!): Post!
   deleteOneCategory(where: CategoryUniqueFilter!): Category!
+  deleteOneTypeTest(where: TypeTestUniqueFilter!): TypeTest!
   deleteManyUser(where: UserFilter!): Int!
   deleteManyPost(where: PostFilter!): Int!
   deleteManyCategory(where: CategoryFilter!): Int!
+  deleteManyTypeTest(where: TypeTestFilter!): Int!
 }
