@@ -8,7 +8,11 @@ import {
 import { getModel, PrismaModelTypes } from "@pothos/plugin-prisma";
 import type { FilterOps } from "@pothos/plugin-prisma-utils";
 import type { PrismaClient } from "@prisma/client";
-import type { RuntimeDataModel } from "@prisma/client/runtime/library";
+import type { getPrismaClient } from "@prisma/client/runtime/library";
+
+export type RuntimeDataModel = Parameters<
+  typeof getPrismaClient
+>[0]["runtimeDataModel"];
 
 const filterOps = ["equals", "in", "notIn", "not", "is", "isNot"] as const;
 const sortableFilterProps = ["lt", "lte", "gt", "gte"] as const;

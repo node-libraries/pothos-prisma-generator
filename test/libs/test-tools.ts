@@ -1,10 +1,10 @@
 import { ApolloServer } from "@apollo/server";
 import { PrismaClient } from "@prisma/client";
-import { RuntimeDataModel } from "@prisma/client/runtime/library";
 import { DocumentNode } from "graphql";
 import { createBuilder } from "./builder";
 import { getSdk } from "../generated/graphql";
 import type { Context } from "./context";
+import type { RuntimeDataModel } from "../../src/libs/generator/PrismaCrudGenerator";
 import type { GraphQLResponse } from "@apollo/server/dist/esm/externalTypes/graphql";
 
 /**
