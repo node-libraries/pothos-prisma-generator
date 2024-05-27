@@ -1,8 +1,16 @@
 import JSON5 from "json5";
 import traverse from "traverse";
 // @transform-path ./PrismaCrudGenerator.js
-import { PrismaCrudGenerator } from "./PrismaCrudGenerator";
+import { PrismaCrudGenerator, RuntimeDataModel } from "./PrismaCrudGenerator";
 import type { SchemaTypes } from "@pothos/core";
+
+export type RemoveReadonly<O> = {
+  -readonly [K in keyof O]: RemoveReadonly<O[K]>;
+};
+
+type RuntimeModel = RemoveReadonly<RuntimeDataModel["models"][number]> & {
+  name: string;
+};
 
 const countOperations = ["count"] as const;
 const findOperations = ["findUnique", "findFirst", "findMany"] as const;
@@ -213,7 +221,9 @@ export class PrismaSchemaGenerator<
   getModels() {
     const builder = this.getBuilder();
     const { models } = this.getDMMF(builder);
-    return Object.entries(models).map(([name, value]) => ({ name, ...value }));
+    return Object.entries(models).map(
+      ([name, value]) => ({ name, ...value } as RuntimeModel)
+    );
   }
 
   protected createModelOptions() {

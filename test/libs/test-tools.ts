@@ -1,11 +1,11 @@
-import { ApolloServer } from "@apollo/server";
+import { ApolloServer, GraphQLResponse } from "@apollo/server";
 import { PrismaClient } from "@prisma/client";
 import { DocumentNode } from "graphql";
 import { createBuilder } from "./builder";
+import { RemoveReadonly } from "../../src/libs/generator/PrismaSchemaGenerator";
 import { getSdk } from "../generated/graphql";
 import type { Context } from "./context";
 import type { RuntimeDataModel } from "../../src/libs/generator/PrismaCrudGenerator";
-import type { GraphQLResponse } from "@apollo/server/dist/esm/externalTypes/graphql";
 
 /**
  * apolloServer
@@ -47,6 +47,8 @@ export const getClient = async () => {
   );
 };
 
+const removeReadOnly = <T>(object: T) => object as RemoveReadonly<T>;
+
 export const setModelDirective = (model: string, directive: string[]) => {
   const prisma = new PrismaClient();
   const { models } = (
@@ -55,9 +57,10 @@ export const setModelDirective = (model: string, directive: string[]) => {
     }
   )._runtimeDataModel;
   const document = models[model].documentation;
-  models[model].documentation = directive.join("\\n");
+  const m = removeReadOnly(models);
+  m[model].documentation = directive.join("\\n");
   return () => {
-    models[model].documentation = document;
+    m[model].documentation = document;
   };
 };
 
@@ -72,7 +75,9 @@ export const setFieldDirective = (
       _runtimeDataModel: RuntimeDataModel;
     }
   )._runtimeDataModel;
-  const modelField = models[model].fields.find((v) => v.name === field)!;
+  const modelField = removeReadOnly(
+    models[model].fields.find((v) => v.name === field)!
+  );
   const document = modelField.documentation;
   modelField.documentation = directive.join("\\n");
   return () => {
