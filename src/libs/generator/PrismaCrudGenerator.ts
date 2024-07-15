@@ -37,9 +37,9 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
 
   private refCache = new Map<
     string | InputType<Types>,
-    Map<string, InputObjectRef<unknown>>
+    Map<string, InputObjectRef<Types, unknown>>
   >();
-  private enumRefs = new Map<string, EnumRef<unknown>>();
+  private enumRefs = new Map<string, EnumRef<Types, unknown>>();
 
   constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>) {
     this.builder = builder;
@@ -70,7 +70,7 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
     }));
   }
 
-  getWhere<Name extends keyof Types["PrismaTypes"] & string>(
+  getWhere<Name extends string & keyof Types["PrismaTypes"]>(
     modelName: Name,
     without?: string[]
   ) {
@@ -137,12 +137,13 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
           return fields;
         }) as never,
       }) as InputObjectRef<
-        (Types["PrismaTypes"][Name] & PrismaModelTypes)["Where"]
+        Types,
+        (PrismaModelTypes & Types["PrismaTypes"][Name])["Where"]
       >;
     });
   }
 
-  getWhereUnique<Name extends keyof Types["PrismaTypes"] & string>(
+  getWhereUnique<Name extends string & keyof Types["PrismaTypes"]>(
     modelName: Name
   ) {
     const name = `${modelName}UniqueFilter`;
@@ -191,12 +192,13 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
           return fields;
         }) as never,
       }) as InputObjectRef<
-        (Types["PrismaTypes"][Name] & PrismaModelTypes)["WhereUnique"]
+        Types,
+        (PrismaModelTypes & Types["PrismaTypes"][Name])["WhereUnique"]
       >;
     });
   }
 
-  getOrderBy<Name extends keyof Types["PrismaTypes"] & string>(
+  getOrderBy<Name extends string & keyof Types["PrismaTypes"]>(
     modelName: Name
   ) {
     const name = `${modelName}OrderBy`;
@@ -295,13 +297,14 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
           return fields;
         }) as never,
       }) as InputObjectRef<
-        (Types["PrismaTypes"][Name] & PrismaModelTypes)["Create"]
+        Types,
+        (PrismaModelTypes & Types["PrismaTypes"][Name])["Create"]
       >;
     });
   }
 
   getCreateRelationInput<
-    Name extends keyof Types["PrismaTypes"] & string,
+    Name extends string & keyof Types["PrismaTypes"],
     Relation extends Model["RelationName"],
     Model extends PrismaModelTypes = Types["PrismaTypes"][Name] extends PrismaModelTypes
       ? Types["PrismaTypes"][Name]
@@ -321,6 +324,7 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
             const relatedFieldName = relatedModel.fields.find(
               (field) => field.relationName === relationField.relationName
             )!;
+
             return {
               create: this.getCreateInput(relationField.type as Name, [
                 relatedFieldName.name,
@@ -329,13 +333,14 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
             };
           },
         } as never) as InputObjectRef<
+          Types,
           NonNullable<Model["Create"][Relation & keyof Model["Update"]]>
         >;
       }
     );
   }
 
-  getUpdateInput<Name extends keyof Types["PrismaTypes"] & string>(
+  getUpdateInput<Name extends string & keyof Types["PrismaTypes"]>(
     modelName: Name,
     without?: string[]
   ) {
@@ -392,13 +397,14 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
           return fields;
         }) as never,
       }) as InputObjectRef<
-        (Types["PrismaTypes"][Name] & PrismaModelTypes)["Update"]
+        Types,
+        (PrismaModelTypes & Types["PrismaTypes"][Name])["Update"]
       >;
     });
   }
 
   getUpdateRelationInput<
-    Name extends keyof Types["PrismaTypes"] & string,
+    Name extends string & keyof Types["PrismaTypes"],
     Relation extends Model["RelationName"],
     Model extends PrismaModelTypes = Types["PrismaTypes"][Name] extends PrismaModelTypes
       ? Types["PrismaTypes"][Name]
@@ -461,6 +467,7 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
             };
           },
         } as never) as InputObjectRef<
+          Types,
           NonNullable<Model["Update"][Relation & keyof Model["Update"]]>
         >;
       }
@@ -539,8 +546,8 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
     }
   }
 
-  private getRef<T extends InputObjectRef<unknown>>(
-    key: string | InputType<Types>,
+  private getRef<T extends InputObjectRef<Types, unknown>>(
+    key: InputType<Types> | string,
     name: string,
     create: () => T
   ): T {
@@ -553,11 +560,11 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
       return cache.get(name)! as T;
     }
 
-    const ref = new InputObjectRef(name);
+    const ref = new InputObjectRef<Types, unknown>(name);
 
     cache.set(name, ref);
 
-    this.builder.configStore.associateRefWithName(ref, create().name);
+    this.builder.configStore.associateParamWithRef(ref, create());
 
     return ref as T;
   }

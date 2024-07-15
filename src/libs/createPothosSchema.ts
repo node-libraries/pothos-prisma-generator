@@ -110,6 +110,7 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                     skip,
                   };
                 },
+                onNull: "error",
               });
             };
 
@@ -175,14 +176,7 @@ export const createModelCountQuery = (
                 required: false,
               }),
             },
-            resolve: async (
-              _root,
-              args: InputShapeFromFields<{
-                filter: InputFieldRef<any, "Arg">;
-              }>,
-              ctx,
-              _info
-            ) => {
+            resolve: async (_root: any, args: any, ctx: object, _info: any) => {
               const prisma = getPrisma(t);
               const authority = generator.getAuthority(ctx);
               generator.checkModelExecutable(
@@ -230,7 +224,13 @@ export const createModelQuery = (
               ...generator.findManyArgs(model.name),
             },
 
-            resolve: async (query, _root, args, ctx, _info) => {
+            resolve: async (
+              query: any,
+              _root: any,
+              args: any,
+              ctx: object,
+              _info: any
+            ) => {
               const prisma = getPrisma(t);
               const authority = generator.getAuthority(ctx);
               generator.checkModelExecutable(
@@ -290,7 +290,13 @@ export const createModelUniqueQuery = (
               }),
             },
 
-            resolve: async (query, _root, args, ctx, _info) => {
+            resolve: async (
+              query: any,
+              _root: any,
+              args: any,
+              ctx: object,
+              _info: any
+            ) => {
               const prisma = getPrisma(t);
               const authority = generator.getAuthority(ctx);
               generator.checkModelExecutable(
@@ -303,11 +309,6 @@ export const createModelUniqueQuery = (
                 operationPrefix,
                 authority,
                 ctx
-              );
-              const modelLimit = generator.getModelLimit(
-                model.name,
-                operationPrefix,
-                authority
               );
               const where = { ...args.filter, ...modelWhere };
               return prisma[lowerFirst(model.name)].findUniqueOrThrow({
@@ -343,7 +344,13 @@ export const createModelListQuery = (
               ...generator.findManyArgs(model.name),
               ...generator.pagerArgs(),
             },
-            resolve: async (query, _root, args, ctx, _info) => {
+            resolve: async (
+              query: any,
+              _root: any,
+              args: any,
+              ctx: object,
+              _info: any
+            ) => {
               const prisma = getPrisma(t);
               const authority = generator.getAuthority(ctx);
               generator.checkModelExecutable(
@@ -416,7 +423,13 @@ export const createModelMutation = (
                 required: true,
               }),
             },
-            resolve: async (query, _root, args, ctx, _info) => {
+            resolve: async (
+              query: any,
+              _root: any,
+              args: any,
+              ctx: object,
+              _info: any
+            ) => {
               const authority = generator.getAuthority(ctx);
               generator.checkModelExecutable(name, operationPrefix, authority);
               const modelInput = generator.getModelInputData(
@@ -460,7 +473,12 @@ export const createManyModelMutation = (
                 required: true,
               }),
             },
-            resolve: async (_root, args, ctx, _info) => {
+            resolve: async (
+              _root: any,
+              args: { input: any[] },
+              ctx: object,
+              _info: any
+            ) => {
               const authority = generator.getAuthority(ctx);
               generator.checkModelExecutable(name, operationPrefix, authority);
               const modelInput = generator.getModelInputData(
@@ -510,7 +528,13 @@ export const updateModelMutation = (
                 required: true,
               }),
             },
-            resolve: async (query, _root, args, ctx, _info) => {
+            resolve: async (
+              query: any,
+              _root: any,
+              args: any,
+              ctx: object,
+              _info: any
+            ) => {
               const authority = generator.getAuthority(ctx);
               generator.checkModelExecutable(name, operationPrefix, authority);
               const modelWhere = generator.getModelWhere(
@@ -574,7 +598,12 @@ export const updateManyModelMutation = (
                 required: true,
               }),
             },
-            resolve: async (_parent, args, ctx, _info) => {
+            resolve: async (
+              _parent: any,
+              args: { where: any; data: any },
+              ctx: object,
+              _info: any
+            ) => {
               const authority = generator.getAuthority(ctx);
               generator.checkModelExecutable(name, operationPrefix, authority);
               const modelWhere = generator.getModelWhere(
@@ -627,7 +656,13 @@ export const deleteModelMutation = (
                 required: true,
               }),
             },
-            resolve: async (query, _root, args, ctx, _info) => {
+            resolve: async (
+              query: any,
+              _root: any,
+              args: any,
+              ctx: object,
+              _info: any
+            ) => {
               const authority = generator.getAuthority(ctx);
               generator.checkModelExecutable(
                 model.name,
@@ -675,7 +710,12 @@ export const deleteManyModelMutation = (
                 required: true,
               }),
             },
-            resolve: async (_parent, args, ctx, _info) => {
+            resolve: async (
+              _parent: any,
+              args: { where: any },
+              ctx: object,
+              _info: any
+            ) => {
               const authority = generator.getAuthority(ctx);
               generator.checkModelExecutable(
                 model.name,
