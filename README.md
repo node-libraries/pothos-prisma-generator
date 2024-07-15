@@ -82,9 +82,11 @@ export const builder = new SchemaBuilder<{
     dmmf: Prisma.dmmf,
   },
   // if necessary
-  authScopes: async (context) => ({
-    authenticated: !!context.user,
-  }),
+  scopeAuth: {
+    authScopes: async (context) => ({
+      authenticated: !!context.user,
+    }),
+  },
   pothosPrismaGenerator: {
     // Disable `autoScalers
     //autoScalers: false,
