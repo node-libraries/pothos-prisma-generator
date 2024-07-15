@@ -100,6 +100,20 @@ export const builder = new SchemaBuilder<{
 });
 ```
 
+- Edge run-times
+
+https://pothos-graphql.dev/docs/plugins/prisma/setup#edge-run-times
+
+```prisma
+generator pothos {
+  provider          = "prisma-pothos-types"
+  clientOutput      = "@prisma/client"
+  output            = "./pothos-types.ts"
+  generateDatamodel = true
+  documentation     = true # Must be set to true
+}
+```
+
 ### How to Write Directives
 
 ```prisma

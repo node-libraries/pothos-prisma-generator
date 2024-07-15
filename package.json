@@ -1,6 +1,6 @@
 {
   "name": "pothos-prisma-generator",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "main": "./dist/cjs/index.js",
   "types": "./dist/cjs/index.d.ts",
   "exports": {
