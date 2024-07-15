@@ -24,11 +24,13 @@ export const createBuilder = () => {
     prisma: {
       client: prisma,
     },
-    authScopes: async (context) =>
-      context.user?.roles.reduce<{ [key: string]: boolean }>((acc, role) => {
-        acc[role] = true;
-        return acc;
-      }, {}) ?? {},
+    scopeAuth: {
+      authScopes: async (context) =>
+        context.user?.roles.reduce<{ [key: string]: boolean }>((acc, role) => {
+          acc[role] = true;
+          return acc;
+        }, {}) ?? {},
+    },
     pothosPrismaGenerator: {
       // Replace the following directives
       // /// @pothos-generator input {data:{author:{connect:{id:"%%USER%%"}}}}

@@ -6,7 +6,10 @@ import {
   SchemaTypes,
 } from "@pothos/core";
 import { getModel, PrismaModelTypes } from "@pothos/plugin-prisma";
-import type { FilterOps } from "@pothos/plugin-prisma-utils";
+import type {
+  FilterOps,
+  PrismaOrderByFields,
+} from "@pothos/plugin-prisma-utils";
 import type { PrismaClient } from "@prisma/client";
 import type { getPrismaClient } from "@prisma/client/runtime/library";
 
@@ -231,7 +234,7 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
             }
           });
 
-          return fields as {};
+          return fields as PrismaOrderByFields<Types, PrismaModelTypes>;
         },
       });
     });
