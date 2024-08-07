@@ -1,11 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // @transform-path ./generator/PrismaSchemaGenerator.js
 import { PrismaSchemaGenerator } from "./generator/PrismaSchemaGenerator";
-import type {
-  InputFieldRef,
-  InputShapeFromFields,
-  SchemaTypes,
-} from "@pothos/core";
+import type { SchemaTypes } from "@pothos/core";
 type LowerFirst<T extends string> = T extends `${infer F}${infer R}`
   ? `${Lowercase<F>}${R}`
   : T;

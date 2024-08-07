@@ -11,8 +11,9 @@ import type { RuntimeDataModel } from "../../src/libs/generator/PrismaCrudGenera
  * apolloServer
  */
 export const createApolloServer = async () => {
+  const builder = createBuilder();
   const apolloServer = new ApolloServer<Context>({
-    schema: createBuilder().toSchema({ sortSchema: false }),
+    schema: builder.toSchema({ sortSchema: false }),
   });
   await apolloServer.start();
   return apolloServer;

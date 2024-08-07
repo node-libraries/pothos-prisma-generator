@@ -1,6 +1,6 @@
 {
   "name": "pothos-prisma-generator",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "main": "./dist/cjs/index.js",
   "types": "./dist/cjs/index.d.ts",
   "exports": {
@@ -65,8 +65,8 @@
     "ts-patch": "^3.2.1",
     "tsconfig-paths": "^4.2.0",
     "typescript": "^5.5.3",
-    "typescript-transform-paths": "^3.4.7",
-    "typescript-eslint": "^7.16.1"
+    "typescript-eslint": "^7.16.1",
+    "typescript-transform-paths": "^3.4.7"
   },
   "author": "SoraKumo <info@croud.jp>",
   "repository": "https://github.com/node-libraries/pothos-prisma-generator"
