@@ -1,17 +1,27 @@
 import { ApolloServer, GraphQLResponse } from "@apollo/server";
 import { PrismaClient } from "@prisma/client";
 import { DocumentNode } from "graphql";
+import {
+  addCustomGenerator,
+  RemoveReadonly,
+  RuntimeDataModel,
+} from "pothos-prisma-generator";
 import { createBuilder } from "./builder";
-import { RemoveReadonly } from "../../src/libs/generator/PrismaSchemaGenerator";
+
 import { getSdk } from "../generated/graphql";
 import type { Context } from "./context";
-import type { RuntimeDataModel } from "../../src/libs/generator/PrismaCrudGenerator";
 
 /**
  * apolloServer
  */
 export const createApolloServer = async () => {
   const builder = createBuilder();
+  builder.options.pothosPrismaGenerator;
+  addCustomGenerator(builder, "checkModelExecutable", async (p) => {
+    // console.log(p.modelName, p.operationPrefix);
+    return true;
+  });
+
   const apolloServer = new ApolloServer<Context>({
     schema: builder.toSchema({ sortSchema: false }),
   });

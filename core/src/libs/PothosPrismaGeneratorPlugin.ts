@@ -1,11 +1,10 @@
-import SchemaBuilder, {
+import {
   BasePlugin,
   BuildCache,
   PothosOutputFieldConfig,
   SchemaTypes,
 } from "@pothos/core";
-// @transform-path ./global-types.js
-import "./global-types";
+import "../global-types.js";
 import { GraphQLFieldResolver } from "graphql";
 import {
   BigIntResolver,
@@ -14,7 +13,6 @@ import {
   HexadecimalResolver,
   JSONResolver,
 } from "graphql-scalars";
-// @transform-path ./libs/createPothosSchema.js
 import {
   createModelListQuery,
   createModelMutation,
@@ -27,17 +25,14 @@ import {
   updateModelMutation,
   createModelCountQuery,
   createModelUniqueQuery,
-} from "./libs/createPothosSchema";
-// @transform-path ./libs/generator/PrismaSchemaGenerator.js
-import { PrismaSchemaGenerator } from "./libs/generator/PrismaSchemaGenerator";
+} from "./createPothosSchema.js";
+import { PrismaSchemaGenerator } from "./generator/PrismaSchemaGenerator.js";
 
-export class PothosPrismaGeneratorPlugin<
-  Types extends SchemaTypes
-> extends BasePlugin<Types> {
-  generator: PrismaSchemaGenerator<Types>;
+export class PothosPrismaGeneratorPlugin extends BasePlugin<SchemaTypes> {
+  generator: PrismaSchemaGenerator<SchemaTypes>;
   constructor(
-    buildCache: BuildCache<Types>,
-    name: keyof PothosSchemaTypes.Plugins<Types>
+    buildCache: BuildCache<SchemaTypes>,
+    name: keyof PothosSchemaTypes.Plugins<SchemaTypes>
   ) {
     super(buildCache, name);
     this.generator = new PrismaSchemaGenerator(this.builder);
@@ -89,8 +84,8 @@ export class PothosPrismaGeneratorPlugin<
     }));
   }
   wrapResolve(
-    resolver: GraphQLFieldResolver<unknown, Types["Context"], object>,
-    fieldConfig: PothosOutputFieldConfig<Types>
+    resolver: GraphQLFieldResolver<unknown, SchemaTypes["Context"], object>,
+    fieldConfig: PothosOutputFieldConfig<SchemaTypes>
   ) {
     const fieldDirectives = Object.values(
       this.generator.fieldDirectives[fieldConfig.parentType] ?? {}
@@ -103,7 +98,7 @@ export class PothosPrismaGeneratorPlugin<
 
       const newResolver: GraphQLFieldResolver<
         unknown,
-        Types["Context"],
+        SchemaTypes["Context"],
         object
       > = (source, args, context, info) => {
         const authority = this.generator.getAuthority(context);
@@ -119,10 +114,3 @@ export class PothosPrismaGeneratorPlugin<
     return resolver;
   }
 }
-
-const pluginName = "pothosPrismaGenerator" as const;
-const allowPluginReRegistration = SchemaBuilder.allowPluginReRegistration;
-SchemaBuilder.allowPluginReRegistration = true;
-SchemaBuilder.registerPlugin(pluginName, PothosPrismaGeneratorPlugin);
-SchemaBuilder.allowPluginReRegistration = allowPluginReRegistration;
-export default pluginName;

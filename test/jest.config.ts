@@ -7,7 +7,7 @@ const config: Config = {
     "^@/(.*)$": "<rootDir>/$1",
   },
   rootDir: "./",
-  roots: ["test/tests"],
+  roots: ["tests"],
   testRegex: ".*\\.spec\\.ts$",
   transform: {
     "^.+\\.(t|j)s$": "ts-jest",
@@ -16,7 +16,7 @@ const config: Config = {
   testEnvironment: "node",
   coveragePathIgnorePatterns: [
     "/node_modules/",
-    "test/lib",
+    "lib",
     "generated",
     "PrismaCrudGenerator",
   ],

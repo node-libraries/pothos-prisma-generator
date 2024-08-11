@@ -1,7 +1,10 @@
+import { getPrismaClient } from "@prisma/client/runtime/library";
 import JSON5 from "json5";
 import traverse from "traverse";
-// @transform-path ./PrismaCrudGenerator.js
-import { PrismaCrudGenerator, RuntimeDataModel } from "./PrismaCrudGenerator";
+import {
+  PrismaCrudGenerator,
+  RuntimeDataModel,
+} from "./PrismaCrudGenerator.js";
 import type { SchemaTypes } from "@pothos/core";
 
 export type RemoveReadonly<O> = {
@@ -36,16 +39,16 @@ const operationMap = {
 
 const allOperations = [...queryOperations, ...mutationOperations];
 
-type Operation = (typeof allOperations)[number];
-type ExtendOperation = Operation | "mutation" | "query";
+export type Operation = (typeof allOperations)[number];
+export type ExtendOperation = Operation | "mutation" | "query";
 
-type FilterOperations = {
+export type FilterOperations = {
   include?: Operation[];
   exclude?: Operation[];
 };
-type DirectiveAuthority = { authority?: string[] };
+export type DirectiveAuthority = { authority?: string[] };
 
-type ModelDirective = {
+export type ModelDirective = {
   operation?: FilterOperations;
   executable?: FilterOperations & DirectiveAuthority;
   order?: {
@@ -73,16 +76,16 @@ type ModelDirective = {
     DirectiveAuthority;
 };
 
-type FieldDirective = {
+export type FieldDirective = {
   readable?: string[];
 };
 
-type ModelAuthorityType<T> = {
+export type ModelAuthorityType<T> = {
   [key: string]: {
     [key in Operation]: [string[], T][];
   };
 };
-type ModelBasicType<T> = {
+export type ModelBasicType<T> = {
   [key: string]: {
     [key in Operation]: T;
   };
@@ -96,8 +99,22 @@ type ModelInputWithoutFields = ModelBasicType<string[]>;
 type ModelSelections = ModelBasicType<string[]>;
 type ModelInputData = ModelAuthorityType<object>;
 
+export type PrismaSchemaGeneratorParams<
+  T extends keyof PrismaSchemaGenerator<SchemaTypes>,
+  P extends PrismaSchemaGenerator<SchemaTypes>[T] extends (
+    ...args: never[]
+  ) => unknown
+    ? Parameters<PrismaSchemaGenerator<SchemaTypes>[T]>
+    : never
+> = P;
+
 export class PrismaSchemaGenerator<
-  Types extends SchemaTypes
+  T extends Partial<PothosSchemaTypes.UserSchemaTypes> = SchemaTypes,
+  Types extends Exclude<SchemaTypes, keyof T> & T = Exclude<
+    SchemaTypes,
+    keyof T
+  > &
+    T
 > extends PrismaCrudGenerator<Types> {
   private _builder;
   modelDirectives: {
@@ -134,9 +151,17 @@ export class PrismaSchemaGenerator<
   };
   authorityFunc?: (props: { context: SchemaTypes["Context"] }) => string[];
 
+  customGenerator: {
+    [K in keyof PrismaSchemaGenerator<Types>]?: PrismaSchemaGenerator<Types>[K][];
+  } = {};
+
   constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>) {
     super(builder);
     this._builder = builder;
+    const custom = builder.options.pothosPrismaGenerator?.custom;
+    if (custom) {
+      this.customGenerator = custom;
+    }
 
     this.getModels().forEach(({ name: modelName, documentation, fields }) => {
       this.modelDirectives[modelName] = this.getSchemaDirectives(
@@ -211,10 +236,10 @@ export class PrismaSchemaGenerator<
     });
   }
 
-  setAuthority(func: (props: { context: SchemaTypes["Context"] }) => string[]) {
+  setAuthority(func: (props: { context: Types["Context"] }) => string[]) {
     this.authorityFunc = func;
   }
-  getAuthority(context: SchemaTypes["Context"]) {
+  getAuthority(context: Types["Context"]) {
     /* istanbul ignore next */
     return this.authorityFunc?.({ context }) ?? [];
   }
@@ -464,11 +489,38 @@ export class PrismaSchemaGenerator<
       }
     );
   }
-  checkModelExecutable(
-    modelName: string,
-    operationPrefix: Operation,
-    authority: string[]
-  ) {
+  async checkModelExecutable({
+    params,
+    prisma,
+    modelName,
+    operationPrefix,
+    authority,
+  }: {
+    params: {
+      root: Types["Root"];
+      args: unknown;
+      ctx: Types["Context"];
+      info: unknown;
+    };
+    prisma: Types["Prisma"];
+    modelName: string;
+    operationPrefix: Operation;
+    authority: string[];
+  }) {
+    const results = this.customGenerator.checkModelExecutable?.map((callback) =>
+      callback({
+        params,
+        prisma,
+        modelName,
+        operationPrefix,
+        authority,
+      })
+    );
+    const checkFalse = (await Promise.all(results ?? [])).some((v) => !v);
+    if (checkFalse) {
+      throw new Error("No permission");
+    }
+
     const values = this.modelExecutable[modelName][operationPrefix];
     if (!values) return true;
     const executable = values.reduce((pre, value) => {
