@@ -88,5 +88,7 @@ jobs:
             ${{ runner.os }}-yarn-
       - name: Initialize DB
         run: yarn --cwd test test:reset
+      - name: Run build
+        run: yarn --cwd core build
       - name: Test
         run: yarn --cwd test test

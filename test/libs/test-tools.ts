@@ -16,7 +16,6 @@ import type { Context } from "./context";
  */
 export const createApolloServer = async () => {
   const builder = createBuilder();
-  builder.options.pothosPrismaGenerator;
   addCustomGenerator(builder, "checkModelExecutable", async (p) => {
     // console.log("checkModelExecutable", p.modelName, p.operationPrefix);
     return true;
