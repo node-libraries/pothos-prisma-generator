@@ -51,37 +51,46 @@ export class PothosPrismaGeneratorPlugin extends BasePlugin<SchemaTypes> {
 
     const generator = this.generator;
     const replace = builder.options.pothosPrismaGenerator?.replace;
-    replace &&
+    if (replace) {
       Object.entries(replace).forEach(([key, value]) => {
         generator.addReplaceValue(key, value);
       });
+    }
     const authority = builder.options.pothosPrismaGenerator?.authority;
-    authority && generator.setAuthority(authority);
+    if (authority) {
+      generator.setAuthority(authority);
+    }
     createModelObject(generator);
 
     if (!builder.configStore.typeConfigs.has("Query")) {
       builder.queryType({});
     }
 
-    builder.queryFields((t) => ({
-      ...createModelCountQuery(t, generator),
-      ...createModelUniqueQuery(t, generator),
-      ...createModelQuery(t, generator),
-      ...createModelListQuery(t, generator),
-    }));
+    builder.queryFields(
+      (t) =>
+        ({
+          ...createModelCountQuery(t, generator),
+          ...createModelUniqueQuery(t, generator),
+          ...createModelQuery(t, generator),
+          ...createModelListQuery(t, generator),
+        } as never)
+    );
 
     if (!builder.configStore.typeConfigs.has("Mutation")) {
       builder.mutationType({});
     }
 
-    builder.mutationFields((t) => ({
-      ...createModelMutation(t, generator),
-      ...createManyModelMutation(t, generator),
-      ...updateModelMutation(t, generator),
-      ...updateManyModelMutation(t, generator),
-      ...deleteModelMutation(t, generator),
-      ...deleteManyModelMutation(t, generator),
-    }));
+    builder.mutationFields(
+      (t) =>
+        ({
+          ...createModelMutation(t, generator),
+          ...createManyModelMutation(t, generator),
+          ...updateModelMutation(t, generator),
+          ...updateManyModelMutation(t, generator),
+          ...deleteModelMutation(t, generator),
+          ...deleteManyModelMutation(t, generator),
+        } as never)
+    );
   }
   wrapResolve(
     resolver: GraphQLFieldResolver<unknown, SchemaTypes["Context"], object>,

@@ -1,4 +1,4 @@
-import SchemaBuilder, { SchemaTypes } from "@pothos/core";
+import SchemaBuilder from "@pothos/core";
 import { PrismaSchemaGenerator } from "./libs/generator/PrismaSchemaGenerator.js";
 import { PothosPrismaGeneratorPlugin } from "./libs/PothosPrismaGeneratorPlugin.js";
 export * from "./libs/generator/PrismaCrudGenerator.js";
@@ -13,7 +13,7 @@ SchemaBuilder.registerPlugin(pluginName, PothosPrismaGeneratorPlugin);
 SchemaBuilder.allowPluginReRegistration = allowPluginReRegistration;
 export default pluginName;
 
-export type CustomGeneratorNames = "checkModelExecutable";
+export type CustomGeneratorNames = "checkModelExecutable" | "getModelWhere";
 
 export const addCustomGenerator = <
   Types extends Partial<PothosSchemaTypes.UserSchemaTypes>,
@@ -25,11 +25,11 @@ export const addCustomGenerator = <
   name: K,
   callback: PrismaSchemaGenerator<Types>[K]
 ) => {
-  const option = builder.options[pluginName];
-  if (option) {
-    if (!option.custom) {
-      option.custom = {};
+  const options = builder.options[pluginName];
+  if (options) {
+    if (!options.custom) {
+      options.custom = {};
     }
-    option.custom[name] = [...(option.custom[name] ?? []), callback];
+    options.custom[name] = [...(options.custom[name] ?? []), callback] as never;
   }
 };

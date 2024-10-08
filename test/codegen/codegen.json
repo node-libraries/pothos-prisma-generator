@@ -1,7 +1,7 @@
 {
-  "schema": "./test/generated/schema.graphql",
+  "schema": "./generated/schema.graphql",
   "overwrite": true,
-  "documents": "./test/graphql/*.graphql",
+  "documents": "./graphql/*.graphql",
   "generates": {
     "./test/generated/graphql.ts": {
       "plugins": [

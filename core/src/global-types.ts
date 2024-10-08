@@ -35,7 +35,7 @@ declare global {
         authority: ({ context }: { context: Types["Context"] }) => string[];
         custom?: {
           [K in keyof PrismaSchemaGenerator<Types> &
-            "checkModelExecutable"]?: PrismaSchemaGenerator<Types>[K][];
+            CustomGeneratorNames]?: PrismaSchemaGenerator<Types>[K][];
         };
       };
     }

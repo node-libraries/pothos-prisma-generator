@@ -195,6 +195,9 @@ query FindManyUser(
       offset: $postOffset
     ) {
       ...post
+      author {
+        ...user
+      }
     }
     postsCount(filter: $postFilter)
   }

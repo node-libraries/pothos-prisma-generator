@@ -99,6 +99,19 @@ type ModelInputWithoutFields = ModelBasicType<string[]>;
 type ModelSelections = ModelBasicType<string[]>;
 type ModelInputData = ModelAuthorityType<object>;
 
+type GeneratorParamsType<Types extends SchemaTypes> = {
+  params: {
+    root: Types["Root"];
+    args: unknown;
+    ctx: Types["Context"];
+    info: unknown;
+  };
+  prisma: Types["Prisma"];
+  modelName: string;
+  operationPrefix: Operation;
+  authority: string[];
+};
+
 export type PrismaSchemaGeneratorParams<
   T extends keyof PrismaSchemaGenerator<SchemaTypes>,
   P extends PrismaSchemaGenerator<SchemaTypes>[T] extends (
@@ -531,12 +544,24 @@ export class PrismaSchemaGenerator<
       throw new Error("No permission");
     return true;
   }
-  getModelWhere(
-    modelName: string,
-    operationPrefix: Operation,
-    authority: string[],
-    ctx: SchemaTypes["Context"]
-  ) {
+  getModelWhere({
+    params,
+    prisma,
+    modelName,
+    operationPrefix,
+    authority,
+  }: {
+    params: {
+      root: Types["Root"];
+      args: unknown;
+      ctx: Types["Context"];
+      info: unknown;
+    };
+    prisma: Types["Prisma"];
+    modelName: string;
+    operationPrefix: Operation;
+    authority: string[];
+  }): { [key: string]: unknown } | undefined {
     const values = this.modelWhere[modelName][operationPrefix];
     const whereModel = values?.find(
       (value) =>
@@ -544,10 +569,23 @@ export class PrismaSchemaGenerator<
     );
 
     const where = this.replaceValue(whereModel?.[1] ?? [], {
-      context: ctx,
+      context: params.ctx,
     });
 
-    return where;
+    const results = this.customGenerator.getModelWhere?.reduce(
+      (target, callback) => ({
+        ...target,
+        ...callback({
+          params,
+          prisma,
+          modelName,
+          operationPrefix,
+          authority,
+        }),
+      }),
+      {}
+    );
+    return { ...results, ...where };
   }
   getModelLimit(
     modelName: string,

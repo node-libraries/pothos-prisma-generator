@@ -18,8 +18,12 @@ export const createApolloServer = async () => {
   const builder = createBuilder();
   builder.options.pothosPrismaGenerator;
   addCustomGenerator(builder, "checkModelExecutable", async (p) => {
-    // console.log(p.modelName, p.operationPrefix);
+    // console.log("checkModelExecutable", p.modelName, p.operationPrefix);
     return true;
+  });
+  addCustomGenerator(builder, "getModelWhere", (p) => {
+    // console.log("getModelWhere", p.modelName, p.operationPrefix);
+    return undefined;
   });
 
   const apolloServer = new ApolloServer<Context>({

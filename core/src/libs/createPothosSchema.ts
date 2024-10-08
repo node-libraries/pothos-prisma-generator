@@ -18,15 +18,22 @@ const getPrisma = <T extends SchemaTypes, ParentShape>(
   return t.builder.options.prisma.client;
 };
 
+const getWhere = (where: object) => {
+  if (!where || Object.keys(where).length === 0) return {};
+  return { where };
+};
+
 export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
   const builder = generator.getBuilder();
   generator.getModels().map((model) => {
-    const selectFields = new Set(generator.getModelExcludeField(model.name));
-    builder.prismaObject(model.name, {
+    const modelName = model.name;
+    const selectFields = new Set(generator.getModelExcludeField(modelName));
+    builder.prismaObject(modelName, {
       fields: (t) => {
         const fields = model.fields
           .filter(({ name }) => !selectFields.has(name))
           .flatMap((field) => {
+            const modelName = field.type;
             if (field.isId) {
               return [[field.name, t.exposeID(field.name)] as const];
             }
@@ -35,7 +42,9 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                 [
                   field.name,
                   t.expose(field.name, {
-                    type: field.isList ? t.listRef(field.type) : field.type,
+                    type: field.isList
+                      ? t.listRef(modelName).listType
+                      : modelName,
                     nullable: !field.isRequired,
                   }),
                 ] as const,
@@ -47,8 +56,8 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                   field.name,
                   t.expose(field.name, {
                     type: field.isList
-                      ? [generator.getEnum(field.type)]
-                      : generator.getEnum(field.type),
+                      ? [generator.getEnum(modelName)]
+                      : generator.getEnum(modelName),
                     nullable: !field.isRequired,
                   }),
                 ] as const,
@@ -57,46 +66,55 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
 
             const createField = () => {
               const operationPrefix = field.isList ? "findMany" : "findFirst";
-              const options = generator.getModelOptions(field.type)[
-                operationPrefix
-              ];
+              const options =
+                generator.getModelOptions(modelName)[operationPrefix];
               return t.relation(field.name, {
                 ...options,
                 nullable: !field.isRequired,
                 args: field.isList
-                  ? {
-                      ...generator.findManyArgs(field.type),
+                  ? ({
+                      ...generator.findManyArgs(modelName),
                       ...generator.pagerArgs(),
-                    }
+                    } as never)
                   : undefined,
                 query: (args, ctx) => {
                   const authority = generator.getAuthority(ctx);
                   const modelOrder = generator.getModelOrder(
-                    field.type,
+                    modelName,
                     operationPrefix,
                     authority
                   );
-                  const modelWhere = generator.getModelWhere(
-                    field.type,
+                  const generatorParams = {
+                    params: {
+                      root: undefined,
+                      args,
+                      ctx,
+                      info: undefined,
+                    },
+                    prisma: undefined,
+                    modelName,
                     operationPrefix,
                     authority,
-                    ctx
-                  );
+                  } as const;
+                  const modelWhere = generator.getModelWhere(generatorParams);
                   const modelLimit = generator.getModelLimit(
-                    field.type,
+                    modelName,
                     operationPrefix,
                     authority
                   );
                   const take =
-                    modelLimit && args.limit
+                    modelLimit && typeof args.limit === "number"
                       ? Math.min(modelLimit, args.limit)
                       : modelLimit ?? args.limit;
 
-                  const where = { ...args.filter, ...modelWhere };
+                  const where = {
+                    ...(typeof args.filter === "object" ? args.filter : {}),
+                    ...modelWhere,
+                  };
                   const skip = args.offset;
                   if (!field.isList) return { where };
                   return {
-                    where: Object.keys(where).length ? where : undefined,
+                    ...getWhere(where),
                     orderBy:
                       args.orderBy && Object.keys(args.orderBy).length
                         ? args.orderBy
@@ -111,26 +129,33 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
 
             const createCount = () => {
               const operationPrefix = "count";
-              const options = generator.getModelOptions(field.type)[
-                operationPrefix
-              ];
+              const options =
+                generator.getModelOptions(modelName)[operationPrefix];
               return t.relationCount(`${field.name}`, {
                 ...options,
                 args: {
                   filter: t.arg({
-                    type: generator.getWhere(field.type),
+                    type: generator.getWhere(modelName),
                     required: false,
-                  }),
+                  }) as never,
                 },
                 where: (args: { filter?: object }, ctx: object) => {
                   const authority = generator.getAuthority(ctx);
-                  const modelWhere = generator.getModelWhere(
-                    field.type,
+                  const generatorParams = {
+                    params: {
+                      root: undefined,
+                      args,
+                      ctx,
+                      info: undefined,
+                    },
+                    prisma: undefined,
+                    modelName,
                     operationPrefix,
                     authority,
-                    ctx
-                  );
-                  return { ...args.filter, ...modelWhere };
+                  } as const;
+                  const modelWhere = generator.getModelWhere(generatorParams);
+                  const where = { ...args.filter, ...modelWhere };
+                  return Object.keys(where).length ? where : undefined;
                 },
               });
             };
@@ -193,15 +218,10 @@ export const createModelCountQuery = (
                 authority,
               } as const;
               await generator.checkModelExecutable(generatorParams);
-              const modelWhere = generator.getModelWhere(
-                modelName,
-                operationPrefix,
-                authority,
-                ctx
-              );
+              const modelWhere = generator.getModelWhere(generatorParams);
               const where = { ...args.filter, ...modelWhere };
               return prisma[lowerFirst(modelName)].count({
-                where: Object.keys(where).length ? where : undefined,
+                ...getWhere(where),
               });
             },
           }),
@@ -222,15 +242,16 @@ export const createModelQuery = (
         generator.getModelOperations(model.name).includes(operationPrefix)
       )
       .map((model) => {
-        const options = generator.getModelOptions(model.name)[operationPrefix];
+        const modelName = model.name;
+        const options = generator.getModelOptions(modelName)[operationPrefix];
         return [
-          `${operationPrefix}${model.name}`,
+          `${operationPrefix}${modelName}`,
           t.prismaField({
             ...options,
-            type: model.name,
+            type: modelName,
             nullable: true,
             args: {
-              ...generator.findManyArgs(model.name),
+              ...generator.findManyArgs(modelName),
             },
 
             resolve: async (
@@ -242,7 +263,7 @@ export const createModelQuery = (
             ) => {
               const prisma = getPrisma(t);
               const authority = generator.getAuthority(ctx);
-              const modelName = model.name;
+
               const generatorParams = {
                 params: {
                   root,
@@ -261,21 +282,18 @@ export const createModelQuery = (
                 operationPrefix,
                 authority
               );
-              const modelWhere = generator.getModelWhere(
-                modelName,
-                operationPrefix,
-                authority,
-                ctx
-              );
+              const modelWhere = generator.getModelWhere(generatorParams);
               const where = { ...args.filter, ...modelWhere };
-              return prisma[lowerFirst(modelName)].findFirst({
+              const result = await prisma[lowerFirst(modelName)].findFirst({
                 ...query,
-                where: Object.keys(where).length ? where : undefined,
+                ...getWhere(where),
                 orderBy:
                   args.orderBy && Object.keys(args.orderBy).length
                     ? args.orderBy
                     : modelOrder,
               });
+
+              return result;
             },
           }),
         ];
@@ -295,15 +313,16 @@ export const createModelUniqueQuery = (
         generator.getModelOperations(model.name).includes(operationPrefix)
       )
       .map((model) => {
-        const options = generator.getModelOptions(model.name)[operationPrefix];
+        const modelName = model.name;
+        const options = generator.getModelOptions(modelName)[operationPrefix];
         return [
-          `${operationPrefix}${model.name}`,
+          `${operationPrefix}${modelName}`,
           t.prismaField({
             ...options,
-            type: model.name,
+            type: modelName,
             args: {
               filter: t.arg({
-                type: generator.getWhereUnique(model.name),
+                type: generator.getWhereUnique(modelName),
                 required: true,
               }),
             },
@@ -317,7 +336,7 @@ export const createModelUniqueQuery = (
             ) => {
               const prisma = getPrisma(t);
               const authority = generator.getAuthority(ctx);
-              const modelName = model.name;
+
               const generatorParams = {
                 params: {
                   root,
@@ -331,16 +350,11 @@ export const createModelUniqueQuery = (
                 authority,
               } as const;
               await generator.checkModelExecutable(generatorParams);
-              const modelWhere = generator.getModelWhere(
-                modelName,
-                operationPrefix,
-                authority,
-                ctx
-              );
+              const modelWhere = generator.getModelWhere(generatorParams);
               const where = { ...args.filter, ...modelWhere };
-              return prisma[lowerFirst(model.name)].findUniqueOrThrow({
+              return prisma[lowerFirst(modelName)].findUniqueOrThrow({
                 ...query,
-                where: where,
+                ...getWhere(where),
               });
             },
           }),
@@ -361,14 +375,15 @@ export const createModelListQuery = (
         generator.getModelOperations(model.name).includes(operationPrefix)
       )
       .map((model) => {
-        const options = generator.getModelOptions(model.name)[operationPrefix];
+        const modelName = model.name;
+        const options = generator.getModelOptions(modelName)[operationPrefix];
         return [
-          `${operationPrefix}${model.name}`,
+          `${operationPrefix}${modelName}`,
           t.prismaField({
             ...options,
-            type: [model.name],
+            type: [modelName],
             args: {
-              ...generator.findManyArgs(model.name),
+              ...generator.findManyArgs(modelName),
               ...generator.pagerArgs(),
             },
             resolve: async (
@@ -380,7 +395,6 @@ export const createModelListQuery = (
             ) => {
               const prisma = getPrisma(t);
               const authority = generator.getAuthority(ctx);
-              const modelName = model.name;
               const generatorParams = {
                 params: {
                   root,
@@ -400,12 +414,7 @@ export const createModelListQuery = (
                 operationPrefix,
                 authority
               );
-              const modelWhere = generator.getModelWhere(
-                modelName,
-                operationPrefix,
-                authority,
-                ctx
-              );
+              const modelWhere = generator.getModelWhere(generatorParams);
               const modelLimit = generator.getModelLimit(
                 modelName,
                 operationPrefix,
@@ -418,9 +427,9 @@ export const createModelListQuery = (
                   ? Math.min(modelLimit, args.limit)
                   : modelLimit ?? args.limit;
               const skip = args.offset;
-              return prisma[lowerFirst(model.name)].findMany({
+              const result = await prisma[lowerFirst(modelName)].findMany({
                 ...query,
-                where: Object.keys(where).length ? where : undefined,
+                ...getWhere(where),
                 orderBy:
                   args.orderBy && Object.keys(args.orderBy).length
                     ? args.orderBy
@@ -428,6 +437,7 @@ export const createModelListQuery = (
                 take,
                 skip,
               });
+              return result;
             },
           }),
         ];
@@ -614,12 +624,7 @@ export const updateModelMutation = (
                 authority,
               } as const;
               await generator.checkModelExecutable(generatorParams);
-              const modelWhere = generator.getModelWhere(
-                modelName,
-                operationPrefix,
-                authority,
-                ctx
-              );
+              const modelWhere = generator.getModelWhere(generatorParams);
               const modelInput = generator.getModelInputData(
                 modelName,
                 operationPrefix,
@@ -629,10 +634,7 @@ export const updateModelMutation = (
 
               return prisma[lowerFirst(modelName)].update({
                 ...query,
-                where: {
-                  ...args.where,
-                  ...modelWhere,
-                },
+                ...getWhere({ ...args.where, ...modelWhere }),
                 data: {
                   ...args.data,
                   ...modelInput,
@@ -696,12 +698,7 @@ export const updateManyModelMutation = (
                 authority,
               } as const;
               await generator.checkModelExecutable(generatorParams);
-              const modelWhere = generator.getModelWhere(
-                modelName,
-                operationPrefix,
-                authority,
-                ctx
-              );
+              const modelWhere = generator.getModelWhere(generatorParams);
               const modelInput = generator.getModelInputData(
                 modelName,
                 operationPrefix,
@@ -711,7 +708,7 @@ export const updateManyModelMutation = (
 
               return prisma[lowerFirst(modelName)]
                 .updateMany({
-                  where: { ...args.where, ...modelWhere },
+                  ...getWhere({ ...args.where, ...modelWhere }),
                   data: { ...args.data, ...modelInput },
                 })
                 .then(({ count }: { count: number }) => count);
@@ -769,12 +766,7 @@ export const deleteModelMutation = (
                 authority,
               } as const;
               await generator.checkModelExecutable(generatorParams);
-              const modelWhere = generator.getModelWhere(
-                modelName,
-                operationPrefix,
-                authority,
-                ctx
-              );
+              const modelWhere = generator.getModelWhere(generatorParams);
 
               return prisma[lowerFirst(modelName)].delete({
                 ...query,
@@ -800,14 +792,14 @@ export const deleteManyModelMutation = (
       )
       .map((model) => {
         const modelName = model.name;
-        const options = generator.getModelOptions(model.name)[operationPrefix];
+        const options = generator.getModelOptions(modelName)[operationPrefix];
         return [
-          `${operationPrefix}${model.name}`,
+          `${operationPrefix}${modelName}`,
           t.int({
             ...options,
             args: {
               where: t.arg({
-                type: generator.getWhere(model.name),
+                type: generator.getWhere(modelName),
                 required: true,
               }),
             },
@@ -832,16 +824,11 @@ export const deleteManyModelMutation = (
                 authority,
               } as const;
               await generator.checkModelExecutable(generatorParams);
-              const modelWhere = generator.getModelWhere(
-                model.name,
-                operationPrefix,
-                authority,
-                ctx
-              );
+              const modelWhere = generator.getModelWhere(generatorParams);
 
-              return prisma[lowerFirst(model.name)]
+              return prisma[lowerFirst(modelName)]
                 .deleteMany({
-                  where: { ...args.where, ...modelWhere },
+                  ...getWhere({ ...args.where, ...modelWhere }),
                 })
                 .then(({ count }: { count: number }) => count);
             },
