@@ -44,7 +44,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: Run lint
-        run: yarn lint
+        run: yarn --cwd core lint
 
   Build:
     name: Build
@@ -61,7 +61,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: Run build
-        run: yarn build
+        run: yarn --cwd core build
 
   BackendTest:
     name: Backend Test
@@ -87,6 +87,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: Initialize DB
-        run: yarn test:reset
+        run: yarn --cwd test test:reset
       - name: Test
-        run: yarn test
+        run: yarn --cwd test test

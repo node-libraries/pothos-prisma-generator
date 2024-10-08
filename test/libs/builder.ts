@@ -1,11 +1,8 @@
-import SchemaBuilder, { SchemaTypes } from "@pothos/core";
+import SchemaBuilder from "@pothos/core";
 import PrismaPlugin from "@pothos/plugin-prisma";
 import PrismaUtils from "@pothos/plugin-prisma-utils";
 import ScopeAuthPlugin from "@pothos/plugin-scope-auth";
-import PothosPrismaGeneratorPlugin, {
-  PrismaSchemaGenerator,
-  PrismaSchemaGeneratorParams,
-} from "pothos-prisma-generator";
+import PothosPrismaGeneratorPlugin from "pothos-prisma-generator";
 import PothosSchemaExporter from "pothos-schema-exporter";
 import { Context, prisma } from "./context";
 
