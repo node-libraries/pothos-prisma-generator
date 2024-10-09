@@ -2,7 +2,6 @@ node_modules
 /src
 /test
 /.github
-/dist/package.json
 .gitignore
 coverage
 yarn.lock
