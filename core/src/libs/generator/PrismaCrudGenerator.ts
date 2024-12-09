@@ -513,11 +513,15 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
   getDMMF<Types extends SchemaTypes>(
     builder: PothosSchemaTypes.SchemaBuilder<Types>
   ): RuntimeDataModel {
-    const client = builder.options.prisma.client as PrismaClient & {
-      _runtimeDataModel: RuntimeDataModel;
-    };
-
-    return client._runtimeDataModel;
+    const prisma = (
+      builder.options as typeof builder.options & {
+        prisma: {
+          client: PrismaClient & { _runtimeDataModel: RuntimeDataModel };
+          dmmf: { datamodel: RuntimeDataModel };
+        };
+      }
+    ).prisma;
+    return prisma.dmmf.datamodel ?? prisma.client._runtimeDataModel;
   }
 
   getEnum(name: string) {
