@@ -517,11 +517,11 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
       builder.options as typeof builder.options & {
         prisma: {
           client: PrismaClient & { _runtimeDataModel: RuntimeDataModel };
-          dmmf: { datamodel: RuntimeDataModel };
+          dmmf?: { datamodel: RuntimeDataModel };
         };
       }
     ).prisma;
-    return prisma.dmmf.datamodel ?? prisma.client._runtimeDataModel;
+    return prisma.dmmf?.datamodel ?? prisma.client._runtimeDataModel;
   }
 
   getEnum(name: string) {
