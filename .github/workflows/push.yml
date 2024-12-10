@@ -46,7 +46,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-
       - name: Run lint
-        run: npm run --cwd core lint
+        run: npm run --prefix core lint
 
   Build:
     name: Build
@@ -64,7 +64,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-
       - name: Run build
-        run: npm run --cwd core build
+        run: npm run --prefix core build
 
   BackendTest:
     name: Backend Test
@@ -91,8 +91,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-
       - name: Initialize DB
-        run: npm run --cwd test test:reset
+        run: npm run --prefix test test:reset
       - name: Run build
-        run: npm run --cwd core build
+        run: npm run --prefix core build
       - name: Test
-        run: npm run --cwd test test
+        run: npm run --prefix test test
