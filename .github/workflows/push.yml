@@ -45,10 +45,8 @@ jobs:
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
       - name: Run lint
-        run: pnpm run --cwd core lint
+        run: npm run --cwd core lint
 
   Build:
     name: Build
@@ -65,10 +63,8 @@ jobs:
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
       - name: Run build
-        run: pnpm run --cwd core build
+        run: npm run --cwd core build
 
   BackendTest:
     name: Backend Test
@@ -94,11 +90,9 @@ jobs:
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
       - name: Initialize DB
-        run: pnpm run --cwd test test:reset
+        run: npm run --cwd test test:reset
       - name: Run build
-        run: pnpm run --cwd core build
+        run: npm run --cwd core build
       - name: Test
-        run: pnpm run --cwd test test
+        run: npm run --cwd test test
