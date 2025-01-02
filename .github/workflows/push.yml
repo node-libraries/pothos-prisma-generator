@@ -14,6 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
+      - run: corepack enable pnpm
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Cache node modules
@@ -21,47 +22,53 @@ jobs:
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-pnpm-
           lookup-only: true
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
-        run: yarn
+        run: pnpm install --frozen-lockfile
 
   Lint:
     name: Lint
     needs: Modules
     runs-on: ubuntu-latest
     steps:
+      - run: corepack enable pnpm
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Cache node modules
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-pnpm-
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
       - name: Run lint
-        run: yarn --cwd core lint
+        run: npm run --prefix core lint
 
   Build:
     name: Build
     needs: Modules
     runs-on: ubuntu-latest
     steps:
+      - run: corepack enable pnpm
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Cache node modules
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-pnpm-
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
       - name: Run build
-        run: yarn --cwd core build
+        run: npm run --prefix core build
 
   BackendTest:
     name: Backend Test
@@ -77,18 +84,21 @@ jobs:
         ports:
           - 5432:5432
     steps:
+      - run: corepack enable pnpm
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Cache node modules
         uses: actions/cache@v4
         with:
           path: node_modules
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-yarn-
+            ${{ runner.os }}-pnpm-
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
       - name: Initialize DB
-        run: yarn --cwd test test:reset
+        run: npm run --prefix test test:reset
       - name: Run build
-        run: yarn --cwd core build
+        run: npm run --prefix core build
       - name: Test
-        run: yarn --cwd test test
+        run: npm run --prefix test test
