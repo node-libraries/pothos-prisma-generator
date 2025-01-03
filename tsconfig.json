@@ -103,10 +103,6 @@
 
     /* Completeness */
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
-    "skipLibCheck": true /* Skip type checking all .d.ts files. */,
-    "baseUrl": "./packages",
-    "paths": {
-      "pothos-prisma-generator": ["./pothos-prisma-generator/src/index.ts"]
-    }
+    "skipLibCheck": true /* Skip type checking all .d.ts files. */
   }
 }
