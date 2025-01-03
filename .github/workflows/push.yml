@@ -68,7 +68,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Run build
-        run: npm run --prefix core build
+        run: npm run --prefix packages/pothos-prisma-generator build
 
   BackendTest:
     name: Backend Test
@@ -97,8 +97,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Initialize DB
-        run: npm run --prefix test test:reset
+        run: npm run --prefix packages/test test:reset
       - name: Run build
-        run: npm run --prefix core build
+        run: npm run --prefix packages/pothos-prisma-generator build
       - name: Test
-        run: npm run --prefix test test
+        run: npm run --prefix packages/test test

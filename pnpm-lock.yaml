@@ -8,7 +8,7 @@ importers:
 
   .: {}
 
-  core:
+  packages/pothos-prisma-generator:
     dependencies:
       graphql-scalars:
         specifier: ^1.24.0
@@ -99,11 +99,7 @@ importers:
         specifier: ^3.5.3
         version: 3.5.3(typescript@5.7.2)
 
-  test:
-    dependencies:
-      pothos-prisma-generator:
-        specifier: '*'
-        version: 1.0.15(graphql@16.10.0)
+  packages/test:
     devDependencies:
       '@apollo/server':
         specifier: ^4.11.2
@@ -3465,9 +3461,6 @@ packages:
   possible-typed-array-names@1.0.0:
     resolution: {integrity: sha512-d7Uw+eZoloe0EHDIYoe+bQ5WXnGMOpmiZFTuMWCwpjzzkL2nTjcKiAk4hh8TjnGye2TwWOk3UXucZ+3rbmBa8Q==}
     engines: {node: '>= 0.4'}
-
-  pothos-prisma-generator@1.0.15:
-    resolution: {integrity: sha512-/+Sz0ut570rolroHcJSGaEu5CqXyjzYqCgGOK9c1pvPh3KE0gSnUCwnCx/rsuRaqQBOL0FBm33NGcpbQZau/3g==}
 
   pothos-schema-exporter@1.0.0:
     resolution: {integrity: sha512-BRynn7gGVlgRXqRQGsDXCnWoHq8SWlxRWT5sRxswFpS4nLkSBTfFyTLrjoOrYOhHi84usiUmtZfH8hLbIPrwfw==}
@@ -8321,14 +8314,6 @@ snapshots:
       find-up: 4.1.0
 
   possible-typed-array-names@1.0.0: {}
-
-  pothos-prisma-generator@1.0.15(graphql@16.10.0):
-    dependencies:
-      graphql-scalars: 1.24.0(graphql@16.10.0)
-      json5: 2.2.3
-      traverse: 0.6.10
-    transitivePeerDependencies:
-      - graphql
 
   pothos-schema-exporter@1.0.0: {}
 
