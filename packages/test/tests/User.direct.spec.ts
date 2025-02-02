@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { beforeAllAsync } from "jest-async";
-import { addSchemaGeneratorCallback } from "../../pothos-prisma-generator/src";
+import { addSchemaGeneratorCallback } from "pothos-prisma-generator";
 import { getClient } from "../libs/test-tools";
 
 describe("User(Direct)", () => {
@@ -68,7 +68,7 @@ describe("User(Direct)", () => {
   });
 
   it("UpdateOneUser(Error)", async () => {
-    const { client, admin, user } = await property;
+    const { client, user } = await property;
     await expect(
       client.UpdateOneUser(
         { data: { name: "test_abc" }, where: { id: user.id } },

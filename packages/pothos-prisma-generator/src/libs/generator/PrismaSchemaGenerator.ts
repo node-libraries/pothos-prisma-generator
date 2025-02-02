@@ -118,14 +118,7 @@ type GeneratorParamsType<Types extends SchemaTypes> = {
   authority: string[];
 };
 
-type ParameterCallback<
-  T extends Partial<PothosSchemaTypes.UserSchemaTypes> = SchemaTypes,
-  Types extends Exclude<SchemaTypes, keyof T> & T = Exclude<
-    SchemaTypes,
-    keyof T
-  > &
-    T
-> = (
+type ParameterCallback<Types extends SchemaTypes> = (
   params: {
     where?: object;
     orderBy?: object;
@@ -152,12 +145,8 @@ export type PrismaSchemaGeneratorParams<
 > = P;
 
 export class PrismaSchemaGenerator<
-  T extends Partial<PothosSchemaTypes.UserSchemaTypes> = SchemaTypes,
-  Types extends Exclude<SchemaTypes, keyof T> & T = Exclude<
-    SchemaTypes,
-    keyof T
-  > &
-    T
+  Types extends SchemaTypes,
+  T extends object = object
 > extends PrismaCrudGenerator<Types> {
   private _builder;
   modelDirectives: {
@@ -186,7 +175,7 @@ export class PrismaSchemaGenerator<
   modelOrder: ModelOrder = {};
   modelInputWithoutFields: ModelInputWithoutFields = {};
   modelInputData: ModelInputData = {};
-  modelParameterCallbacks: ParameterCallback<T, Types>[] = [];
+  modelParameterCallbacks: ParameterCallback<Types>[] = [];
 
   replaceValues?: {
     [key: string]: (props: {
@@ -291,7 +280,7 @@ export class PrismaSchemaGenerator<
       ([name, value]) => ({ name, ...value } as RuntimeModel)
     );
   }
-  addModelParameterCallback(callback: ParameterCallback<T, Types>) {
+  addModelParameterCallback(callback: ParameterCallback<Types>) {
     this.modelParameterCallbacks.push(callback);
   }
   addModelOptions(

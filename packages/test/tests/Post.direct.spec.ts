@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { beforeAllAsync } from "jest-async";
-import { addSchemaGeneratorCallback } from "../../pothos-prisma-generator/src";
+import { addSchemaGeneratorCallback } from "pothos-prisma-generator";
 import { getClient } from "../libs/test-tools";
 
 describe("Post", () => {

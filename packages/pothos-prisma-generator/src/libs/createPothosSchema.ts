@@ -35,7 +35,12 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
           .flatMap((field) => {
             const modelName = field.type;
             if (field.isId) {
-              return [[field.name, t.exposeID(field.name)] as const];
+              return [
+                [
+                  field.name,
+                  t.exposeID(field.name, { nullable: false }),
+                ] as const,
+              ];
             }
             if (field.kind === "scalar") {
               return [
@@ -215,6 +220,7 @@ export const createModelCountQuery = (
           `${operationPrefix}${modelName}`,
           t.int({
             ...options,
+            nullable: false,
             args: {
               filter: t.arg({
                 type: generator.getWhere(modelName),
@@ -359,6 +365,7 @@ export const createModelUniqueQuery = (
           t.prismaField({
             ...options,
             type: modelName,
+            nullable: false,
             args: {
               filter: t.arg({
                 type: generator.getWhereUnique(modelName),
@@ -428,6 +435,7 @@ export const createModelListQuery = (
           t.prismaField({
             ...options,
             type: [modelName],
+            nullable: false,
             args: {
               ...generator.findManyArgs(modelName),
               ...generator.pagerArgs(),
@@ -511,6 +519,7 @@ export const createModelMutation = (
           t.prismaField({
             ...options,
             type: modelName,
+            nullable: false,
             args: {
               input: t.arg({
                 type: generator.getCreateInput(modelName),
@@ -579,6 +588,7 @@ export const createManyModelMutation = (
           `${operationPrefix}${modelName}`,
           t.int({
             ...options,
+            nullable: false,
             args: {
               input: t.arg({
                 type: [generator.getCreateInput(modelName)],
@@ -648,6 +658,7 @@ export const updateModelMutation = (
           t.prismaField({
             ...options,
             type: modelName,
+            nullable: false,
             args: {
               where: t.arg({
                 type: generator.getWhereUnique(modelName),
@@ -719,6 +730,7 @@ export const updateManyModelMutation = (
           `${operationPrefix}${modelName}`,
           t.int({
             ...options,
+            nullable: false,
             args: {
               where: t.arg({
                 type: generator.getWhere(modelName),
@@ -793,6 +805,7 @@ export const deleteModelMutation = (
           `${operationPrefix}${modelName}`,
           t.prismaField({
             ...options,
+            nullable: false,
             type: modelName,
             args: {
               where: t.arg({
@@ -855,6 +868,7 @@ export const deleteManyModelMutation = (
           `${operationPrefix}${modelName}`,
           t.int({
             ...options,
+            nullable: false,
             args: {
               where: t.arg({
                 type: generator.getWhere(modelName),

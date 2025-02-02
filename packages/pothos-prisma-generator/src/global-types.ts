@@ -5,20 +5,29 @@ import { PrismaClient } from "@prisma/client";
 
 declare global {
   export namespace PothosSchemaTypes {
-    export interface SchemaBuilder<Types extends SchemaTypes> {
-      addCustomGenerator<K extends keyof PrismaSchemaGenerator<Types>>(
+    export interface SchemaBuilder<
+      Types extends SchemaTypes,
+      T extends object = object
+    > {
+      addCustomGenerator<K extends keyof PrismaSchemaGenerator<Types, T>>(
         name: K,
         callback: PrismaSchemaGenerator<SchemaTypes>[K]
       ): void;
     }
-    export interface Plugins<Types extends SchemaTypes> {
-      pothosPrismaGenerator: PothosPrismaGeneratorPlugin;
+    export interface Plugins<
+      Types extends SchemaTypes,
+      T extends object = object
+    > {
+      pothosPrismaGenerator: PothosPrismaGeneratorPlugin<Types, T>;
     }
     export interface UserSchemaTypes {
       Prisma: PrismaClient;
     }
 
-    export interface SchemaBuilderOptions<Types extends SchemaTypes> {
+    export interface SchemaBuilderOptions<
+      Types extends SchemaTypes,
+      T extends object = object
+    > {
       pothosPrismaGenerator?: {
         autoScalers?: boolean;
         replace?: {
@@ -29,13 +38,16 @@ declare global {
           }) => object | string | number | undefined;
         };
         authority: ({ context }: { context: Types["Context"] }) => string[];
-        callbacks?: GeneratorCallback<Types>[];
+        callbacks?: GeneratorCallback<Types, T>[];
       };
     }
   }
 }
 
-export type GeneratorCallback<Types extends SchemaTypes> = (params: {
-  builder: PothosSchemaTypes.SchemaBuilder<Types>;
-  generator: PrismaSchemaGenerator<Types>;
+export type GeneratorCallback<
+  Types extends SchemaTypes,
+  T extends object = object
+> = (params: {
+  builder: PothosSchemaTypes.SchemaBuilder<Types, T>;
+  generator: PrismaSchemaGenerator<Types, T>;
 }) => void;

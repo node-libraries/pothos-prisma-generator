@@ -67,7 +67,7 @@ describe("User", () => {
   });
 
   it("UpdateOneUser(Error)", async () => {
-    const { client, admin, user } = await property;
+    const { client, user } = await property;
     await expect(
       client.UpdateOneUser(
         { data: { name: "test_abc" }, where: { id: user.id } },

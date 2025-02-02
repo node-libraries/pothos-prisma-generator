@@ -1,6 +1,6 @@
 import SchemaBuilder, { SchemaTypes } from "@pothos/core";
-import { GeneratorCallback } from "./global-types.js";
 import { PothosPrismaGeneratorPlugin } from "./libs/PothosPrismaGeneratorPlugin.js";
+import type { GeneratorCallback } from "./global-types.js";
 export * from "./libs/generator/PrismaCrudGenerator.js";
 export * from "./libs/generator/PrismaSchemaGenerator.js";
 export * from "./libs/createPothosSchema.js";
@@ -14,10 +14,11 @@ SchemaBuilder.allowPluginReRegistration = allowPluginReRegistration;
 export default pluginName;
 
 export const addSchemaGeneratorCallback = <
-  Types extends PothosSchemaTypes.ExtendDefaultTypes<SchemaTypes>
+  Types extends SchemaTypes,
+  T extends object = object
 >(
-  builder: PothosSchemaTypes.SchemaBuilder<Types>,
-  callback: GeneratorCallback<Types>
+  builder: PothosSchemaTypes.SchemaBuilder<Types, T>,
+  callback: GeneratorCallback<Types, T>
 ) => {
   const options = builder.options[pluginName];
   if (options) {

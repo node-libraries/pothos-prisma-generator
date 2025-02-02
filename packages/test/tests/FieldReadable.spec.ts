@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { beforeAllAsync } from "jest-async";
-import { OrderBy } from "../generated/graphql";
 import { getClient, setFieldDirective } from "../libs/test-tools";
 
 describe("Order", () => {

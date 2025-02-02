@@ -28,14 +28,17 @@ import {
 } from "./createPothosSchema.js";
 import { PrismaSchemaGenerator } from "./generator/PrismaSchemaGenerator.js";
 
-export class PothosPrismaGeneratorPlugin extends BasePlugin<SchemaTypes> {
-  generator: PrismaSchemaGenerator<SchemaTypes>;
+export class PothosPrismaGeneratorPlugin<
+  Types extends SchemaTypes,
+  T extends object = object
+> extends BasePlugin<Types, T> {
+  generator: PrismaSchemaGenerator<Types, T>;
   constructor(
-    buildCache: BuildCache<SchemaTypes>,
-    name: keyof PothosSchemaTypes.Plugins<SchemaTypes>
+    buildCache: BuildCache<Types>,
+    name: keyof PothosSchemaTypes.Plugins<Types, T>
   ) {
     super(buildCache, name);
-    const generator = new PrismaSchemaGenerator(this.builder);
+    const generator = new PrismaSchemaGenerator<Types, T>(this.builder);
     this.generator = generator;
     const builder = this.builder;
     builder.options.pothosPrismaGenerator?.callbacks?.forEach((callback) =>

@@ -1,11 +1,8 @@
 import { ApolloServer, GraphQLResponse } from "@apollo/server";
 import { PrismaClient } from "@prisma/client";
 import { DocumentNode } from "graphql";
+import { RemoveReadonly, RuntimeDataModel } from "pothos-prisma-generator";
 import { createBuilder } from "./builder";
-import {
-  RemoveReadonly,
-  RuntimeDataModel,
-} from "../../pothos-prisma-generator/src";
 import { getSdk } from "../generated/graphql";
 import type { Context } from "./context";
 
