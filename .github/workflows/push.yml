@@ -41,8 +41,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm -g install pnpm
-      - run: npm -g remove eslint
+      - run: npm -g install pnpm @eslint/js
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Cache node modules
