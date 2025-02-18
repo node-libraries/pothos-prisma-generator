@@ -1,6 +1,3 @@
-/**
- * @type {import('eslint').Linter.FlatConfig[]}
- */
 import eslint from "@eslint/js";
 import eslintConfigPrettier from "eslint-config-prettier";
 import importPlugin from "eslint-plugin-import";
