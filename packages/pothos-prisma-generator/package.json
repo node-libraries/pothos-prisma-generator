@@ -52,8 +52,5 @@
     "typescript-transform-paths": "^3.5.3"
   },
   "author": "SoraKumo <info@croud.jp>",
-  "repository": "https://github.com/node-libraries/pothos-prisma-generator",
-  "pnpm": {
-    "neverBuiltDependencies": []
-  }
+  "repository": "https://github.com/node-libraries/pothos-prisma-generator"
 }

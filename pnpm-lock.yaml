@@ -106,6 +106,10 @@ importers:
         specifier: ^3.5.3
         version: 3.5.3(typescript@5.7.3)
 
+  packages/pothos-prisma-generator/dist/esm: {}
+
+  packages/pothos-prisma-generator/esm: {}
+
   packages/test:
     devDependencies:
       '@apollo/server':
