@@ -145,8 +145,7 @@ export type PrismaSchemaGeneratorParams<
 > = P;
 
 export class PrismaSchemaGenerator<
-  Types extends SchemaTypes,
-  T extends object = object
+  Types extends SchemaTypes
 > extends PrismaCrudGenerator<Types> {
   private _builder;
   modelDirectives: {

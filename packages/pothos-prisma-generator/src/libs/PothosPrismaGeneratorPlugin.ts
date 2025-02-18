@@ -32,13 +32,13 @@ export class PothosPrismaGeneratorPlugin<
   Types extends SchemaTypes,
   T extends object = object
 > extends BasePlugin<Types, T> {
-  generator: PrismaSchemaGenerator<Types, T>;
+  generator: PrismaSchemaGenerator<Types>;
   constructor(
     buildCache: BuildCache<Types>,
     name: keyof PothosSchemaTypes.Plugins<Types, T>
   ) {
     super(buildCache, name);
-    const generator = new PrismaSchemaGenerator<Types, T>(this.builder);
+    const generator = new PrismaSchemaGenerator<Types>(this.builder);
     this.generator = generator;
     const builder = this.builder;
     builder.options.pothosPrismaGenerator?.callbacks?.forEach((callback) =>

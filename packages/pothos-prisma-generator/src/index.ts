@@ -13,12 +13,9 @@ SchemaBuilder.registerPlugin(pluginName, PothosPrismaGeneratorPlugin);
 SchemaBuilder.allowPluginReRegistration = allowPluginReRegistration;
 export default pluginName;
 
-export const addSchemaGeneratorCallback = <
-  Types extends SchemaTypes,
-  T extends object = object
->(
-  builder: PothosSchemaTypes.SchemaBuilder<Types, T>,
-  callback: GeneratorCallback<Types, T>
+export const addSchemaGeneratorCallback = <Types extends SchemaTypes>(
+  builder: PothosSchemaTypes.SchemaBuilder<Types>,
+  callback: GeneratorCallback<Types>
 ) => {
   const options = builder.options[pluginName];
   if (options) {
