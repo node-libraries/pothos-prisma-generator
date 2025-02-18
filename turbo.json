@@ -1,0 +1,14 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [
+    "**/.env.*local"
+  ],
+  "tasks": {
+    "lint": {
+      "dependsOn": [
+        "^lint"
+      ]
+    },
+    "clean": {}
+  }
+}
