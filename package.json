@@ -10,11 +10,6 @@
     "@types/jest": "^29.5.14"
   },
   "pnpm": {
-    "peerDependencyRules": {
-      "allowAny": [
-        "@babel/*",
-        "eslint"
-      ]
-    }
+    "neverBuiltDependencies": []
   }
 }
