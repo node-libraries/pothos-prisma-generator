@@ -10,7 +10,7 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "lint": "eslint ./tests",
+    "lint": "npx eslint ./tests",
     "lint:fix": "eslint --fix ./tests",
     "dev:docker": "docker compose -p pothos-prisma-generator -f docker/docker-compose.yml up -d",
     "prisma:generate": "prisma generate",
