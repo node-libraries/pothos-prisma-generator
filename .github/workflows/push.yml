@@ -28,7 +28,7 @@ jobs:
           lookup-only: true
       - name: Install dependencies
         if: steps.cache.outputs.cache-hit != 'true'
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
 
   Lint:
     name: Lint
@@ -46,7 +46,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
       - name: Run lint
         run: npm run --prefix packages/pothos-prisma-generator lint
 
@@ -66,7 +66,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
       - name: Run build
         run: npm run --prefix packages/pothos-prisma-generator build
 
@@ -95,7 +95,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install
       - name: Initialize DB
         run: npm run --prefix packages/test test:reset
       - name: Test
