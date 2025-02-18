@@ -25,7 +25,7 @@ jobs:
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           lookup-only: true
       - name: Install dependencies
-        if: steps.cache.outputs.cache-hit != 'true'
+        # if: steps.cache.outputs.cache-hit != 'true'
         run: pnpm install --frozen-lockfile
 
   Lint:
