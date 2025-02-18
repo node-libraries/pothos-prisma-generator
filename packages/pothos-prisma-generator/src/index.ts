@@ -1,6 +1,6 @@
 import SchemaBuilder, { SchemaTypes } from "@pothos/core";
 import { PothosPrismaGeneratorPlugin } from "./libs/PothosPrismaGeneratorPlugin.js";
-import type { GeneratorCallback } from "./global-types.js";
+import type { GeneratorCallback } from "./global-types.ts";
 export * from "./libs/generator/PrismaCrudGenerator.js";
 export * from "./libs/generator/PrismaSchemaGenerator.js";
 export * from "./libs/createPothosSchema.js";
