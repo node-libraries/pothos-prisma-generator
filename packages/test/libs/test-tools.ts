@@ -1,52 +1,39 @@
-import { ApolloServer, GraphQLResponse } from "@apollo/server";
 import { PrismaClient } from "@prisma/client";
 import { DocumentNode } from "graphql";
 import { RemoveReadonly, RuntimeDataModel } from "pothos-prisma-generator";
 import { createBuilder } from "./builder";
 import { getSdk } from "../generated/graphql";
 import type { Context } from "./context";
+import { execute } from "graphql";
 
 type Builder = ReturnType<typeof createBuilder>;
 
-/**
- * apolloServer
- */
-export const createApolloServer = async (
-  onCreate?: (builder: Builder) => void
-) => {
+export const getSchema = () => {
+  const builder = createBuilder();
+  return builder.toSchema({ sortSchema: false });
+};
+export const getClient = async (onCreate?: (builder: Builder) => void) => {
   const builder = createBuilder();
   onCreate?.(builder);
-  const apolloServer = new ApolloServer<Context>({
-    schema: builder.toSchema({ sortSchema: false }),
-  });
-  await apolloServer.start();
-  return apolloServer;
-};
-
-export type Server = ApolloServer<Context>;
-
-export const getBodyData = <T>(result: GraphQLResponse<T>) => {
-  const { body } = result;
-  const data = body.kind !== "single" ? undefined : body.singleResult.data;
-  const errors = body.kind !== "single" ? undefined : body.singleResult.errors;
-  return { data, errors };
-};
-
-export const getClient = async (onCreate?: (builder: Builder) => void) => {
-  const server = await createApolloServer(onCreate);
+  const schema = builder.toSchema({ sortSchema: false });
   return getSdk(
-    async <R, V>(doc: DocumentNode, vars: V, context?: Context): Promise<R> => {
-      const result = await server.executeOperation(
-        {
-          query: doc,
-          variables: vars as never,
-        },
-        { contextValue: context }
-      );
-      const { data, errors } = getBodyData(result);
+    async <R, V>(
+      document: DocumentNode,
+      vars: V,
+      context?: Context
+    ): Promise<R> => {
+      const result = await execute({
+        document,
+        variableValues: vars as never,
+        contextValue: context ?? {},
+        schema,
+      });
+      const { data, errors } = result;
       if (errors) {
         throw errors;
       }
+      if (data && Object.keys(data).length === 0)
+        throw new Error("No data returned");
       return data as R;
     }
   );
