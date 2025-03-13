@@ -10,7 +10,7 @@ describe("Post2", () => {
     const user = await prisma.user.findUniqueOrThrow({
       where: { email: "example@example.com" },
     });
-    const client = await getClient();
+    const [client] = await getClient();
     return { user, client };
   });
 

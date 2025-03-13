@@ -1,7 +1,11 @@
 import { PrismaClient } from "@prisma/client";
 import { beforeAllAsync } from "jest-async";
-import { addSchemaGeneratorCallback } from "pothos-prisma-generator";
+import {
+  addModelField,
+  addSchemaGeneratorCallback,
+} from "pothos-prisma-generator";
 import { getClient } from "../libs/test-tools";
+import gql from "graphql-tag";
 
 describe("User(Direct)", () => {
   const prisma = new PrismaClient({});
@@ -12,7 +16,19 @@ describe("User(Direct)", () => {
     const admin = await prisma.user.findUniqueOrThrow({
       where: { email: "admin@example.com" },
     });
-    const client = await getClient((builder) => {
+    const [client, requester] = await getClient((builder) => {
+      addModelField(builder, {
+        modelName: "User",
+        fieldName: "Test",
+        field: (t) => {
+          return t.string({
+            resolve: (parent) => {
+              return `${parent.name}-test`;
+            },
+          });
+        },
+      });
+
       addSchemaGeneratorCallback(builder, ({ generator }) => {
         generator.addModelOptions(
           "User",
@@ -25,7 +41,7 @@ describe("User(Direct)", () => {
         generator.addFieldDirectives("User", "roles", "readable", ["ADMIN"]);
       });
     });
-    return { user, admin, client };
+    return { user, admin, client, requester };
   });
 
   afterAll(async () => {
@@ -39,6 +55,27 @@ describe("User(Direct)", () => {
     ).resolves.toMatchObject({
       findManyUser: expect.any(Array),
     });
+  });
+
+  it("FindManyUserField", async () => {
+    const { requester, admin } = await property;
+    const { findManyUser } = (await requester(
+      gql`
+        query MyQuery {
+          findManyUser {
+            id
+            name
+            Test
+          }
+        }
+      `,
+      { user: admin }
+    )) as { findManyUser: { name: string; Test: string }[] };
+    expect(
+      findManyUser.every(
+        (v) => (v as typeof v & { Test: string }).Test === `${v.name}-test`
+      )
+    ).toBeTruthy();
   });
 
   it("FindManyUser(Error)", async () => {

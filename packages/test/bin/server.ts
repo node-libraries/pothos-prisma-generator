@@ -13,3 +13,5 @@ app.use(
   })
 );
 serve(app);
+
+console.log("http://localhost:3000/graphql");

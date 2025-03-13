@@ -16,27 +16,26 @@ export const getClient = async (onCreate?: (builder: Builder) => void) => {
   const builder = createBuilder();
   onCreate?.(builder);
   const schema = builder.toSchema({ sortSchema: false });
-  return getSdk(
-    async <R, V>(
-      document: DocumentNode,
-      vars: V,
-      context?: Context
-    ): Promise<R> => {
-      const result = await execute({
-        document,
-        variableValues: vars as never,
-        contextValue: context ?? {},
-        schema,
-      });
-      const { data, errors } = result;
-      if (errors) {
-        throw errors;
-      }
-      if (data && Object.keys(data).length === 0)
-        throw new Error("No data returned");
-      return data as R;
+  const requester = async <R, V>(
+    document: DocumentNode,
+    vars: V,
+    context?: Context
+  ): Promise<R> => {
+    const result = await execute({
+      document,
+      variableValues: vars as never,
+      contextValue: context ?? {},
+      schema,
+    });
+    const { data, errors } = result;
+    if (errors) {
+      throw errors;
     }
-  );
+    if (data && Object.keys(data).length === 0)
+      throw new Error("No data returned");
+    return data as R;
+  };
+  return [getSdk(requester), requester] as const;
 };
 
 const removeReadOnly = <T>(object: T) => object as RemoveReadonly<T>;

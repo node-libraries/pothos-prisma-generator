@@ -17,7 +17,7 @@ describe("Order", () => {
       `@pothos-generator order {orderBy:{id:"desc"},authority:["ADMIN"]}`,
       `@pothos-generator order {orderBy:{id:"asc"}}`,
     ]);
-    const client = await getClient();
+    const [client] = await getClient();
     return { user, client, admin };
   });
 

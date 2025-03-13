@@ -5,7 +5,8 @@ import {
   PrismaCrudGenerator,
   RuntimeDataModel,
 } from "./PrismaCrudGenerator.js";
-import type { SchemaTypes } from "@pothos/core";
+import type { FieldRef, SchemaTypes } from "@pothos/core";
+import type { PrismaObjectFieldBuilder as _PrismaObjectFieldBuilder } from "@pothos/plugin-prisma";
 
 export type RemoveReadonly<O> = {
   -readonly [K in keyof O]: RemoveReadonly<O[K]>;
@@ -161,6 +162,14 @@ export class PrismaSchemaGenerator<
           undefined
         >[];
       };
+    };
+  } = {};
+  modelFields: {
+    [key: string]: {
+      [key: string]: (
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        t: PothosSchemaTypes.PrismaObjectFieldBuilder<Types, any>
+      ) => FieldRef<Types>;
     };
   } = {};
 

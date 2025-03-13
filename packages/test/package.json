@@ -21,7 +21,7 @@
     "prisma:test": "next-exec -c test -- tsx bin/test",
     "pothos:schema": "tsx bin/createSchema",
     "codegen": "graphql-codegen --config codegen/codegen.json",
-    "server": "next-exec -c test -- tsx bin/server.ts",
+    "server": "next-exec -c test -- tsx --watch bin/server.ts",
     "test:reset": "pnpm run prisma:reset && pnpm run prisma:seed",
     "test": "next-exec -c test -- jest --coverage"
   },

@@ -23,7 +23,7 @@ describe("User", () => {
     const admin = await prisma.user.findUniqueOrThrow({
       where: { email: "admin@example.com" },
     });
-    const client = await getClient();
+    const [client] = await getClient();
     return { user, admin, client };
   });
 

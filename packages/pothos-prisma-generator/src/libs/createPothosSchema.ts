@@ -28,6 +28,7 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
   generator.getModels().map((model) => {
     const modelName = model.name;
     const selectFields = new Set(generator.getModelExcludeField(modelName));
+    const modelFields = generator.modelFields[modelName] ?? {};
     builder.prismaObject(modelName, {
       fields: (t) => {
         const fields = model.fields
@@ -196,7 +197,14 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                 ]
               : [[field.name, createField()] as const];
           });
-        return Object.fromEntries(fields);
+
+        return Object.fromEntries([
+          ...fields,
+          ...Object.entries(modelFields).map(([key, callback]) => [
+            key,
+            callback(t as never),
+          ]),
+        ]);
       },
     });
   });

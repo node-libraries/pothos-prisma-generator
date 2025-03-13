@@ -44,6 +44,8 @@ export class PothosPrismaGeneratorPlugin<
     builder.options.pothosPrismaGenerator?.callbacks?.forEach((callback) =>
       callback({ builder, generator })
     );
+    generator.modelFields =
+      builder.options.pothosPrismaGenerator?.modelFields ?? {};
     generator.createModels();
   }
   beforeBuild(): void {

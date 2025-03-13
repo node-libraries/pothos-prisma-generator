@@ -16,7 +16,7 @@ describe("Order", () => {
       `@pothos-generator limit {authority:["ADMIN"]}`,
       `@pothos-generator limit {limit:5}`,
     ]);
-    const client = await getClient();
+    const [client] = await getClient();
     return { user, client, admin };
   });
 

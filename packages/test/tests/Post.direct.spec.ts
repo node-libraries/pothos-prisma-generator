@@ -13,7 +13,7 @@ describe("Post", () => {
     const admin = await prisma.user.findUniqueOrThrow({
       where: { email: "admin@example.com" },
     });
-    const client = await getClient((builder) => {
+    const [client] = await getClient((builder) => {
       addSchemaGeneratorCallback(builder, ({ generator }) => {
         generator.addModelOperations("Post", {
           exclude: ["deleteMany"],

@@ -5,8 +5,7 @@ import ScopeAuthPlugin from "@pothos/plugin-scope-auth";
 import PothosPrismaGeneratorPlugin from "pothos-prisma-generator";
 import PothosSchemaExporter from "pothos-schema-exporter";
 import { Context, prisma } from "./context";
-
-// import type PrismaTypes from "@pothos/plugin-prisma/generated";
+import type PrismaTypes from "@pothos/plugin-prisma/generated";
 
 /**
  * Create a new schema builder instance
@@ -14,7 +13,7 @@ import { Context, prisma } from "./context";
 export const createBuilder = () => {
   return new SchemaBuilder<{
     Context: Context;
-    // PrismaTypes: PrismaTypes; //Not used because it is generated automatically
+    PrismaTypes: PrismaTypes; //Not used because it is generated automatically
     Prisma: typeof prisma;
   }>({
     plugins: [

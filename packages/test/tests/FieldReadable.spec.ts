@@ -7,7 +7,7 @@ describe("Order", () => {
 
   const property = beforeAllAsync(async () => {
     setFieldDirective("User", "roles", [` @pothos-generator readable []`]);
-    const client = await getClient();
+    const [client] = await getClient();
     return { client };
   });
 

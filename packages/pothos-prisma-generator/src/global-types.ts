@@ -1,7 +1,8 @@
-import { SchemaTypes } from "@pothos/core";
+import { SchemaTypes, type FieldRef } from "@pothos/core";
 import { PrismaSchemaGenerator } from "./libs/generator/PrismaSchemaGenerator.js";
 import { PothosPrismaGeneratorPlugin } from "./libs/PothosPrismaGeneratorPlugin.js";
 import type { PrismaClient } from "@prisma/client";
+import type { PrismaObjectFieldBuilder as _PrismaObjectFieldBuilder } from "@pothos/plugin-prisma";
 
 declare global {
   export namespace PothosSchemaTypes {
@@ -33,6 +34,13 @@ declare global {
         };
         authority: ({ context }: { context: Types["Context"] }) => string[];
         callbacks?: GeneratorCallback<Types>[];
+        modelFields?: {
+          [key: string]: {
+            [key: string]: (
+              t: PothosSchemaTypes.PrismaObjectFieldBuilder<Types, any>
+            ) => FieldRef<Types>;
+          };
+        };
       };
     }
   }
