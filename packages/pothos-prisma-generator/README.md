@@ -445,3 +445,51 @@ In the following case, the condition `where:{}` is added if you are logged in, a
 // Sample assumes ["ADMIN", "USER"] is set during authentication
 authority: ({ context }) => context.user?.roles ?? [],
 ```
+
+## How to add directives on the code
+
+- Request generator callback from builder
+
+  - addSchemaGeneratorCallback: <Types extends SchemaTypes>(builder: PothosSchemaTypes.SchemaBuilder<Types>, callback: GeneratorCallback<Types>) => void;
+
+- Add model options
+  - addModelOptions(modelName: string, filterOperations: FilterOperations, options: object): void;
+- Add model operations
+  - addModelOperations(modelName: string, filterOperations: FilterOperations): void;
+- Add model directives
+  - addModelDirectives<K extends keyof ModelDirective>(modelName: string, directive: K, values: Required<ModelDirective>[K]): void;
+- Add field directives
+  - addFieldDirectives(modelName: string, fieldName: string, directive: keyof FieldDirective, value: string[]): void;
+
+```ts
+addSchemaGeneratorCallback(builder, ({ generator }) => {
+  generator.addModelOptions(
+    "User",
+    { include: ["mutation"] },
+    { authScopes: { ADMIN: true } }
+  );
+  generator.addModelOperations("User", {
+    include: ["createOne", "updateOne", "findMany"],
+  });
+  generator.addFieldDirectives("User", "roles", "readable", ["ADMIN"]);
+});
+```
+
+## Adding custom fields to a model
+
+Addition of a Test field to the `User` model.
+Note that custom fields are N+1.
+
+```ts
+addModelField(builder, {
+  modelName: "User",
+  fieldName: "Test",
+  field: (t) => {
+    return t.string({
+      resolve: (parent) => {
+        return `${parent.name}-test`;
+      },
+    });
+  },
+});
+```
