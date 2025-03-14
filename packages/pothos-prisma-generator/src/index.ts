@@ -1,7 +1,7 @@
 import SchemaBuilder, { SchemaTypes, type FieldRef } from "@pothos/core";
 import { PothosPrismaGeneratorPlugin } from "./libs/PothosPrismaGeneratorPlugin.js";
 import type { GeneratorCallback } from "./global-types.ts";
-import type { PrismaModelTypes, PrismaObjectRef } from "@pothos/plugin-prisma";
+import type { PrismaModelTypes } from "@pothos/plugin-prisma";
 export * from "./libs/generator/PrismaCrudGenerator.js";
 export * from "./libs/generator/PrismaSchemaGenerator.js";
 export * from "./libs/createPothosSchema.js";
