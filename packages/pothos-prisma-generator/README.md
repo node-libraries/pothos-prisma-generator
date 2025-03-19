@@ -23,6 +23,20 @@ Generate a GraphQL schema from `prisma.schema` that can be queried as follows.
 
 The schema is generated internally at runtime, so no text output of the code is performed.
 
+## Notes on running from `tsx`.
+
+Using `async-function@1.0.0` will cause errors for Pothos, so the version must be specified as follows.
+
+- package.json
+
+```json
+{
+  "resolutions": {
+    "async-function": "0.1.0"
+  }
+}
+```
+
 ## Sample code
 
 - Next.js
