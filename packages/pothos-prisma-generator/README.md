@@ -476,7 +476,7 @@ authority: ({ context }) => context.user?.roles ?? [],
   - addFieldDirectives(modelName: string, fieldName: string, directive: keyof FieldDirective, value: string[]): void;
 
 ```ts
-addSchemaGeneratorCallback(builder, ({ generator }) => {
+builder.addSchemaGenerator(({ generator }) => {
   generator.addModelOptions(
     "User",
     { include: ["mutation"] },
@@ -495,10 +495,8 @@ Addition of a Test field to the `User` model.
 Note that custom fields are N+1.
 
 ```ts
-addModelField(builder, {
-  modelName: "User",
-  fieldName: "Test",
-  field: (t) => {
+builder.addModelFields("User", {
+  Test: (t) => {
     return t.string({
       resolve: (parent) => {
         return `${parent.name}-test`;

@@ -1,4 +1,4 @@
-import {
+import SchemaBuilder, {
   BasePlugin,
   BuildCache,
   PothosOutputFieldConfig,
@@ -44,9 +44,9 @@ export class PothosPrismaGeneratorPlugin<
     builder.options.pothosPrismaGenerator?.callbacks?.forEach((callback) =>
       callback({ builder, generator })
     );
+    generator.createModels();
     generator.modelFields =
       builder.options.pothosPrismaGenerator?.modelFields ?? {};
-    generator.createModels();
   }
   beforeBuild(): void {
     const builder = this.builder;
@@ -134,3 +134,32 @@ export class PothosPrismaGeneratorPlugin<
     return resolver;
   }
 }
+
+const schemaBuilderProto =
+  SchemaBuilder.prototype as PothosSchemaTypes.SchemaBuilder<SchemaTypes>;
+
+schemaBuilderProto.addModelFields = function (modelName, fields) {
+  const options = this.options.pothosPrismaGenerator;
+  if (options) {
+    if (!options.modelFields) {
+      options.modelFields = {};
+    }
+    if (!options.modelFields[modelName]) {
+      options.modelFields[modelName] = {} as never;
+    }
+    options.modelFields[modelName] = {
+      ...options.modelFields[modelName],
+      ...fields,
+    };
+  }
+};
+
+schemaBuilderProto.addSchemaGenerator = function (callback) {
+  const options = this.options.pothosPrismaGenerator;
+  if (options) {
+    if (!options.callbacks) {
+      options.callbacks = [];
+    }
+    options.callbacks.push(callback);
+  }
+};

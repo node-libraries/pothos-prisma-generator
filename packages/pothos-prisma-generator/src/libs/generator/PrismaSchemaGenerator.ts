@@ -6,7 +6,10 @@ import {
   RuntimeDataModel,
 } from "./PrismaCrudGenerator.js";
 import type { FieldRef, SchemaTypes } from "@pothos/core";
-import type { PrismaObjectFieldBuilder as _PrismaObjectFieldBuilder } from "@pothos/plugin-prisma";
+import type {
+  PrismaObjectFieldBuilder as _PrismaObjectFieldBuilder,
+  PrismaModelTypes,
+} from "@pothos/plugin-prisma";
 
 export type RemoveReadonly<O> = {
   -readonly [K in keyof O]: RemoveReadonly<O[K]>;
@@ -165,7 +168,7 @@ export class PrismaSchemaGenerator<
     };
   } = {};
   modelFields: {
-    [key: string]: {
+    [key in keyof Types["PrismaTypes"]]?: {
       [key: string]: (
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         t: PothosSchemaTypes.PrismaObjectFieldBuilder<Types, any>
@@ -314,14 +317,14 @@ export class PrismaSchemaGenerator<
       filterOperations,
     ];
   }
-  addModelDirectives<K extends keyof ModelDirective>(
-    modelName: string,
-    directive: K,
-    values: Required<ModelDirective>[K]
-  ) {
-    this.modelDirectives[modelName] = this.modelDirectives[modelName] ?? {};
-    this.modelDirectives[modelName][directive] = [
-      ...(this.modelDirectives[modelName][directive] ?? []),
+  addModelDirectives<
+    K extends keyof ModelDirective,
+    Name extends keyof Types["PrismaTypes"]
+  >(modelName: Name, directive: K, values: Required<ModelDirective>[K]) {
+    this.modelDirectives[modelName as string] =
+      this.modelDirectives[modelName as string] ?? {};
+    this.modelDirectives[modelName as string][directive] = [
+      ...(this.modelDirectives[modelName as string][directive] ?? []),
       values,
     ] as (typeof this.modelDirectives)[string][K];
   }

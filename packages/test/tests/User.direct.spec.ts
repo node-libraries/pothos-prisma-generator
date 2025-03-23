@@ -1,9 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { beforeAllAsync } from "jest-async";
-import {
-  addModelField,
-  addSchemaGeneratorCallback,
-} from "pothos-prisma-generator";
 import { getClient } from "../libs/test-tools";
 import gql from "graphql-tag";
 
@@ -17,10 +13,9 @@ describe("User(Direct)", () => {
       where: { email: "admin@example.com" },
     });
     const [client, requester] = await getClient((builder) => {
-      addModelField(builder, {
-        modelName: "User",
-        fieldName: "Test",
-        field: (t) => {
+      builder.prismaObject;
+      builder.addModelFields("User", {
+        Test: (t) => {
           return t.string({
             resolve: (parent) => {
               return `${parent.name}-test`;
@@ -29,7 +24,7 @@ describe("User(Direct)", () => {
         },
       });
 
-      addSchemaGeneratorCallback(builder, ({ generator }) => {
+      builder.addSchemaGenerator(({ generator }) => {
         generator.addModelOptions(
           "User",
           { include: ["mutation"] },

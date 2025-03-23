@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { beforeAllAsync } from "jest-async";
-import { addSchemaGeneratorCallback } from "pothos-prisma-generator";
 import { getClient } from "../libs/test-tools";
 
 describe("Post", () => {
@@ -14,7 +13,7 @@ describe("Post", () => {
       where: { email: "admin@example.com" },
     });
     const [client] = await getClient((builder) => {
-      addSchemaGeneratorCallback(builder, ({ generator }) => {
+      builder.addSchemaGenerator(({ generator }) => {
         generator.addModelOperations("Post", {
           exclude: ["deleteMany"],
         });

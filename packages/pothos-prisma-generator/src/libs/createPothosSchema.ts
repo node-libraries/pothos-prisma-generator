@@ -202,7 +202,7 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
           ...fields,
           ...Object.entries(modelFields).map(([key, callback]) => [
             key,
-            callback(t as never),
+            callback(t),
           ]),
         ]);
       },

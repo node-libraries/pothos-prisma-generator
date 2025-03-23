@@ -2,14 +2,27 @@ import { SchemaTypes, type FieldRef } from "@pothos/core";
 import { PrismaSchemaGenerator } from "./libs/generator/PrismaSchemaGenerator.js";
 import { PothosPrismaGeneratorPlugin } from "./libs/PothosPrismaGeneratorPlugin.js";
 import type { PrismaClient } from "@prisma/client";
-import type { PrismaObjectFieldBuilder as _PrismaObjectFieldBuilder } from "@pothos/plugin-prisma";
+import type {
+  PrismaObjectFieldBuilder as _PrismaObjectFieldBuilder,
+  PrismaModelTypes,
+} from "@pothos/plugin-prisma";
 
 declare global {
   export namespace PothosSchemaTypes {
     export interface SchemaBuilder<Types extends SchemaTypes> {
-      addCustomGenerator<K extends keyof PrismaSchemaGenerator<Types>>(
-        name: K,
-        callback: PrismaSchemaGenerator<SchemaTypes>[K]
+      addSchemaGenerator(callback: GeneratorCallback<Types>): void;
+      addModelFields<
+        Name extends keyof Types["PrismaTypes"],
+        Model extends PrismaModelTypes & Types["PrismaTypes"][Name],
+        Shape extends Model["Shape"]
+      >(
+        modelName: Name,
+        fields: Record<
+          string,
+          (
+            t: PothosSchemaTypes.PrismaObjectFieldBuilder<Types, Model, Shape>
+          ) => FieldRef<Types>
+        >
       ): void;
     }
     export interface Plugins<
@@ -35,9 +48,12 @@ declare global {
         authority: ({ context }: { context: Types["Context"] }) => string[];
         callbacks?: GeneratorCallback<Types>[];
         modelFields?: {
-          [key: string]: {
+          [key in keyof Types["PrismaTypes"]]?: {
             [key: string]: (
-              t: PothosSchemaTypes.PrismaObjectFieldBuilder<Types, any>
+              t: PothosSchemaTypes.PrismaObjectFieldBuilder<
+                Types,
+                PrismaModelTypes
+              >
             ) => FieldRef<Types>;
           };
         };
