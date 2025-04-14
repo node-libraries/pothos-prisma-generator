@@ -526,8 +526,10 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
 
   getEnum(name: string) {
     if (!this.enumRefs.has(name)) {
-      const enums = Object.values(this.getDMMF(this.builder).enums) as DMMF.DatamodelEnum[];
-      const modelEnum = enums.find(e => e.name === name);
+      const enums = this.getDMMF(this.builder).enums;
+      const modelEnum = Array.isArray(enums)
+        ? (enums as DMMF.DatamodelEnum[]).find((e) => e.name === name)
+        : enums[name];
       if (modelEnum) {
         const enumRef = this.builder.enumType(name, {
           values: modelEnum.values.map(({ name }) => name),
