@@ -6,12 +6,12 @@ import {
   SchemaTypes,
 } from "@pothos/core";
 import { getModel, PrismaModelTypes } from "@pothos/plugin-prisma";
+import { DMMF, getPrismaClient } from "@prisma/client/runtime/library";
 import type {
   FilterOps,
   PrismaOrderByFields,
 } from "@pothos/plugin-prisma-utils";
 import type { PrismaClient } from "@prisma/client";
-import type { getPrismaClient } from "@prisma/client/runtime/library";
 
 export type RuntimeDataModel = Parameters<
   typeof getPrismaClient
@@ -526,7 +526,8 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
 
   getEnum(name: string) {
     if (!this.enumRefs.has(name)) {
-      const modelEnum = this.getDMMF(this.builder).enums[name];
+      const enums = Object.values(this.getDMMF(this.builder).enums) as DMMF.DatamodelEnum[];
+      const modelEnum = enums.find(e => e.name === name);
       if (modelEnum) {
         const enumRef = this.builder.enumType(name, {
           values: modelEnum.values.map(({ name }) => name),
@@ -547,6 +548,7 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
       case "Float":
       case "DateTime":
       case "Json":
+      case "Decimal":
         return type;
       default:
         return null;
