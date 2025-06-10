@@ -61,6 +61,28 @@ const main = async () => {
       }
     }
   });
+
+  // add TypeTest
+  await prisma.typeTest.count().then(async (count) => {
+    if (!count) {
+      await prisma.typeTest.createMany({
+        data: [
+          {
+            role: "USER",
+            scalarList: ["item1", "item2", "item3"],
+          },
+          {
+            role: "ADMIN",
+            scalarList: ["admin1", "admin2"],
+          },
+          {
+            role: "USER",
+            scalarList: [],
+          },
+        ],
+      });
+    }
+  });
 };
 
 main();
