@@ -49,7 +49,7 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                   field.name,
                   t.expose(field.name, {
                     type: field.isList
-                      ? t.listRef(modelName).listType
+                      ? [modelName]
                       : modelName,
                     nullable: !field.isRequired,
                   }),

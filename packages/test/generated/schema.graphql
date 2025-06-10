@@ -452,7 +452,7 @@ type Category {
 
 type TypeTest {
   id: ID!
-  scalarList: String!
+  scalarList: [String!]!
   role: Role!
 }
 
