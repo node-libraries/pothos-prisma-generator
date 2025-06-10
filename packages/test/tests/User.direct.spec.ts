@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
+import gql from "graphql-tag";
 import { beforeAllAsync } from "jest-async";
 import { getClient } from "../libs/test-tools";
-import gql from "graphql-tag";
 
 describe("User(Direct)", () => {
   const prisma = new PrismaClient({});
@@ -13,7 +13,6 @@ describe("User(Direct)", () => {
       where: { email: "admin@example.com" },
     });
     const [client, requester] = await getClient((builder) => {
-      builder.prismaObject;
       builder.addModelFields("User", {
         Test: (t) => {
           return t.string({

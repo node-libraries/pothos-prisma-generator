@@ -6,7 +6,7 @@ Automatic generation of GraphQL schema from prisma schema.
 
 Generate a GraphQL schema from `prisma.schema` that can be queried as follows.
 
-[prisma.schema](https://github.com/node-libraries/pothos-prisma-generator/blob/master/test/prisma/schema.prisma) -> [queries.graphql](https://github.com/node-libraries/pothos-prisma-generator/blob/master/test/graphql/operations.graphql)
+[prisma.schema](https://github.com/node-libraries/pothos-prisma-generator/blob/master/packages/test/prisma/schema.prisma) -> [queries.graphql](https://github.com/node-libraries/pothos-prisma-generator/blob/master/packages/test/graphql/operations.graphql)
 
 ![](https://raw.githubusercontent.com/node-libraries/pothos-prisma-generator/master/documents/screenshot01.png)
 
@@ -112,6 +112,11 @@ export const builder = new SchemaBuilder<{
     // Set the following permissions
     /// @pothos-generator any {authority:["ROLE"]}
     authority: ({ context }) => context.user?.roles ?? [],
+    // Whether `include:[‘all’]` is applied by default
+    defaultIncludes: {
+      operations: true, // default
+      fields: true, // default
+    },
   },
 });
 ```
@@ -155,6 +160,8 @@ If no operation is specified on the directive, it is applied to all.
   `deleteOne`, `deleteMany`
 - mutation  
   `createOne`, `createMany`, `updateOne`, `updateMany`, `deleteOne`, `deleteMany`
+- all
+  `findUnique`, `findFirst`, `findMany`, `count`, `createOne`, `createMany`, `updateOne`, `updateMany`, `deleteOne`, `deleteMany`
 
 ### Select the operation to output
 

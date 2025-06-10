@@ -10,7 +10,10 @@ import type PrismaTypes from "@pothos/plugin-prisma/generated";
 /**
  * Create a new schema builder instance
  */
-export const createBuilder = () => {
+export const createBuilder = (defaultIncludes?: {
+  operations?: boolean;
+  fields?: boolean;
+}) => {
   return new SchemaBuilder<{
     Context: Context;
     PrismaTypes: PrismaTypes; //Not used because it is generated automatically
@@ -41,6 +44,7 @@ export const createBuilder = () => {
       // Set the following permissions
       /// @pothos-generator any {authority:["ROLE"]}
       authority: ({ context }) => context.user?.roles ?? [],
+      defaultIncludes,
     },
   });
 };

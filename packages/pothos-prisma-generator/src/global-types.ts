@@ -38,6 +38,10 @@ declare global {
     export interface SchemaBuilderOptions<Types extends SchemaTypes> {
       pothosPrismaGenerator?: {
         autoScalers?: boolean;
+        defaultIncludes?: {
+          operations?: boolean;
+          fields?: boolean;
+        };
         replace?: {
           [key: string]: ({
             context,

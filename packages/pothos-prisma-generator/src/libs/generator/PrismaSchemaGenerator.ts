@@ -25,10 +25,11 @@ const mutationOperations = [
   ...updateOperations,
   ...deleteOperations,
 ] as const;
-
 const queryOperations = [...findOperations, ...countOperations] as const;
+const allOperations = [...queryOperations, ...mutationOperations];
 
 const operationMap = {
+  all: allOperations,
   find: findOperations,
   query: queryOperations,
   create: createOperations,
@@ -37,15 +38,14 @@ const operationMap = {
   mutation: mutationOperations,
 };
 
-const allOperations = [...queryOperations, ...mutationOperations];
-
 export type Operation = (typeof allOperations)[number];
 export type ExtendOperation =
   | Operation
   | "mutation"
   | "query"
   | "update"
-  | "delete";
+  | "delete"
+  | "all";
 
 export type FilterOperations = {
   include?: ExtendOperation[];
@@ -326,17 +326,20 @@ export class PrismaSchemaGenerator<
   }
   addFieldDirectives(
     modelName: string,
-    fieldName: string,
+    fieldName: string | string[],
     directive: keyof FieldDirective,
     value: string[]
   ) {
     this.fieldDirectives[modelName] = this.fieldDirectives[modelName] ?? {};
-    this.fieldDirectives[modelName][fieldName] =
-      this.fieldDirectives[modelName][fieldName] ?? {};
-    this.fieldDirectives[modelName][fieldName][directive] = [
-      ...(this.fieldDirectives[modelName][fieldName][directive] ?? []),
-      value,
-    ];
+    const fieldNames = Array.isArray(fieldName) ? fieldName : [fieldName];
+    fieldNames.forEach((name) => {
+      this.fieldDirectives[modelName][name] =
+        this.fieldDirectives[modelName][name] ?? {};
+      this.fieldDirectives[modelName][name][directive] = [
+        ...(this.fieldDirectives[modelName][name][directive] ?? []),
+        value,
+      ];
+    });
   }
   protected createModelOptions() {
     this.getModels().forEach(({ name }) => {
@@ -521,15 +524,21 @@ export class PrismaSchemaGenerator<
     );
 
   getFilterOperations = ({ include, exclude }: FilterOperations) => {
-    if (include) {
-      return this.expandOperations(include);
-    }
-    if (exclude) {
-      const expandExclude = this.expandOperations(exclude);
-      return allOperations.filter((action) => !expandExclude.includes(action));
-    }
-    return allOperations;
+    const defaultIncludes =
+      this.getBuilder().options.pothosPrismaGenerator?.defaultIncludes
+        ?.operations ?? true;
+    const includeOperations = include
+      ? this.expandOperations(include)
+      : defaultIncludes
+      ? allOperations
+      : [];
+    const excludeOperations = exclude ? this.expandOperations(exclude) : [];
+    const result = includeOperations.filter(
+      (action) => !excludeOperations.includes(action)
+    );
+    return result;
   };
+
   getFieldReadable(modelName: string, fieldName: string) {
     return this.fieldDirectives[modelName][fieldName]?.readable?.reduce(
       (a, b) => {
@@ -544,9 +553,12 @@ export class PrismaSchemaGenerator<
     modelName: string,
     fields?: { include?: string[]; exclude?: string[] }
   ) {
+    const defaultIncludes =
+      this.getBuilder().options.pothosPrismaGenerator?.defaultIncludes
+        ?.fields ?? true;
     const model = this.getModels().find(({ name }) => name === modelName);
     const modelFields = model!.fields.map(({ name }) => name);
-    const include = fields?.include ?? modelFields;
+    const include = fields?.include ?? (defaultIncludes ? modelFields : []);
     const exclude = fields?.exclude ?? [];
     const result = include.filter((field) => !exclude.includes(field));
     return modelFields.filter((field) => !result.includes(field));
@@ -562,7 +574,7 @@ export class PrismaSchemaGenerator<
     const directives = this.getModelDirectives(modelName, "operation");
     const operators = directives.reduce<string[]>((_, action) => {
       return this.getFilterOperations(action);
-    }, allOperations);
+    }, this.getFilterOperations({}));
     return operators;
   }
 

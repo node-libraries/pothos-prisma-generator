@@ -12,8 +12,11 @@ export const getSchema = () => {
   const builder = createBuilder();
   return builder.toSchema({ sortSchema: false });
 };
-export const getClient = async (onCreate?: (builder: Builder) => void) => {
-  const builder = createBuilder();
+export const getClient = async (
+  onCreate?: (builder: Builder) => void,
+  defaultIncludes?: { operations?: boolean; fields?: boolean }
+) => {
+  const builder = createBuilder(defaultIncludes);
   onCreate?.(builder);
   const schema = builder.toSchema({ sortSchema: false });
   const requester = async <R, V>(
@@ -57,7 +60,7 @@ export const setModelDirective = (model: string, directive: string[]) => {
 
 export const setFieldDirective = (
   model: string,
-  field: string,
+  field: string | string[],
   directive: string[]
 ) => {
   const prisma = new PrismaClient();
