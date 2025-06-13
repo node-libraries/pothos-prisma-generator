@@ -107,4 +107,4 @@ jobs:
       - name: Run build
         run: npm run --prefix packages/pothos-prisma-generator build
       - name: Test
-        run: npm run --prefix packages/test test
+        run: npm run --prefix packages/test test:actions

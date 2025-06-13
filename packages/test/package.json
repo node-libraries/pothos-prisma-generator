@@ -10,9 +10,13 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "test": "pnpm docker:start && pnpm prisma:migrate && pnpm prisma:seed && next-exec -c test -- jest --coverage",
+    "test:reset": "pnpm run prisma:reset && pnpm run prisma:seed",
+    "test:actions": "next-exec -c test -- jest --coverage",
+    "server": "next-exec -c test -- tsx --watch bin/server.ts",
     "lint": "npx eslint ./tests",
     "lint:fix": "eslint --fix ./tests",
-    "dev:docker": "docker compose -p pothos-prisma-generator -f docker/docker-compose.yml up -d",
+    "docker:start": "docker compose -p pothos-prisma-generator -f docker/docker-compose.yml up -d",
     "prisma:generate": "prisma generate",
     "prisma:format": "prisma format",
     "prisma:migrate": "next-exec -c test -- prisma migrate dev -n migrate",
@@ -20,10 +24,7 @@
     "prisma:seed": "next-exec -c test -- tsx bin/seeds",
     "prisma:test": "next-exec -c test -- tsx bin/test",
     "pothos:schema": "tsx bin/createSchema",
-    "codegen": "graphql-codegen --config codegen/codegen.json",
-    "server": "next-exec -c test -- tsx --watch bin/server.ts",
-    "test:reset": "pnpm run prisma:reset && pnpm run prisma:seed",
-    "test": "next-exec -c test -- jest --coverage"
+    "codegen": "graphql-codegen --config codegen/codegen.json"
   },
   "devDependencies": {
     "@eslint/js": "9.28.0",

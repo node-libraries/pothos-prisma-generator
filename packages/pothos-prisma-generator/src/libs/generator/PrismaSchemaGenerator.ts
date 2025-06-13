@@ -65,7 +65,7 @@ export type ModelDirective = {
   } & FilterOperations &
     DirectiveAuthority;
   limit?: {
-    limit?: object;
+    limit?: number;
   } & FilterOperations &
     DirectiveAuthority;
   option?: {

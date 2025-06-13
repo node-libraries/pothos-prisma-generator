@@ -1,5 +1,10 @@
 # pothos-prisma-generator
 
+[![](https://img.shields.io/npm/l/pothos-prisma-generator)](https://www.npmjs.com/package/pothos-prisma-generator)
+[![](https://img.shields.io/npm/v/pothos-prisma-generator)](https://www.npmjs.com/package/pothos-prisma-generator)
+[![](https://img.shields.io/npm/dw/pothos-prisma-generator)](https://www.npmjs.com/package/pothos-prisma-generator)
+[![](https://deepwiki.com/badge.svg)](https://deepwiki.com/node-libraries/pothos-prisma-generator)
+
 ## Overview
 
 Automatic generation of GraphQL schema from prisma schema.
