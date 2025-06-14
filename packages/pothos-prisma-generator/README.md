@@ -488,22 +488,12 @@ authority: ({ context }) => context.user?.roles ?? [],
   - addFieldDirectives(modelName: string, fieldName: string, directive: keyof FieldDirective, value: string[]): void;
 
 ```ts
-builder.addSchemaGenerator(({ generator }) => {
-  generator.addModelOptions(
-    "User",
-    { include: ["mutation"] },
-    { authScopes: { ADMIN: true } }
-  );
-  generator.addModelOperations("User", {
-    include: ["createOne", "updateOne", "findMany"],
-  });
-  generator.addFieldDirectives("User", "roles", "readable", ["ADMIN"]);
-});
+builder.addSchemaGenerator(({ generator }) => {});
 ```
 
 ## Adding custom fields to a model
 
-Addition of a Test field to the `User` model.
+Addition of a Test field to the `User` model.  
 Note that custom fields are N+1.
 
 ```ts
@@ -516,4 +506,16 @@ builder.addModelFields("User", {
     });
   },
 });
+
+builder.addModelOptions(
+  "User",
+  { include: ["mutation"] },
+  { authScopes: { ADMIN: true } }
+);
+
+builder.addModelOperations("User", {
+  include: ["createOne", "updateOne", "findMany"],
+});
+
+builder.addFieldDirectives("User", "roles", "readable", ["ADMIN"]);
 ```

@@ -163,3 +163,46 @@ schemaBuilderProto.addSchemaGenerator = function (callback) {
     options.callbacks.push(callback);
   }
 };
+
+schemaBuilderProto.addModelOptions = function (
+  modelName,
+  filterOperations,
+  options
+) {
+  this.addSchemaGenerator((c) => {
+    c.generator.addModelOptions(modelName, filterOperations, options);
+  });
+};
+
+schemaBuilderProto.addModelOperations = function (modelName, filterOperations) {
+  this.addSchemaGenerator((c) => {
+    c.generator.addModelOperations(modelName, filterOperations);
+  });
+};
+
+schemaBuilderProto.addModelDirectives = function (
+  modelName,
+  directive,
+  values
+) {
+  this.addSchemaGenerator((c) => {
+    c.generator.addModelDirectives(modelName, directive, values);
+  });
+};
+
+schemaBuilderProto.addFieldDirectives = function (
+  modelName,
+  fieldName,
+  directive,
+  value
+) {
+  this.addSchemaGenerator((c) => {
+    c.generator.addFieldDirectives(modelName, fieldName, directive, value);
+  });
+};
+
+schemaBuilderProto.addModelParameterCallback = function (callback) {
+  this.addSchemaGenerator((c) => {
+    c.generator.addModelParameterCallback(callback);
+  });
+};

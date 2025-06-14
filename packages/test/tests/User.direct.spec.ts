@@ -23,17 +23,15 @@ describe("User(Direct)", () => {
         },
       });
 
-      builder.addSchemaGenerator(({ generator }) => {
-        generator.addModelOptions(
-          "User",
-          { include: ["mutation"] },
-          { authScopes: { ADMIN: true } }
-        );
-        generator.addModelOperations("User", {
-          include: ["createOne", "updateOne", "findMany"],
-        });
-        generator.addFieldDirectives("User", "roles", "readable", ["ADMIN"]);
+      builder.addModelOptions(
+        "User",
+        { include: ["mutation"] },
+        { authScopes: { ADMIN: true } }
+      );
+      builder.addModelOperations("User", {
+        include: ["createOne", "updateOne", "findMany"],
       });
+      builder.addFieldDirectives("User", "roles", "readable", ["ADMIN"]);
     });
     return { user, admin, client, requester };
   });

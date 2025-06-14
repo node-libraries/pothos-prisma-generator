@@ -13,57 +13,55 @@ describe("Post", () => {
       where: { email: "admin@example.com" },
     });
     const [client] = await getClient((builder) => {
-      builder.addSchemaGenerator(({ generator }) => {
-        generator.addModelOperations("Post", {
-          exclude: ["deleteMany"],
-        });
-        generator.addModelDirectives("Post", "executable", {
-          include: ["mutation"],
-          authority: ["USER"],
-        });
-        generator.addModelDirectives("Post", "input-field", {
-          fields: { exclude: ["id", "createdAt", "updatedAt", "author"] },
-        });
-        generator.addModelDirectives("Post", "input-data", {
-          authority: ["ADMIN"],
-        });
-        // generator.addModelDirectives("Post", "input-data", {
-        //   data: { authorId: "%%USER%%" },
-        // });
-        generator.addModelDirectives("Post", "where", {
-          include: ["query"],
-          where: {},
-          authority: ["USER"],
-        });
-        generator.addModelDirectives("Post", "where", {
-          include: ["query"],
-          where: { published: true },
-        });
-        generator.addModelDirectives("Post", "where", {
-          include: ["update", "delete"],
-          where: { authorId: "%%USER%%" },
-        });
-        generator.addModelDirectives("Post", "order", {
-          orderBy: { title: "asc" },
-        });
-        generator.addModelParameterCallback((params, generatorParams) => {
-          if (
-            generatorParams.modelName === "Post" &&
-            !generatorParams.authority.includes("ADMIN") &&
-            generatorParams.operationPrefix === "createOne"
-          ) {
-            if (!generatorParams.params.ctx.user?.id)
-              throw new Error("No permission");
-            return {
-              ...params,
-              input: {
-                ...params.input,
-                authorId: generatorParams.params.ctx.user.id,
-              },
-            };
-          }
-          return params;
-        });
+      builder.addModelOperations("Post", {
+        exclude: ["deleteMany"],
+      });
+      builder.addModelDirectives("Post", "executable", {
+        include: ["mutation"],
+        authority: ["USER"],
+      });
+      builder.addModelDirectives("Post", "input-field", {
+        fields: { exclude: ["id", "createdAt", "updatedAt", "author"] },
+      });
+      builder.addModelDirectives("Post", "input-data", {
+        authority: ["ADMIN"],
+      });
+      // generator.addModelDirectives("Post", "input-data", {
+      //   data: { authorId: "%%USER%%" },
+      // });
+      builder.addModelDirectives("Post", "where", {
+        include: ["query"],
+        where: {},
+        authority: ["USER"],
+      });
+      builder.addModelDirectives("Post", "where", {
+        include: ["query"],
+        where: { published: true },
+      });
+      builder.addModelDirectives("Post", "where", {
+        include: ["update", "delete"],
+        where: { authorId: "%%USER%%" },
+      });
+      builder.addModelDirectives("Post", "order", {
+        orderBy: { title: "asc" },
+      });
+      builder.addModelParameterCallback((params, generatorParams) => {
+        if (
+          generatorParams.modelName === "Post" &&
+          !generatorParams.authority.includes("ADMIN") &&
+          generatorParams.operationPrefix === "createOne"
+        ) {
+          if (!generatorParams.params.ctx.user?.id)
+            throw new Error("No permission");
+          return {
+            ...params,
+            input: {
+              ...params.input,
+              authorId: generatorParams.params.ctx.user.id,
+            },
+          };
+        }
+        return params;
       });
     });
     return { user, client, admin };

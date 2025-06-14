@@ -1,5 +1,11 @@
 import { SchemaTypes, type FieldRef } from "@pothos/core";
-import { PrismaSchemaGenerator } from "./libs/generator/PrismaSchemaGenerator.js";
+import {
+  PrismaSchemaGenerator,
+  type FieldDirective,
+  type FilterOperations,
+  type ModelDirective,
+  type ParameterCallback,
+} from "./libs/generator/PrismaSchemaGenerator.js";
 import { PothosPrismaGeneratorPlugin } from "./libs/PothosPrismaGeneratorPlugin.js";
 import type { PrismaClient } from "@prisma/client";
 import type {
@@ -24,6 +30,30 @@ declare global {
           ) => FieldRef<Types>
         >
       ): void;
+      addModelOptions(
+        modelName: string,
+        filterOperations: FilterOperations,
+        options: object
+      ): void;
+      addModelOperations(
+        modelName: string,
+        filterOperations: FilterOperations
+      ): void;
+      addFieldDirectives(
+        modelName: string,
+        fieldName: string | string[],
+        directive: keyof FieldDirective,
+        value: string[]
+      ): void;
+      addModelDirectives<
+        K extends keyof ModelDirective,
+        Name extends keyof Types["PrismaTypes"]
+      >(
+        modelName: Name,
+        directive: K,
+        values: Required<ModelDirective>[K]
+      ): void;
+      addModelParameterCallback(callback: ParameterCallback<Types>): void;
     }
     export interface Plugins<
       Types extends SchemaTypes,

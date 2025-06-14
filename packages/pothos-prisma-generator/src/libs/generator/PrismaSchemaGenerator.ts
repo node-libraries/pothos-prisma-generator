@@ -118,7 +118,7 @@ type GeneratorParamsType<Types extends SchemaTypes> = {
   authority: string[];
 };
 
-type ParameterCallback<Types extends SchemaTypes> = (
+export type ParameterCallback<Types extends SchemaTypes> = (
   params: {
     where?: object;
     orderBy?: object;
