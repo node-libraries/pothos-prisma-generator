@@ -14,6 +14,9 @@ importers:
 
   packages/pothos-prisma-generator:
     dependencies:
+      '@prisma/generator-helper':
+        specifier: 6.9.0
+        version: 6.9.0
       graphql-scalars:
         specifier: ^1.24.2
         version: 1.24.2(graphql@16.11.0)
@@ -1407,8 +1410,11 @@ packages:
   '@prisma/debug@6.8.2':
     resolution: {integrity: sha512-4muBSSUwJJ9BYth5N8tqts8JtiLT8QI/RSAzEogwEfpbYGFo9mYsInsVo8dqXdPO2+Rm5OG5q0qWDDE3nyUbVg==}
 
-  '@prisma/dmmf@6.8.2':
-    resolution: {integrity: sha512-okGJF/7hQZam/2wt+Y0hPyNxyY5S+L0FzAgtL932Q3YxUWHusRllrN39bCV45oF3QWY992g7rTWYdL2Rynt1qg==}
+  '@prisma/debug@6.9.0':
+    resolution: {integrity: sha512-bFeur/qi/Q+Mqk4JdQ3R38upSYPebv5aOyD1RKywVD+rAMLtRkmTFn28ZuTtVOnZHEdtxnNOCH+bPIeSGz1+Fg==}
+
+  '@prisma/dmmf@6.9.0':
+    resolution: {integrity: sha512-iMK+VwpZBhmpI67IKkHgnkJkoJcTK8e7w0cjnSFwdQY9nhf6GxS07SZVSvaQCZgBU/DJRANYDqddWyzkcAi4uw==}
 
   '@prisma/engines-version@6.8.0-43.2060c79ba17c6bb9f5823312b6f6b7f4a845738e':
     resolution: {integrity: sha512-Rkik9lMyHpFNGaLpPF3H5q5TQTkm/aE7DsGM5m92FZTvWQsvmi6Va8On3pWvqLHOt5aPUvFb/FeZTmphI4CPiQ==}
@@ -1419,11 +1425,11 @@ packages:
   '@prisma/fetch-engine@6.8.2':
     resolution: {integrity: sha512-lCvikWOgaLOfqXGacEKSNeenvj0n3qR5QvZUOmPE2e1Eh8cMYSobxonCg9rqM6FSdTfbpqp9xwhSAOYfNqSW0g==}
 
-  '@prisma/generator-helper@6.8.2':
-    resolution: {integrity: sha512-KBLW47sbwFBKKYMiICIAEWsG6TdpPapPT7e7hpmpF3xMgYAm6YIXu4JGwfQVDY9Vbcb+0vPdPdSEQtInYOOe5g==}
+  '@prisma/generator-helper@6.9.0':
+    resolution: {integrity: sha512-t3F2M0LR2PYERUQ4pXbMF0G8navRqDWynN9EqOu1WnbOBhPMUYF/Y40RxSe7LAKVqJ0PbNO0rc8MBDcQkFWQqg==}
 
-  '@prisma/generator@6.8.2':
-    resolution: {integrity: sha512-yExkvgqiKg1WHzjYttz40g5DsOtud8RhapM0Mum6pw+wrDoQyhSAxs5NHyFCV+9VPvRd2v+jAP2CTT07bsibjw==}
+  '@prisma/generator@6.9.0':
+    resolution: {integrity: sha512-4f0eZeLPB8Q/vmB7XHV7krn6Pu2Q4kLZLlC42LaBLfkHLdsYC/jsVCOQohKKHsq/ONpfgrzwYWf3ZBVHBZgNSA==}
 
   '@prisma/get-platform@6.8.2':
     resolution: {integrity: sha512-vXSxyUgX3vm1Q70QwzwkjeYfRryIvKno1SXbIqwSptKwqKzskINnDUcx85oX+ys6ooN2ATGSD0xN2UTfg6Zcow==}
@@ -6245,14 +6251,14 @@ snapshots:
       '@pothos/core': 4.6.2(graphql@16.11.0)
       '@pothos/plugin-prisma': 4.8.1(@pothos/core@4.6.2(graphql@16.11.0))(@prisma/client@6.8.2(prisma@6.8.2(typescript@5.8.3))(typescript@5.8.3))(graphql@16.11.0)(typescript@5.8.3)
       '@prisma/client': 6.8.2(prisma@6.8.2(typescript@5.8.3))(typescript@5.8.3)
-      '@prisma/generator-helper': 6.8.2
+      '@prisma/generator-helper': 6.9.0
       graphql: 16.11.0
 
   '@pothos/plugin-prisma@4.8.1(@pothos/core@4.6.2(graphql@16.11.0))(@prisma/client@6.8.2(prisma@6.8.2(typescript@5.8.3))(typescript@5.8.3))(graphql@16.11.0)(typescript@5.8.3)':
     dependencies:
       '@pothos/core': 4.6.2(graphql@16.11.0)
       '@prisma/client': 6.8.2(prisma@6.8.2(typescript@5.8.3))(typescript@5.8.3)
-      '@prisma/generator-helper': 6.8.2
+      '@prisma/generator-helper': 6.9.0
       graphql: 16.11.0
       typescript: 5.8.3
 
@@ -6272,7 +6278,9 @@ snapshots:
 
   '@prisma/debug@6.8.2': {}
 
-  '@prisma/dmmf@6.8.2': {}
+  '@prisma/debug@6.9.0': {}
+
+  '@prisma/dmmf@6.9.0': {}
 
   '@prisma/engines-version@6.8.0-43.2060c79ba17c6bb9f5823312b6f6b7f4a845738e': {}
 
@@ -6289,13 +6297,13 @@ snapshots:
       '@prisma/engines-version': 6.8.0-43.2060c79ba17c6bb9f5823312b6f6b7f4a845738e
       '@prisma/get-platform': 6.8.2
 
-  '@prisma/generator-helper@6.8.2':
+  '@prisma/generator-helper@6.9.0':
     dependencies:
-      '@prisma/debug': 6.8.2
-      '@prisma/dmmf': 6.8.2
-      '@prisma/generator': 6.8.2
+      '@prisma/debug': 6.9.0
+      '@prisma/dmmf': 6.9.0
+      '@prisma/generator': 6.9.0
 
-  '@prisma/generator@6.8.2': {}
+  '@prisma/generator@6.9.0': {}
 
   '@prisma/get-platform@6.8.2':
     dependencies:

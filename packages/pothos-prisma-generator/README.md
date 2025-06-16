@@ -82,6 +82,8 @@ import { DateTimeResolver } from "graphql-scalars";
 import PrismaUtils from "@pothos/plugin-prisma-utils";
 import ScopeAuthPlugin from "@pothos/plugin-scope-auth";
 import PothosPrismaGeneratorPlugin from "pothos-prisma-generator";
+// Edge run-times
+// import { prismaDmmf } from "./generated/prisma-dmmf.js";
 
 /**
  * Create a new schema builder instance
@@ -99,6 +101,8 @@ export const builder = new SchemaBuilder<{
   prisma: {
     client: prisma,
     dmmf: Prisma.dmmf,
+    // If you use `pothosPrismaGenerator` in prisma schema
+    // dmmf: prismaDmmf,
   },
   // if necessary
   scopeAuth: {
@@ -135,8 +139,12 @@ generator pothos {
   provider          = "prisma-pothos-types"
   clientOutput      = "@prisma/client"
   output            = "./pothos-types.ts"
-  generateDatamodel = true
-  documentation     = true # Must be set to true
+}
+
+# If you use `enums`, you need to use the dmmf output here
+generator pothosPrismaGenerator {
+  provider = "pothos-prisma-generator"
+  output   = "./prisma-dmmf.ts"
 }
 ```
 
