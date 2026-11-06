@@ -6,6 +6,7 @@
   "author": "SoraKumo <info@croud.jp>",
   "license": "MIT",
   "scripts": {
+    "prepare": "pnpm --filter \"@/test\" run prisma:generate",
     "build": "pnpm --filter pothos-prisma-generator run build",
     "test": "pnpm --filter \"@/test\" test",
     "lint": "biome lint",

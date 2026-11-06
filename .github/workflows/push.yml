@@ -72,7 +72,9 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm --filter "@/test" run prisma:generate
       - name: Run build
         run: npm run --prefix packages/pothos-prisma-generator build
 
@@ -101,7 +103,9 @@ jobs:
           path: node_modules
           key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm --filter "@/test" run prisma:generate
       - name: Initialize DB
         run: npm run --prefix packages/test test:reset
       - name: Run build
