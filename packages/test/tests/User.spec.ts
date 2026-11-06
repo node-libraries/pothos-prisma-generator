@@ -1,5 +1,5 @@
-import { createPrismaClient } from "../libs/client";
 import { beforeAllAsync } from "../libs/async";
+import { createPrismaClient } from "../libs/client";
 import {
   getClient,
   setFieldDirective,
@@ -34,7 +34,7 @@ describe("User", () => {
   it("FindManyUser", async () => {
     const { client, admin } = await property;
     await expect(
-      client.FindManyUser({}, { user: admin })
+      client.FindManyUser({}, { user: admin }),
     ).resolves.toMatchObject({
       findManyUser: expect.any(Array),
     });
@@ -59,8 +59,8 @@ describe("User", () => {
     await expect(
       client.UpdateOneUser(
         { data: { name: "test_abc" }, where: { id: user.id } },
-        { user: admin }
-      )
+        { user: admin },
+      ),
     ).resolves.toMatchObject({
       updateOneUser: expect.any(Object),
     });
@@ -71,8 +71,8 @@ describe("User", () => {
     await expect(
       client.UpdateOneUser(
         { data: { name: "test_abc" }, where: { id: user.id } },
-        { user }
-      )
+        { user },
+      ),
     ).rejects.toMatchObject([
       {
         message: "Not authorized to resolve Mutation.updateOneUser",
@@ -84,8 +84,8 @@ describe("User", () => {
     await expect(
       client.UpdateManyUser(
         { data: { name: "test_abc" }, where: {} },
-        { user: admin }
-      )
+        { user: admin },
+      ),
     ).rejects.toThrow();
   });
 });

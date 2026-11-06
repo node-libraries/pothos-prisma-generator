@@ -1,6 +1,6 @@
-import { createPrismaClient } from "../libs/client";
-import { beforeAllAsync } from "../libs/async";
 import { OrderBy } from "../generated/graphql";
+import { beforeAllAsync } from "../libs/async";
+import { createPrismaClient } from "../libs/client";
 import { getClient, setModelDirective } from "../libs/test-tools";
 
 describe("Category", () => {

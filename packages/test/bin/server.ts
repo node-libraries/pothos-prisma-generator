@@ -1,6 +1,6 @@
+import { graphqlServer } from "@hono/graphql-server";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
-import { graphqlServer } from "@hono/graphql-server";
 import { getSchema } from "../libs/test-tools";
 
 const app = new Hono();
@@ -10,7 +10,7 @@ app.use(
   graphqlServer({
     schema: getSchema(),
     graphiql: true,
-  })
+  }),
 );
 serve(app);
 

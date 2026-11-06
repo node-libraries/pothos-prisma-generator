@@ -1,9 +1,9 @@
-import { createPrismaClient } from "../libs/client";
-import { beforeAllAsync } from "../libs/async";
-import { getClient, setModelDirective } from "../libs/test-tools";
-import { createBuilder } from "../libs/builder";
-import { PrismaSchemaGenerator } from "pothos-prisma-generator";
 import gql from "graphql-tag";
+import { PrismaSchemaGenerator } from "pothos-prisma-generator";
+import { beforeAllAsync } from "../libs/async";
+import { createBuilder } from "../libs/builder";
+import { createPrismaClient } from "../libs/client";
+import { getClient, setModelDirective } from "../libs/test-tools";
 
 describe("Security fixes", () => {
   const prisma = createPrismaClient({});
@@ -40,8 +40,8 @@ describe("Security fixes", () => {
     await expect(
       client.CreateOnePost(
         { input: { title: "Forbidden", content: "Forbidden" } },
-        { user }
-      )
+        { user },
+      ),
     ).rejects.toMatchObject([
       {
         message: "No permission",
@@ -52,7 +52,7 @@ describe("Security fixes", () => {
     await expect(
       client.CreateOnePost({
         input: { title: "Unauth", content: "Unauth" },
-      })
+      }),
     ).rejects.toMatchObject([
       {
         message: "No permission",
@@ -63,8 +63,8 @@ describe("Security fixes", () => {
     await expect(
       client.CreateOnePost(
         { input: { title: "Allowed", content: "Allowed" } },
-        { user: admin }
-      )
+        { user: admin },
+      ),
     ).resolves.toMatchObject({
       createOnePost: {
         title: "Allowed",
@@ -99,8 +99,8 @@ describe("Security fixes", () => {
             deleteManyPost(where: {})
           }
         `,
-        { user: admin }
-      )
+        { user: admin },
+      ),
     ).rejects.toThrow();
 
     await expect(
@@ -110,8 +110,8 @@ describe("Security fixes", () => {
             createManyPost(input: [])
           }
         `,
-        { user: admin }
-      )
+        { user: admin },
+      ),
     ).rejects.toThrow();
   });
 
@@ -121,7 +121,7 @@ describe("Security fixes", () => {
 
     generator.addReplaceValue(
       "%%USER%%",
-      ({ context }: { context: { user?: { id: string } } }) => context.user?.id
+      ({ context }: { context: { user?: { id: string } } }) => context.user?.id,
     );
 
     const template = {
@@ -155,5 +155,30 @@ describe("Security fixes", () => {
     const resAnon = generator.replaceValue(template, { context: {} });
     expect(resAnon.nested.author.id).toBeUndefined();
     expect(resAnon.list[0]).toBeUndefined();
+  });
+
+  it("resolves nested single relation without invalid where statement (Issue #1)", async () => {
+    const { requester } = await property;
+    // ネストした単一リレーション取得時に where: {} が付加されてエラーにならないこと
+    const result = await requester(gql`
+      query {
+        findManyCategory {
+          id
+          name
+          posts {
+            id
+            title
+            author {
+              id
+              name
+            }
+          }
+        }
+      }
+    `);
+    expect(result).toBeDefined();
+    expect(
+      (result as { findManyCategory: unknown[] }).findManyCategory,
+    ).toBeInstanceOf(Array);
   });
 });

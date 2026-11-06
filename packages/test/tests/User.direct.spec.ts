@@ -1,6 +1,6 @@
-import { createPrismaClient } from "../libs/client";
 import gql from "graphql-tag";
 import { beforeAllAsync } from "../libs/async";
+import { createPrismaClient } from "../libs/client";
 import { getClient } from "../libs/test-tools";
 
 describe("User(Direct)", () => {
@@ -26,7 +26,7 @@ describe("User(Direct)", () => {
       builder.addModelOptions(
         "User",
         { include: ["mutation"] },
-        { authScopes: { ADMIN: true } }
+        { authScopes: { ADMIN: true } },
       );
       builder.addModelOperations("User", {
         include: ["createOne", "updateOne", "findMany"],
@@ -43,7 +43,7 @@ describe("User(Direct)", () => {
   it("FindManyUser", async () => {
     const { client, admin } = await property;
     await expect(
-      client.FindManyUser({}, { user: admin })
+      client.FindManyUser({}, { user: admin }),
     ).resolves.toMatchObject({
       findManyUser: expect.any(Array),
     });
@@ -61,12 +61,12 @@ describe("User(Direct)", () => {
           }
         }
       `,
-      { user: admin }
+      { user: admin },
     )) as { findManyUser: { name: string; Test: string }[] };
     expect(
       findManyUser.every(
-        (v) => (v as typeof v & { Test: string }).Test === `${v.name}-test`
-      )
+        (v) => (v as typeof v & { Test: string }).Test === `${v.name}-test`,
+      ),
     ).toBeTruthy();
   });
 
@@ -89,8 +89,8 @@ describe("User(Direct)", () => {
     await expect(
       client.UpdateOneUser(
         { data: { name: "test_abc" }, where: { id: user.id } },
-        { user: admin }
-      )
+        { user: admin },
+      ),
     ).resolves.toMatchObject({
       updateOneUser: expect.any(Object),
     });
@@ -101,8 +101,8 @@ describe("User(Direct)", () => {
     await expect(
       client.UpdateOneUser(
         { data: { name: "test_abc" }, where: { id: user.id } },
-        { user }
-      )
+        { user },
+      ),
     ).rejects.toMatchObject([
       {
         message: "Not authorized to resolve Mutation.updateOneUser",
@@ -114,8 +114,8 @@ describe("User(Direct)", () => {
     await expect(
       client.UpdateManyUser(
         { data: { name: "test_abc" }, where: {} },
-        { user: admin }
-      )
+        { user: admin },
+      ),
     ).rejects.toThrow();
   });
 });

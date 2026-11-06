@@ -1,5 +1,5 @@
-import { createPrismaClient } from "../libs/client";
 import { beforeAllAsync } from "../libs/async";
+import { createPrismaClient } from "../libs/client";
 import { getClient } from "../libs/test-tools";
 
 describe("ScalarArray", () => {
@@ -88,6 +88,6 @@ describe("ScalarArray", () => {
       },
     });
     expect(result.length).toBeGreaterThan(0);
-    expect(result.some(item => item.scalarList.includes("test"))).toBe(true);
+    expect(result.some((item) => item.scalarList.includes("test"))).toBe(true);
   });
 });

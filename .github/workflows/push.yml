@@ -41,7 +41,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm -g install pnpm @eslint/js
+      - run: npm -g install pnpm
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Cache node modules
@@ -52,7 +52,7 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
       - name: Run lint
-        run: npm run --prefix packages/pothos-prisma-generator lint
+        run: pnpm lint
 
   Build:
     name: Build

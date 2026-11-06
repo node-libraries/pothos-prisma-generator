@@ -1,7 +1,8 @@
 #!/usr/bin/env node
+import helper from "@prisma/generator-helper";
 import fs from "fs";
 import path from "path";
-import helper from "@prisma/generator-helper";
+
 helper.generatorHandler({
   onManifest: () => ({
     defaultOutput: "/path/to/default/output",
@@ -17,9 +18,9 @@ helper.generatorHandler({
         `export const prismaDmmf = ${JSON.stringify(
           { datamodel: options.dmmf.datamodel },
           null,
-          2
+          2,
         )};`,
-        "utf8"
+        "utf8",
       );
     }
   },

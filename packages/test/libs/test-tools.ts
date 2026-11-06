@@ -1,11 +1,10 @@
+import { DocumentNode, execute } from "graphql";
+import { RemoveReadonly, RuntimeDataModel } from "pothos-prisma-generator";
+import { getSdk } from "../generated/graphql";
+import { createBuilder } from "./builder";
+import type { Context } from "./context";
 import { prisma } from "./context";
 import { prismaDmmf } from "./prisma-dmmf";
-import { DocumentNode } from "graphql";
-import { RemoveReadonly, RuntimeDataModel } from "pothos-prisma-generator";
-import { createBuilder } from "./builder";
-import { getSdk } from "../generated/graphql";
-import type { Context } from "./context";
-import { execute } from "graphql";
 
 type Builder = ReturnType<typeof createBuilder>;
 
@@ -15,7 +14,7 @@ export const getSchema = () => {
 };
 export const getClient = async (
   onCreate?: (builder: Builder) => void,
-  defaultIncludes?: { operations?: boolean; fields?: boolean }
+  defaultIncludes?: { operations?: boolean; fields?: boolean },
 ) => {
   const builder = createBuilder(defaultIncludes);
   onCreate?.(builder);
@@ -23,7 +22,7 @@ export const getClient = async (
   const requester = async <R, V>(
     document: DocumentNode,
     vars: V,
-    context?: Context
+    context?: Context,
   ): Promise<R> => {
     const result = await execute({
       document,
@@ -72,7 +71,7 @@ export const setModelDirective = (model: string, directive: string[]) => {
 export const setFieldDirective = (
   model: string,
   field: string | string[],
-  directive: string[]
+  directive: string[],
 ) => {
   const dmmfModels = prismaDmmf.datamodel.models;
   const dmmfModel = (dmmfModels as any[]).find((m) => m.name === model);
@@ -88,7 +87,7 @@ export const setFieldDirective = (
     }
   )._runtimeDataModel;
   const modelField = removeReadOnly(
-    models[model]?.fields?.find((v) => v.name === field)
+    models[model]?.fields?.find((v) => v.name === field),
   );
   const document = modelField?.documentation;
   if (modelField) {

@@ -1,6 +1,6 @@
-import { createPrismaClient } from "../libs/client";
-import { beforeAllAsync } from "../libs/async";
 import { OrderBy } from "../generated/graphql";
+import { beforeAllAsync } from "../libs/async";
+import { createPrismaClient } from "../libs/client";
 import { getClient, setModelDirective } from "../libs/test-tools";
 
 describe("Order", () => {
@@ -33,13 +33,13 @@ describe("Order", () => {
     await client.FindManyCategory().then((result) => {
       const { findManyCategory } = result;
       expect(findManyCategory.map(({ id }) => id)).toEqual(
-        categories.map(({ id }) => id)
+        categories.map(({ id }) => id),
       );
     });
     await client.FindManyCategory({}, { user: admin }).then((result) => {
       const { findManyCategory } = result;
       expect(findManyCategory.map(({ id }) => id)).toEqual(
-        categories.map(({ id }) => id).reverse()
+        categories.map(({ id }) => id).reverse(),
       );
     });
     await client
@@ -47,7 +47,7 @@ describe("Order", () => {
       .then((result) => {
         const { findManyCategory } = result;
         expect(findManyCategory.map(({ id }) => id)).toEqual(
-          categories.map(({ id }) => id)
+          categories.map(({ id }) => id),
         );
       });
 
@@ -62,12 +62,12 @@ describe("Order", () => {
     await client
       .FindUniquePost(
         { filter: { id: post.id }, categoryOrderBy: { id: OrderBy.Asc } },
-        { user: admin }
+        { user: admin },
       )
       .then((result) => {
         const { findUniquePost } = result;
         expect(findUniquePost.categories.map(({ id }) => id)).toEqual(
-          categories.map(({ id }) => id)
+          categories.map(({ id }) => id),
         );
       });
 
@@ -76,7 +76,7 @@ describe("Order", () => {
       .then((result) => {
         const { findUniquePost } = result;
         expect(findUniquePost.categories.map(({ id }) => id)).toEqual(
-          categories.map(({ id }) => id).reverse()
+          categories.map(({ id }) => id).reverse(),
         );
       });
   });

@@ -1,6 +1,6 @@
-import { createPrismaClient } from "../libs/client";
-import { beforeAllAsync } from "../libs/async";
 import { OrderBy } from "../generated/graphql";
+import { beforeAllAsync } from "../libs/async";
+import { createPrismaClient } from "../libs/client";
 import { getClient } from "../libs/test-tools";
 
 describe("Post2", () => {
@@ -58,7 +58,7 @@ describe("Post2", () => {
       .then((result) => {
         const { findManyPost } = result;
         const sortedPosts = [...findManyPost].sort((a, b) =>
-          a.id.localeCompare(b.id)
+          a.id.localeCompare(b.id),
         );
         expect(findManyPost).toMatchObject(sortedPosts);
       });
@@ -86,7 +86,7 @@ describe("Post2", () => {
       .then((result) => {
         const { findManyPost } = result;
         expect(findManyPost.map(({ id }) => id)).toEqual(
-          post.map(({ id }) => id)
+          post.map(({ id }) => id),
         );
       });
     await client
@@ -98,7 +98,7 @@ describe("Post2", () => {
       .then((result) => {
         const { findManyPost } = result;
         expect(findManyPost.map(({ id }) => id)).not.toEqual(
-          post.map(({ id }) => id)
+          post.map(({ id }) => id),
         );
       });
   });

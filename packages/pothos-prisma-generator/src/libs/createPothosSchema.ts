@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { PrismaSchemaGenerator } from "./generator/PrismaSchemaGenerator.js";
+
 import type { FieldRef, SchemaTypes } from "@pothos/core";
+import { PrismaSchemaGenerator } from "./generator/PrismaSchemaGenerator.js";
+
 type LowerFirst<T extends string> = T extends `${infer F}${infer R}`
   ? `${Lowercase<F>}${R}`
   : T;
@@ -13,7 +15,7 @@ const getPrisma = <T extends SchemaTypes, ParentShape>(
   t:
     | PothosSchemaTypes.ObjectFieldBuilder<T, ParentShape>
     | PothosSchemaTypes.QueryFieldBuilder<T, ParentShape>
-    | PothosSchemaTypes.MutationFieldBuilder<T, ParentShape>
+    | PothosSchemaTypes.MutationFieldBuilder<T, ParentShape>,
 ): any => {
   return t.builder.options.prisma.client;
 };
@@ -48,9 +50,7 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                 [
                   field.name,
                   t.expose(field.name, {
-                    type: field.isList
-                      ? [modelName]
-                      : modelName,
+                    type: field.isList ? [modelName] : modelName,
                     nullable: !field.isRequired,
                   }),
                 ] as const,
@@ -90,13 +90,13 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                     offset?: number;
                     orderBy?: object;
                   },
-                  ctx
+                  ctx,
                 ) => {
                   const authority = generator.getAuthority(ctx);
                   const modelOrder = generator.getModelOrder(
                     modelName,
                     operationPrefix,
-                    authority
+                    authority,
                   );
                   const generatorParams = {
                     params: {
@@ -115,7 +115,7 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                   const modelLimit = generator.getModelLimit(
                     modelName,
                     operationPrefix,
-                    authority
+                    authority,
                   );
 
                   const safeLimit =
@@ -130,27 +130,29 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                   const take =
                     modelLimit !== undefined && safeLimit !== undefined
                       ? Math.min(modelLimit, safeLimit)
-                      : modelLimit ?? safeLimit;
+                      : (modelLimit ?? safeLimit);
 
-                  const { where, take: resolvedTake, skip, orderBy } =
-                    generator.getParameters(
-                      {
-                        where: {
-                          ...(typeof args.filter === "object"
-                            ? args.filter
-                            : {}),
-                          ...modelWhere,
-                        },
-                        take,
-                        skip: safeOffset,
-                        orderBy:
-                          args.orderBy && Object.keys(args.orderBy).length
-                            ? args.orderBy
-                            : modelOrder,
+                  const {
+                    where,
+                    take: resolvedTake,
+                    skip,
+                    orderBy,
+                  } = generator.getParameters(
+                    {
+                      where: {
+                        ...(typeof args.filter === "object" ? args.filter : {}),
+                        ...modelWhere,
                       },
-                      generatorParams
-                    );
-                  if (!field.isList) return { where };
+                      take,
+                      skip: safeOffset,
+                      orderBy:
+                        args.orderBy && Object.keys(args.orderBy).length
+                          ? args.orderBy
+                          : modelOrder,
+                    },
+                    generatorParams,
+                  );
+                  if (!field.isList) return {};
                   return {
                     ...getWhere(where),
                     orderBy,
@@ -195,7 +197,7 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                     {
                       where: { ...args.filter, ...modelWhere },
                     },
-                    generatorParams
+                    generatorParams,
                   );
 
                   return where && Object.keys(where).length ? where : undefined;
@@ -225,14 +227,14 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
 
 export const createModelCountQuery = (
   t: PothosSchemaTypes.QueryFieldBuilder<any, any>,
-  generator: PrismaSchemaGenerator<any>
+  generator: PrismaSchemaGenerator<any>,
 ): Record<string, FieldRef<any, any, "Query">> => {
   const operationPrefix = "count";
   return Object.fromEntries(
     generator
       .getModels()
       .filter((model) =>
-        generator.getModelOperations(model.name).includes(operationPrefix)
+        generator.getModelOperations(model.name).includes(operationPrefix),
       )
       .map((model) => {
         const modelName = model.name;
@@ -252,7 +254,7 @@ export const createModelCountQuery = (
               root: unknown,
               args: unknown[],
               ctx: object,
-              info: unknown
+              info: unknown,
             ) => {
               const prisma = getPrisma(t);
               const authority = generator.getAuthority(ctx);
@@ -275,7 +277,7 @@ export const createModelCountQuery = (
                 {
                   where: { ...args.filter, ...modelWhere },
                 },
-                generatorParams
+                generatorParams,
               );
 
               return prisma[lowerFirst(modelName)].count({
@@ -284,20 +286,20 @@ export const createModelCountQuery = (
             },
           }),
         ];
-      })
+      }),
   );
 };
 
 export const createModelQuery = (
   t: PothosSchemaTypes.QueryFieldBuilder<any, any>,
-  generator: PrismaSchemaGenerator<any>
+  generator: PrismaSchemaGenerator<any>,
 ) => {
   const operationPrefix = "findFirst";
   return Object.fromEntries(
     generator
       .getModels()
       .filter((model) =>
-        generator.getModelOperations(model.name).includes(operationPrefix)
+        generator.getModelOperations(model.name).includes(operationPrefix),
       )
       .map((model) => {
         const modelName = model.name;
@@ -317,7 +319,7 @@ export const createModelQuery = (
               root: SchemaTypes["Root"],
               args: any,
               ctx: SchemaTypes["Context"],
-              info: unknown
+              info: unknown,
             ) => {
               const prisma = getPrisma(t);
               const authority = generator.getAuthority(ctx);
@@ -339,7 +341,7 @@ export const createModelQuery = (
               const modelOrder = generator.getModelOrder(
                 modelName,
                 operationPrefix,
-                authority
+                authority,
               );
               const modelWhere = generator.getModelWhere(generatorParams);
               const { where, orderBy } = generator.getParameters(
@@ -350,7 +352,7 @@ export const createModelQuery = (
                       ? args.orderBy
                       : modelOrder,
                 },
-                generatorParams
+                generatorParams,
               );
 
               const result = await prisma[lowerFirst(modelName)].findFirst({
@@ -363,20 +365,20 @@ export const createModelQuery = (
             },
           }),
         ];
-      })
+      }),
   );
 };
 
 export const createModelUniqueQuery = (
   t: PothosSchemaTypes.QueryFieldBuilder<any, any>,
-  generator: PrismaSchemaGenerator<any>
+  generator: PrismaSchemaGenerator<any>,
 ) => {
   const operationPrefix = "findUnique";
   return Object.fromEntries(
     generator
       .getModels()
       .filter((model) =>
-        generator.getModelOperations(model.name).includes(operationPrefix)
+        generator.getModelOperations(model.name).includes(operationPrefix),
       )
       .map((model) => {
         const modelName = model.name;
@@ -399,7 +401,7 @@ export const createModelUniqueQuery = (
               root: SchemaTypes["Root"],
               args: any,
               ctx: SchemaTypes["Context"],
-              info: unknown
+              info: unknown,
             ) => {
               const prisma = getPrisma(t);
               const authority = generator.getAuthority(ctx);
@@ -423,7 +425,7 @@ export const createModelUniqueQuery = (
                 {
                   where: { ...args.filter, ...modelWhere },
                 },
-                generatorParams
+                generatorParams,
               );
 
               return prisma[lowerFirst(modelName)].findUniqueOrThrow({
@@ -433,20 +435,20 @@ export const createModelUniqueQuery = (
             },
           }),
         ];
-      })
+      }),
   );
 };
 
 export const createModelListQuery = (
   t: PothosSchemaTypes.QueryFieldBuilder<any, any>,
-  generator: PrismaSchemaGenerator<any>
+  generator: PrismaSchemaGenerator<any>,
 ) => {
   const operationPrefix = "findMany";
   return Object.fromEntries(
     generator
       .getModels()
       .filter((model) =>
-        generator.getModelOperations(model.name).includes(operationPrefix)
+        generator.getModelOperations(model.name).includes(operationPrefix),
       )
       .map((model) => {
         const modelName = model.name;
@@ -466,7 +468,7 @@ export const createModelListQuery = (
               root: SchemaTypes["Root"],
               args: any,
               ctx: SchemaTypes["Context"],
-              info: unknown
+              info: unknown,
             ) => {
               const prisma = getPrisma(t);
               const authority = generator.getAuthority(ctx);
@@ -482,13 +484,13 @@ export const createModelListQuery = (
               const modelOrder = generator.getModelOrder(
                 modelName,
                 operationPrefix,
-                authority
+                authority,
               );
               const modelWhere = generator.getModelWhere(generatorParams);
               const modelLimit = generator.getModelLimit(
                 modelName,
                 operationPrefix,
-                authority
+                authority,
               );
               const safeLimit =
                 typeof args.limit === "number"
@@ -502,9 +504,14 @@ export const createModelListQuery = (
               const take =
                 modelLimit !== undefined && safeLimit !== undefined
                   ? Math.min(modelLimit, safeLimit)
-                  : modelLimit ?? safeLimit;
+                  : (modelLimit ?? safeLimit);
 
-              const { where, take: resolvedTake, skip, orderBy } = generator.getParameters(
+              const {
+                where,
+                take: resolvedTake,
+                skip,
+                orderBy,
+              } = generator.getParameters(
                 {
                   where: { ...args.filter, ...modelWhere },
                   take,
@@ -514,7 +521,7 @@ export const createModelListQuery = (
                       ? args.orderBy
                       : modelOrder,
                 },
-                generatorParams
+                generatorParams,
               );
 
               const result = await prisma[lowerFirst(modelName)].findMany({
@@ -528,20 +535,20 @@ export const createModelListQuery = (
             },
           }),
         ];
-      })
+      }),
   );
 };
 
 export const createModelMutation = (
   t: PothosSchemaTypes.MutationFieldBuilder<any, any>,
-  generator: PrismaSchemaGenerator<any>
+  generator: PrismaSchemaGenerator<any>,
 ) => {
   const operationPrefix = "createOne";
   return Object.fromEntries(
     generator
       .getModels()
       .filter(({ name }) =>
-        generator.getModelOperations(name).includes(operationPrefix)
+        generator.getModelOperations(name).includes(operationPrefix),
       )
       .map(({ name }) => {
         const modelName = name;
@@ -563,7 +570,7 @@ export const createModelMutation = (
               root: SchemaTypes["Root"],
               args: any,
               ctx: SchemaTypes["Context"],
-              info: unknown
+              info: unknown,
             ) => {
               const authority = generator.getAuthority(ctx);
               const prisma = getPrisma(t);
@@ -584,13 +591,13 @@ export const createModelMutation = (
                 modelName,
                 operationPrefix,
                 authority,
-                ctx
+                ctx,
               );
               const { input } = generator.getParameters(
                 {
                   input: { ...args.input, ...modelInput },
                 },
-                generatorParams
+                generatorParams,
               );
 
               return prisma[lowerFirst(modelName)].create({
@@ -600,20 +607,20 @@ export const createModelMutation = (
             },
           }),
         ];
-      })
+      }),
   );
 };
 
 export const createManyModelMutation = (
   t: PothosSchemaTypes.MutationFieldBuilder<any, any>,
-  generator: PrismaSchemaGenerator<any>
+  generator: PrismaSchemaGenerator<any>,
 ): Record<string, FieldRef<any, any, "Mutation">> => {
   const operationPrefix = "createMany";
   return Object.fromEntries(
     generator
       .getModels()
       .filter(({ name }) =>
-        generator.getModelOperations(name).includes(operationPrefix)
+        generator.getModelOperations(name).includes(operationPrefix),
       )
       .map(({ name: modelName }) => {
         const options = generator.getModelOptions(modelName)[operationPrefix];
@@ -632,7 +639,7 @@ export const createManyModelMutation = (
               root: any,
               args: { input: any[] },
               ctx: object,
-              info: any
+              info: any,
             ) => {
               const authority = generator.getAuthority(ctx);
               const prisma = getPrisma(t);
@@ -653,13 +660,13 @@ export const createManyModelMutation = (
                 modelName,
                 operationPrefix,
                 authority,
-                ctx
+                ctx,
               );
               const { input } = generator.getParameters(
                 {
                   input: args.input.map((v) => ({ ...v, ...modelInput })),
                 },
-                generatorParams
+                generatorParams,
               );
               return prisma[lowerFirst(modelName)]
                 .createMany({
@@ -669,20 +676,20 @@ export const createManyModelMutation = (
             },
           }),
         ];
-      })
+      }),
   );
 };
 
 export const updateModelMutation = (
   t: PothosSchemaTypes.MutationFieldBuilder<any, any>,
-  generator: PrismaSchemaGenerator<any>
+  generator: PrismaSchemaGenerator<any>,
 ) => {
   const operationPrefix = "updateOne";
   return Object.fromEntries(
     generator
       .getModels()
       .filter((model) =>
-        generator.getModelOperations(model.name).includes(operationPrefix)
+        generator.getModelOperations(model.name).includes(operationPrefix),
       )
       .map(({ name: modelName }) => {
         const options = generator.getModelOptions(modelName)[operationPrefix];
@@ -707,7 +714,7 @@ export const updateModelMutation = (
               root: SchemaTypes["Root"],
               args: any,
               ctx: SchemaTypes["Context"],
-              info: unknown
+              info: unknown,
             ) => {
               const authority = generator.getAuthority(ctx);
               const prisma = getPrisma(t);
@@ -724,14 +731,14 @@ export const updateModelMutation = (
                 modelName,
                 operationPrefix,
                 authority,
-                ctx
+                ctx,
               );
               const { where, input } = generator.getParameters(
                 {
                   where: { ...args.where, ...modelWhere },
                   input: { ...args.data, ...modelInput },
                 },
-                generatorParams
+                generatorParams,
               );
 
               return prisma[lowerFirst(modelName)].update({
@@ -742,20 +749,20 @@ export const updateModelMutation = (
             },
           }),
         ];
-      })
+      }),
   );
 };
 
 export const updateManyModelMutation = (
   t: PothosSchemaTypes.MutationFieldBuilder<any, any>,
-  generator: PrismaSchemaGenerator<any>
+  generator: PrismaSchemaGenerator<any>,
 ): Record<string, FieldRef<any, any, "Mutation">> => {
   const operationPrefix = "updateMany";
   return Object.fromEntries(
     generator
       .getModels()
       .filter((model) =>
-        generator.getModelOperations(model.name).includes(operationPrefix)
+        generator.getModelOperations(model.name).includes(operationPrefix),
       )
       .map(({ name: modelName }) => {
         const options = generator.getModelOptions(modelName)[operationPrefix];
@@ -772,7 +779,7 @@ export const updateManyModelMutation = (
               data: t.arg({
                 type: generator.getUpdateInput(
                   modelName,
-                  generator.getModelInputFields(modelName)[operationPrefix]
+                  generator.getModelInputFields(modelName)[operationPrefix],
                 ),
                 required: true,
               }),
@@ -781,7 +788,7 @@ export const updateManyModelMutation = (
               root: SchemaTypes["Root"],
               args: any,
               ctx: SchemaTypes["Context"],
-              info: unknown
+              info: unknown,
             ) => {
               const authority = generator.getAuthority(ctx);
               const prisma = getPrisma(t);
@@ -798,14 +805,14 @@ export const updateManyModelMutation = (
                 modelName,
                 operationPrefix,
                 authority,
-                ctx
+                ctx,
               );
               const { where, input } = generator.getParameters(
                 {
                   where: { ...args.where, ...modelWhere },
                   input: { ...args.data, ...modelInput },
                 },
-                generatorParams
+                generatorParams,
               );
               return prisma[lowerFirst(modelName)]
                 .updateMany({
@@ -816,20 +823,20 @@ export const updateManyModelMutation = (
             },
           }),
         ];
-      })
+      }),
   );
 };
 
 export const deleteModelMutation = (
   t: PothosSchemaTypes.MutationFieldBuilder<any, any>,
-  generator: PrismaSchemaGenerator<any>
+  generator: PrismaSchemaGenerator<any>,
 ) => {
   const operationPrefix = "deleteOne";
   return Object.fromEntries(
     generator
       .getModels()
       .filter((model) =>
-        generator.getModelOperations(model.name).includes(operationPrefix)
+        generator.getModelOperations(model.name).includes(operationPrefix),
       )
       .map((model) => {
         const modelName = model.name;
@@ -851,7 +858,7 @@ export const deleteModelMutation = (
               root: SchemaTypes["Root"],
               args: any,
               ctx: SchemaTypes["Context"],
-              info: unknown
+              info: unknown,
             ) => {
               const authority = generator.getAuthority(ctx);
               const prisma = getPrisma(t);
@@ -869,7 +876,7 @@ export const deleteModelMutation = (
                 {
                   where: { ...args.where, ...modelWhere },
                 },
-                generatorParams
+                generatorParams,
               );
 
               return prisma[lowerFirst(modelName)].delete({
@@ -879,20 +886,20 @@ export const deleteModelMutation = (
             },
           }),
         ];
-      })
+      }),
   );
 };
 
 export const deleteManyModelMutation = (
   t: PothosSchemaTypes.MutationFieldBuilder<any, any>,
-  generator: PrismaSchemaGenerator<any>
+  generator: PrismaSchemaGenerator<any>,
 ): Record<string, FieldRef<any, any, "Mutation">> => {
   const operationPrefix = "deleteMany";
   return Object.fromEntries(
     generator
       .getModels()
       .filter((model) =>
-        generator.getModelOperations(model.name).includes(operationPrefix)
+        generator.getModelOperations(model.name).includes(operationPrefix),
       )
       .map((model) => {
         const modelName = model.name;
@@ -912,7 +919,7 @@ export const deleteManyModelMutation = (
               root: any,
               args: { where: any },
               ctx: object,
-              info: any
+              info: any,
             ) => {
               const authority = generator.getAuthority(ctx);
               const prisma = getPrisma(t);
@@ -935,7 +942,7 @@ export const deleteManyModelMutation = (
                 {
                   where: { ...args.where, ...modelWhere },
                 },
-                generatorParams
+                generatorParams,
               );
 
               return prisma[lowerFirst(modelName)]
@@ -946,6 +953,6 @@ export const deleteManyModelMutation = (
             },
           }),
         ];
-      })
+      }),
   );
 };

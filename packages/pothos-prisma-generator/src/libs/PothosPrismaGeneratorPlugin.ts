@@ -14,35 +14,35 @@ import {
   JSONResolver,
 } from "graphql-scalars";
 import {
+  createManyModelMutation,
+  createModelCountQuery,
   createModelListQuery,
   createModelMutation,
-  createManyModelMutation,
   createModelObject,
   createModelQuery,
+  createModelUniqueQuery,
   deleteManyModelMutation,
   deleteModelMutation,
   updateManyModelMutation,
   updateModelMutation,
-  createModelCountQuery,
-  createModelUniqueQuery,
 } from "./createPothosSchema.js";
 import { PrismaSchemaGenerator } from "./generator/PrismaSchemaGenerator.js";
 
 export class PothosPrismaGeneratorPlugin<
   Types extends SchemaTypes,
-  T extends object = object
+  T extends object = object,
 > extends BasePlugin<Types, T> {
   generator: PrismaSchemaGenerator<Types>;
   constructor(
     buildCache: BuildCache<Types>,
-    name: keyof PothosSchemaTypes.Plugins<Types, T>
+    name: keyof PothosSchemaTypes.Plugins<Types, T>,
   ) {
     super(buildCache, name);
     const generator = new PrismaSchemaGenerator<Types>(this.builder);
     this.generator = generator;
     const builder = this.builder;
     builder.options.pothosPrismaGenerator?.callbacks?.forEach((callback) =>
-      callback({ builder, generator })
+      callback({ builder, generator }),
     );
     generator.createModels();
     generator.modelFields =
@@ -91,7 +91,7 @@ export class PothosPrismaGeneratorPlugin<
           ...createModelUniqueQuery(t, generator),
           ...createModelQuery(t, generator),
           ...createModelListQuery(t, generator),
-        } as never)
+        }) as never,
     );
 
     if (!builder.configStore.typeConfigs.has("Mutation")) {
@@ -107,20 +107,20 @@ export class PothosPrismaGeneratorPlugin<
           ...updateManyModelMutation(t, generator),
           ...deleteModelMutation(t, generator),
           ...deleteManyModelMutation(t, generator),
-        } as never)
+        }) as never,
     );
   }
   wrapResolve(
     resolver: GraphQLFieldResolver<unknown, Types["Context"], object>,
-    fieldConfig: PothosOutputFieldConfig<Types>
+    fieldConfig: PothosOutputFieldConfig<Types>,
   ) {
     const fieldDirectives = Object.values(
-      this.generator.fieldDirectives[fieldConfig.parentType] ?? {}
+      this.generator.fieldDirectives[fieldConfig.parentType] ?? {},
     ).filter((v) => Object.keys(v).length);
     if (fieldDirectives.length) {
       const readable = this.generator.getFieldReadable(
         fieldConfig.parentType,
-        fieldConfig.name
+        fieldConfig.name,
       );
 
       const newResolver: GraphQLFieldResolver<
@@ -174,7 +174,7 @@ schemaBuilderProto.addSchemaGenerator = function (callback) {
 schemaBuilderProto.addModelOptions = function (
   modelName,
   filterOperations,
-  options
+  options,
 ) {
   this.addSchemaGenerator((c) => {
     c.generator.addModelOptions(modelName, filterOperations, options);
@@ -190,7 +190,7 @@ schemaBuilderProto.addModelOperations = function (modelName, filterOperations) {
 schemaBuilderProto.addModelDirectives = function (
   modelName,
   directive,
-  values
+  values,
 ) {
   this.addSchemaGenerator((c) => {
     c.generator.addModelDirectives(modelName, directive, values);
@@ -201,7 +201,7 @@ schemaBuilderProto.addFieldDirectives = function (
   modelName,
   fieldName,
   directive,
-  value
+  value,
 ) {
   this.addSchemaGenerator((c) => {
     c.generator.addFieldDirectives(modelName, fieldName, directive, value);

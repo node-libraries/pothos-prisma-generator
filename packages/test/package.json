@@ -14,8 +14,8 @@
     "test:reset": "pnpm run prisma:reset && pnpm run prisma:seed",
     "test:actions": "next-exec -c test -- vitest run --coverage",
     "server": "next-exec -c test -- tsx --watch bin/server.ts",
-    "lint": "npx eslint ./tests",
-    "lint:fix": "eslint --fix ./tests",
+    "lint": "biome lint ./tests",
+    "lint:fix": "biome check --write ./tests",
     "docker:start": "docker compose -p pothos-prisma-generator -f docker/docker-compose.yml up -d",
     "prisma:generate": "prisma generate",
     "prisma:format": "prisma format",
@@ -27,7 +27,6 @@
     "codegen": "graphql-codegen --config codegen/codegen.json"
   },
   "devDependencies": {
-    "@eslint/js": "10.0.1",
     "@graphql-codegen/cli": "^7.4.6",
     "@graphql-codegen/typescript": "^6.1.2",
     "@graphql-codegen/typescript-generic-sdk": "^5.0.1",
@@ -45,10 +44,6 @@
     "@types/traverse": "^0.6.37",
     "@vitest/coverage-v8": "^4.1.4",
     "cpy-cli": "^7.0.0",
-    "eslint": "10.14.0",
-    "eslint-config-prettier": "^10.1.8",
-    "eslint-import-resolver-typescript": "^4.4.5",
-    "eslint-plugin-import": "^2.32.0",
     "graphql": "^17.1.0",
     "graphql-tag": "^2.12.7",
     "hono": "4.13.16",
@@ -61,7 +56,6 @@
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.23.15",
     "typescript": "^7.0.2",
-    "typescript-eslint": "^8.72.1",
     "typescript-transform-paths": "^4.0.0",
     "vitest": "^4.1.4"
   },

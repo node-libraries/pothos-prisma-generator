@@ -1,5 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg";
-import { PrismaClient, Prisma } from "@prisma/client";
+import { Prisma, PrismaClient } from "@prisma/client";
 
 export const createPrismaClient = (options?: Prisma.PrismaClientOptions) => {
   const databaseUrl =

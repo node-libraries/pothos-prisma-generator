@@ -1,5 +1,5 @@
-import { createPrismaClient } from "../libs/client";
 import { beforeAllAsync } from "../libs/async";
+import { createPrismaClient } from "../libs/client";
 import { getClient } from "../libs/test-tools";
 
 describe("Post", () => {
@@ -77,7 +77,7 @@ describe("Post", () => {
       const { findManyPost } = result;
       // published: false is not included
       expect(findManyPost.some(({ published }) => published === false)).toBe(
-        false
+        false,
       );
     });
   });
@@ -88,7 +88,7 @@ describe("Post", () => {
       expect(findManyPost).not.toHaveLength(0);
       // published: false is included
       expect(findManyPost.some(({ published }) => published === false)).toBe(
-        true
+        true,
       );
     });
   });
@@ -97,8 +97,8 @@ describe("Post", () => {
     await expect(
       client.CreateOnePost(
         { input: { title: "Title", content: "Content" } },
-        { user }
-      )
+        { user },
+      ),
     ).resolves.toMatchObject({
       createOnePost: {
         title: "Title",
@@ -110,8 +110,8 @@ describe("Post", () => {
     await expect(
       client.CreateOnePost(
         { input: { title: "Title", content: "Content" } },
-        { user: admin }
-      )
+        { user: admin },
+      ),
     ).resolves.toMatchObject({
       createOnePost: {
         title: "Title",
@@ -126,7 +126,7 @@ describe("Post", () => {
     await expect(
       client.CreateOnePost({
         input: { title: "Title", content: "Content" },
-      })
+      }),
     ).rejects.toHaveLength(1);
   });
 });

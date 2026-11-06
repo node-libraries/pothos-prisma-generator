@@ -24,7 +24,7 @@ const main = async () => {
           return prisma.user.create({
             data,
           });
-        })
+        }),
       );
     }
     return prisma.category.findMany();

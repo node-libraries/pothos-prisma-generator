@@ -7,9 +7,13 @@
   "license": "MIT",
   "scripts": {
     "build": "pnpm --filter pothos-prisma-generator run build",
-    "test": "pnpm --filter \"@/test\" test"
+    "test": "pnpm --filter \"@/test\" test",
+    "lint": "biome lint",
+    "lint:fix": "biome check --write"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "@biomejs/biome": "^2.6.5"
+  },
   "overrides": {
     "sha.js": ">=2.4.12",
     "shell-quote": ">=1.9.0",

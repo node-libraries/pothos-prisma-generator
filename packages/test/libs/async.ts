@@ -1,4 +1,4 @@
-import { beforeAll, afterAll, it } from "vitest";
+import { afterAll, beforeAll, it } from "vitest";
 
 class Sync<T> {
   promise: Promise<T>;
@@ -35,7 +35,7 @@ export const afterAllAsync = <T>(proc: () => Promise<T>, timeout?: number) => {
 export const testSync = (
   name: string,
   proc: () => void | Promise<void>,
-  timeout?: number
+  timeout?: number,
 ) => {
   it(name, proc, timeout);
 };

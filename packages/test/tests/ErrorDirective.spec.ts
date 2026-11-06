@@ -10,7 +10,7 @@ describe("ErrorDirective", () => {
       `@pothos-generator operation1 {exclude:["deleteMany"]}`,
     ]);
     await expect(getClient()).rejects.toThrow(
-      /^Error parsing schema directive: Post/
+      /^Error parsing schema directive: Post/,
     );
     restore();
   });
@@ -19,7 +19,7 @@ describe("ErrorDirective", () => {
       `@pothos-generator operation {exclude-["deleteMany"]}`,
     ]);
     await expect(getClient()).rejects.toThrow(
-      /SyntaxError: JSON5: invalid character '-'/
+      /SyntaxError: JSON5: invalid character '-'/,
     );
     restore();
   });
@@ -28,7 +28,7 @@ describe("ErrorDirective", () => {
       ` @pothos-generator readable2 ["ADMIN"]`,
     ]);
     await expect(getClient()).rejects.toThrow(
-      /^Error parsing schema directive: User.roles/
+      /^Error parsing schema directive: User.roles/,
     );
     restore();
   });
@@ -37,7 +37,7 @@ describe("ErrorDirective", () => {
       ` @pothos-generator readable [ADMIN]`,
     ]);
     await expect(getClient()).rejects.toThrow(
-      /SyntaxError: JSON5: invalid character 'A'/
+      /SyntaxError: JSON5: invalid character 'A'/,
     );
     restore();
   });

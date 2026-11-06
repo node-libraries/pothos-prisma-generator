@@ -6,12 +6,12 @@ import {
   SchemaTypes,
 } from "@pothos/core";
 import { getModel, PrismaModelTypes } from "@pothos/plugin-prisma";
-import { DMMF, getPrismaClient } from "@prisma/client/runtime/client";
 import type {
   FilterOps,
   PrismaOrderByFields,
 } from "@pothos/plugin-prisma-utils";
 import type { PrismaClient } from "@prisma/client";
+import { DMMF, getPrismaClient } from "@prisma/client/runtime/client";
 
 export type RuntimeDataModel = Parameters<
   typeof getPrismaClient
@@ -49,7 +49,7 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
   }
 
   findManyArgs<Name extends keyof Types["PrismaTypes"] & string>(
-    modelName: Name
+    modelName: Name,
   ) {
     return this.builder.args((t) => ({
       filter: t.field({
@@ -75,7 +75,7 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
 
   getWhere<Name extends string & keyof Types["PrismaTypes"]>(
     modelName: Name,
-    without?: string[]
+    without?: string[],
   ) {
     const withoutName = (without ?? [])
       .map((name) => `Without${capitalize(name)}`)
@@ -90,7 +90,7 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
         fields: (() => {
           const fields: Record<string, InputType<Types>> = {};
           const withoutFields = model.fields.filter((field) =>
-            without?.includes(field.name)
+            without?.includes(field.name),
           );
 
           model.fields
@@ -99,8 +99,8 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
                 !withoutFields.some(
                   (f) =>
                     f.name === field.name ||
-                    f.relationFromFields?.includes(field.name)
-                )
+                    f.relationFromFields?.includes(field.name),
+                ),
             )
             .forEach((field) => {
               let type;
@@ -108,10 +108,10 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
                 case "scalar":
                   type = field.isList
                     ? this.getScalarListFilter(
-                        this.mapScalarType(field.type) as InputType<Types>
+                        this.mapScalarType(field.type) as InputType<Types>,
                       )
                     : this.getFilter(
-                        this.mapScalarType(field.type) as InputType<Types>
+                        this.mapScalarType(field.type) as InputType<Types>,
                       );
                   break;
                 case "enum":
@@ -147,7 +147,7 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
   }
 
   getWhereUnique<Name extends string & keyof Types["PrismaTypes"]>(
-    modelName: Name
+    modelName: Name,
   ) {
     const name = `${modelName}UniqueFilter`;
 
@@ -165,9 +165,9 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
                 field.isUnique ||
                 field.isId ||
                 model.uniqueIndexes.some((index) =>
-                  index.fields.includes(field.name)
+                  index.fields.includes(field.name),
                 ) ||
-                model.primaryKey?.fields.includes(field.name)
+                model.primaryKey?.fields.includes(field.name),
             )
             .forEach((field) => {
               let type;
@@ -202,7 +202,7 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
   }
 
   getOrderBy<Name extends string & keyof Types["PrismaTypes"]>(
-    modelName: Name
+    modelName: Name,
   ) {
     const name = `${modelName}OrderBy`;
     return this.getRef(modelName, name, () => {
@@ -243,7 +243,7 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
   getCreateInput<Name extends keyof Types["PrismaTypes"] & string>(
     modelName: Name,
     without?: string[],
-    isCustomName?: false
+    isCustomName?: false,
   ) {
     const withoutName = (without ?? [])
       .map((name) => `Without${capitalize(name)}`)
@@ -259,10 +259,10 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
         fields: (() => {
           const fields: Record<string, InputTypeParam<Types>> = {};
           const withoutFields = model.fields.filter((field) =>
-            without?.includes(field.name)
+            without?.includes(field.name),
           );
           const relationIds = model.fields.flatMap(
-            (field) => field.relationFromFields ?? []
+            (field) => field.relationFromFields ?? [],
           );
 
           model.fields
@@ -271,8 +271,8 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
                 !withoutFields.some(
                   (f) =>
                     f.name === field.name ||
-                    f.relationFromFields?.includes(field.name)
-                ) && !relationIds.includes(field.name)
+                    f.relationFromFields?.includes(field.name),
+                ) && !relationIds.includes(field.name),
             )
             .forEach((field) => {
               let type;
@@ -309,9 +309,10 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
   getCreateRelationInput<
     Name extends string & keyof Types["PrismaTypes"],
     Relation extends Model["RelationName"],
-    Model extends PrismaModelTypes = Types["PrismaTypes"][Name] extends PrismaModelTypes
+    Model extends
+      PrismaModelTypes = Types["PrismaTypes"][Name] extends PrismaModelTypes
       ? Types["PrismaTypes"][Name]
-      : never
+      : never,
   >(modelName: Name, relation: Relation) {
     return this.getRef(
       `${modelName}${capitalize(relation)}`,
@@ -321,11 +322,11 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
         return this.builder.prismaCreateRelation(modelName, relation, {
           fields: () => {
             const relationField = model.fields.find(
-              (field) => field.name === relation
+              (field) => field.name === relation,
             )!;
             const relatedModel = getModel(relationField.type, this.builder);
             const relatedFieldName = relatedModel.fields.find(
-              (field) => field.relationName === relationField.relationName
+              (field) => field.relationName === relationField.relationName,
             )!;
 
             return {
@@ -339,13 +340,13 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
           Types,
           NonNullable<Model["Create"][Relation & keyof Model["Update"]]>
         >;
-      }
+      },
     );
   }
 
   getUpdateInput<Name extends string & keyof Types["PrismaTypes"]>(
     modelName: Name,
-    without?: string[]
+    without?: string[],
   ) {
     const withoutName = (without ?? [])
       .map((name) => `Without${capitalize(name)}`)
@@ -359,10 +360,10 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
         fields: (() => {
           const fields: Record<string, InputTypeParam<Types>> = {};
           const withoutFields = model.fields.filter((field) =>
-            without?.includes(field.name)
+            without?.includes(field.name),
           );
           const relationIds = model.fields.flatMap(
-            (field) => field.relationFromFields ?? []
+            (field) => field.relationFromFields ?? [],
           );
 
           model.fields
@@ -371,8 +372,8 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
                 !withoutFields.some(
                   (f) =>
                     f.name === field.name ||
-                    f.relationFromFields?.includes(field.name)
-                ) && !relationIds.includes(field.name)
+                    f.relationFromFields?.includes(field.name),
+                ) && !relationIds.includes(field.name),
             )
             .forEach((field) => {
               let type;
@@ -409,9 +410,10 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
   getUpdateRelationInput<
     Name extends string & keyof Types["PrismaTypes"],
     Relation extends Model["RelationName"],
-    Model extends PrismaModelTypes = Types["PrismaTypes"][Name] extends PrismaModelTypes
+    Model extends
+      PrismaModelTypes = Types["PrismaTypes"][Name] extends PrismaModelTypes
       ? Types["PrismaTypes"][Name]
-      : never
+      : never,
   >(modelName: Name, relation: Relation) {
     return this.getRef(
       `${modelName}${capitalize(relation)}`,
@@ -421,11 +423,11 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
         return this.builder.prismaUpdateRelation(modelName, relation, {
           fields: () => {
             const relationField = model.fields.find(
-              (field) => field.name === relation
+              (field) => field.name === relation,
             )!;
             const relatedModel = getModel(relationField.type, this.builder);
             const relatedFieldName = relatedModel.fields.find(
-              (field) => field.relationName === relationField.relationName
+              (field) => field.relationName === relationField.relationName,
             )!.name;
 
             if (relationField.isList) {
@@ -473,7 +475,7 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
           Types,
           NonNullable<Model["Update"][Relation & keyof Model["Update"]]>
         >;
-      }
+      },
     );
   }
 
@@ -498,7 +500,7 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
     return this.getRef(type, `${String(type)}ListFilter`, () =>
       this.builder.prismaScalarListFilter(type, {
         ops: scalarListOps,
-      })
+      }),
     );
   }
 
@@ -506,12 +508,12 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
     return this.getRef(type, `${String(type)}ListFilter`, () =>
       this.builder.prismaListFilter(type, {
         ops: listOps,
-      })
+      }),
     );
   }
 
   getDMMF<Types extends SchemaTypes>(
-    builder: PothosSchemaTypes.SchemaBuilder<Types>
+    builder: PothosSchemaTypes.SchemaBuilder<Types>,
   ): RuntimeDataModel {
     const prisma = (
       builder.options as typeof builder.options & {
@@ -536,7 +538,11 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
         });
         this.enumRefs.set(name, enumRef);
       } else {
-        const client = (this.builder.options as unknown as { prisma?: { client?: Record<string, unknown> } }).prisma?.client;
+        const client = (
+          this.builder.options as unknown as {
+            prisma?: { client?: Record<string, unknown> };
+          }
+        ).prisma?.client;
         const clientEnum = client?.[name];
         if (clientEnum && typeof clientEnum === "object") {
           const enumRef = this.builder.enumType(name, {
@@ -569,7 +575,7 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
   private getRef<T extends InputObjectRef<Types, unknown>>(
     key: InputType<Types> | string,
     name: string,
-    create: () => T
+    create: () => T,
   ): T {
     if (!this.refCache.has(key)) {
       this.refCache.set(key, new Map());
