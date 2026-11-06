@@ -18,11 +18,12 @@ The schema is built dynamically in-memory at runtime—no need to generate and m
 ### Supported Operations & Features
 
 - **Queries**: `count<Model>`, `findUnique<Model>`, `findFirst<Model>`, `findMany<Model>`
-- **Mutations**: `createOne<Model>`, `createMany<Model>`, `updateOne<Model>`, `updateMany<Model>`, `deleteOne<Model>`, `deleteMany<Model>`
+- **Mutations**: `createOne<Model>`, `createMany<Model>`, `updateOne<Model>`, `updateMany<Model>`, `deleteOne<Model>`, `deleteMany<Model>`, `upsertOne<Model>`
 - **Relations**: Automatic 1-to-1, 1-to-many relation fields, plus relation count fields (e.g., `user.posts`, `user.postsCount`)
-- **Paging & Sorting**: `limit`, `offset`, and multi-field `orderBy`
-- **Filtering**: Deep filtering powered by Prisma (`equals`, `contains`, `in`, `lt`, `lte`, etc.)
-- **Directives**: Configure permissions, filters, defaults, and field visibility via schema comments (`/// @pothos-generator ...`)
+- **Paging & Sorting**: `limit`, `offset`, `cursor`, `distinct`, and multi-field `orderBy` (safely excluding list relations)
+- **Filtering**: Deep filtering powered by Prisma (`equals`, `contains`, `mode` [Insensitive/Default], `AND`, `OR`, `NOT`, `in`, `lt`, `lte`, etc.)
+- **Directives**: Configure permissions, filters, defaults, field visibility (`readable`), and mutability (`writable`) via schema comments (`/// @pothos-generator ...`)
+- **Async Support**: Asynchronous `authority`, `replace`, and parameter callbacks supported out of the box
 - **Built-in Scalars**: Auto-registers `BigInt`, `DateTime`, `Json`, `Decimal`, and `Bytes` via `graphql-scalars`
 
 ---
@@ -253,6 +254,28 @@ model User {
   /// Invisible in GraphQL schema (removed completely)
   /// @pothos-generator readable []
   secretToken String
+}
+```
+
+#### 10. `writable` (Field directive) - Field mutation access
+
+Placed on individual model fields to restrict or disable write access in mutations (`createOne`, `createMany`, `updateOne`, `upsertOne`).
+
+- Setting `writable false` completely omits the field from all GraphQL input types.
+- Setting `writable ["ADMIN"]` (or `{ authority: ["ADMIN"] }`) validates user authority at mutation runtime and rejects unauthorized writes.
+
+```prisma
+model User {
+  id    String @id @default(uuid())
+  email String @unique
+
+  /// Never allow writing via mutations (excluded from input types)
+  /// @pothos-generator writable false
+  createdAt DateTime @default(now())
+
+  /// Only ADMIN can update or create with this field
+  /// @pothos-generator writable ["ADMIN"]
+  roles String[]
 }
 ```
 

@@ -25,6 +25,7 @@ import {
   deleteModelMutation,
   updateManyModelMutation,
   updateModelMutation,
+  upsertOneModelMutation,
 } from "./createPothosSchema.js";
 import { PrismaSchemaGenerator } from "./generator/PrismaSchemaGenerator.js";
 
@@ -107,6 +108,7 @@ export class PothosPrismaGeneratorPlugin<
           ...updateManyModelMutation(t, generator),
           ...deleteModelMutation(t, generator),
           ...deleteManyModelMutation(t, generator),
+          ...upsertOneModelMutation(t, generator),
         }) as never,
     );
   }
@@ -129,6 +131,14 @@ export class PothosPrismaGeneratorPlugin<
         object
       > = (source, args, context, info) => {
         const authority = this.generator.getAuthority(context);
+        if (authority instanceof Promise) {
+          return authority.then((auth) => {
+            if (readable && !auth.some((v) => readable.has(v))) {
+              throw new Error("No permission");
+            }
+            return resolver(source, args, context, info);
+          });
+        }
         if (readable) {
           if (!authority.some((v) => readable.has(v)))
             throw new Error("No permission");
@@ -204,7 +214,12 @@ schemaBuilderProto.addFieldDirectives = function (
   value,
 ) {
   this.addSchemaGenerator((c) => {
-    c.generator.addFieldDirectives(modelName, fieldName, directive, value);
+    c.generator.addFieldDirectives(
+      modelName,
+      fieldName,
+      directive,
+      value as never,
+    );
   });
 };
 

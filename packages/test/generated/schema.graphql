@@ -21,6 +21,11 @@ A field whose value is a hexadecimal: https://en.wikipedia.org/wiki/Hexadecimal.
 """
 scalar Decimal
 
+enum StringFilterMode {
+  Default
+  Insensitive
+}
+
 enum Role {
   ADMIN
   USER
@@ -31,7 +36,43 @@ enum OrderBy {
   Desc
 }
 
+enum PostDistinctEnum {
+  id
+  published
+  title
+  content
+  authorId
+  createdAt
+  updatedAt
+  publishedAt
+}
+
+enum CategoryDistinctEnum {
+  id
+  name
+  createdAt
+  updatedAt
+}
+
+enum UserDistinctEnum {
+  id
+  email
+  name
+  roles
+  createdAt
+  updatedAt
+}
+
+enum TypeTestDistinctEnum {
+  id
+  scalarList
+  role
+}
+
 input PostFilter {
+  AND: [PostFilter!]
+  OR: [PostFilter!]
+  NOT: PostFilter
   id: StringFilter
   published: BooleanFilter
   title: StringFilter
@@ -54,6 +95,7 @@ input StringFilter {
   contains: String
   startsWith: String
   endsWith: String
+  mode: StringFilterMode
   lt: String
   lte: String
   gt: String
@@ -70,6 +112,9 @@ input BooleanFilter {
 }
 
 input UserFilter {
+  AND: [UserFilter!]
+  OR: [UserFilter!]
+  NOT: UserFilter
   id: StringFilter
   email: StringFilter
   name: StringFilter
@@ -107,6 +152,9 @@ input DateTimeFilter {
 }
 
 input CategoryFilter {
+  AND: [CategoryFilter!]
+  OR: [CategoryFilter!]
+  NOT: CategoryFilter
   id: StringFilter
   name: StringFilter
   posts: PostListFilter
@@ -127,7 +175,6 @@ input PostOrderBy {
   content: OrderBy
   author: UserOrderBy
   authorId: OrderBy
-  categories: CategoryOrderBy
   createdAt: OrderBy
   updatedAt: OrderBy
   publishedAt: OrderBy
@@ -137,21 +184,29 @@ input UserOrderBy {
   id: OrderBy
   email: OrderBy
   name: OrderBy
-  posts: PostOrderBy
-  roles: OrderBy
   createdAt: OrderBy
   updatedAt: OrderBy
+}
+
+input PostUniqueFilter {
+  id: String
 }
 
 input CategoryOrderBy {
   id: OrderBy
   name: OrderBy
-  posts: PostOrderBy
   createdAt: OrderBy
   updatedAt: OrderBy
 }
 
+input CategoryUniqueFilter {
+  id: String
+}
+
 input TypeTestFilter {
+  AND: [TypeTestFilter!]
+  OR: [TypeTestFilter!]
+  NOT: TypeTestFilter
   id: StringFilter
   scalarList: StringListFilter
   role: RoleFilter
@@ -179,21 +234,12 @@ input UserUniqueFilter {
   email: String
 }
 
-input PostUniqueFilter {
-  id: String
-}
-
-input CategoryUniqueFilter {
-  id: String
-}
-
 input TypeTestUniqueFilter {
   id: String
 }
 
 input TypeTestOrderBy {
   id: OrderBy
-  scalarList: OrderBy
   role: OrderBy
 }
 
@@ -208,11 +254,11 @@ input UserCreateInput {
 }
 
 input UserCreatePostsRelationInput {
-  create: [PostCreateInput!]
+  create: [PostCreateWithoutAuthorInput!]
   connect: [PostUniqueFilter!]
 }
 
-input PostCreateInput {
+input PostCreateWithoutAuthorInput {
   id: String
   published: Boolean
   title: String
@@ -224,18 +270,101 @@ input PostCreateInput {
 }
 
 input PostCreateCategoriesRelationInput {
-  create: [CategoryCreateInput!]
+  create: [CategoryCreateWithoutPostsInput!]
   connect: [CategoryUniqueFilter!]
 }
 
-input CategoryCreateInput {
+input CategoryCreateWithoutPostsInput {
   id: String
   name: String!
   createdAt: DateTime
   updatedAt: DateTime
 }
 
+input PostCreateInput {
+  id: String
+  published: Boolean
+  title: String
+  content: String
+  author: PostCreateAuthorRelationInput
+  categories: PostCreateCategoriesRelationInput
+  createdAt: DateTime
+  updatedAt: DateTime
+  publishedAt: DateTime
+}
+
+input PostCreateAuthorRelationInput {
+  create: UserCreateWithoutPostsInput
+  connect: UserUniqueFilter
+}
+
+input UserCreateWithoutPostsInput {
+  id: String
+  email: String!
+  name: String
+  roles: [Role!]
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input CategoryCreateInput {
+  id: String
+  name: String!
+  posts: CategoryCreatePostsRelationInput
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input CategoryCreatePostsRelationInput {
+  create: [PostCreateWithoutCategoriesInput!]
+  connect: [PostUniqueFilter!]
+}
+
+input PostCreateWithoutCategoriesInput {
+  id: String
+  published: Boolean
+  title: String
+  content: String
+  author: PostCreateAuthorRelationInput
+  createdAt: DateTime
+  updatedAt: DateTime
+  publishedAt: DateTime
+}
+
 input TypeTestCreateInput {
+  id: String
+  scalarList: [String!]
+  role: Role!
+}
+
+input UserCreateManyInput {
+  id: String
+  email: String!
+  name: String
+  roles: [Role!]
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input PostCreateManyInput {
+  id: String
+  published: Boolean
+  title: String
+  content: String
+  authorId: String
+  createdAt: DateTime
+  updatedAt: DateTime
+  publishedAt: DateTime
+}
+
+input CategoryCreateManyInput {
+  id: String
+  name: String!
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input TypeTestCreateManyInput {
   id: String
   scalarList: [String!]
   role: Role!
@@ -252,7 +381,7 @@ input UserUpdateInput {
 }
 
 input UserUpdatePostsRelationInput {
-  create: [PostCreateInput!]
+  create: [PostCreateWithoutAuthorInput!]
   set: [PostUniqueFilter!]
   disconnect: [PostUniqueFilter!]
   delete: [PostUniqueFilter!]
@@ -274,7 +403,7 @@ input PostUpdateWithoutAuthorInput {
 }
 
 input PostUpdateCategoriesRelationInput {
-  create: [CategoryCreateInput!]
+  create: [CategoryCreateWithoutPostsInput!]
   set: [CategoryUniqueFilter!]
   disconnect: [CategoryUniqueFilter!]
   delete: [CategoryUniqueFilter!]
@@ -292,6 +421,9 @@ input CategoryUpdateWithoutPostsInput {
 }
 
 input CategoryWithoutPostsFilter {
+  AND: [CategoryWithoutPostsFilter!]
+  OR: [CategoryWithoutPostsFilter!]
+  NOT: CategoryWithoutPostsFilter
   id: StringFilter
   name: StringFilter
   createdAt: DateTimeFilter
@@ -309,6 +441,9 @@ input PostUpdateCategoriesRelationInputUpdateMany {
 }
 
 input PostWithoutAuthorFilter {
+  AND: [PostWithoutAuthorFilter!]
+  OR: [PostWithoutAuthorFilter!]
+  NOT: PostWithoutAuthorFilter
   id: StringFilter
   published: BooleanFilter
   title: StringFilter
@@ -342,7 +477,7 @@ input PostUpdateInput {
 }
 
 input PostUpdateAuthorRelationInput {
-  create: UserCreateInput
+  create: UserCreateWithoutPostsInput
   update: UserUpdateWithoutPostsInput
   connect: UserUniqueFilter
   disconnect: Boolean
@@ -367,7 +502,7 @@ input CategoryUpdateInput {
 }
 
 input CategoryUpdatePostsRelationInput {
-  create: [PostCreateInput!]
+  create: [PostCreateWithoutCategoriesInput!]
   set: [PostUniqueFilter!]
   disconnect: [PostUniqueFilter!]
   delete: [PostUniqueFilter!]
@@ -389,6 +524,9 @@ input PostUpdateWithoutCategoriesInput {
 }
 
 input PostWithoutCategoriesFilter {
+  AND: [PostWithoutCategoriesFilter!]
+  OR: [PostWithoutCategoriesFilter!]
+  NOT: PostWithoutCategoriesFilter
   id: StringFilter
   published: BooleanFilter
   title: StringFilter
@@ -420,7 +558,7 @@ type User {
   id: ID!
   email: String!
   name: String!
-  posts(filter: PostFilter, orderBy: [PostOrderBy!], limit: Int, offset: Int): [Post!]!
+  posts(filter: PostFilter, orderBy: [PostOrderBy!], cursor: PostUniqueFilter, distinct: [PostDistinctEnum!], limit: Int, offset: Int): [Post!]!
   postsCount(filter: PostFilter): Int!
   roles: [Role!]!
   createdAt: DateTime!
@@ -434,7 +572,7 @@ type Post {
   content: String!
   author: User
   authorId: String
-  categories(filter: CategoryFilter, orderBy: [CategoryOrderBy!], limit: Int, offset: Int): [Category!]!
+  categories(filter: CategoryFilter, orderBy: [CategoryOrderBy!], cursor: CategoryUniqueFilter, distinct: [CategoryDistinctEnum!], limit: Int, offset: Int): [Category!]!
   categoriesCount(filter: CategoryFilter): Int!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -444,7 +582,7 @@ type Post {
 type Category {
   id: ID!
   name: String!
-  posts(filter: PostFilter, orderBy: [PostOrderBy!], limit: Int, offset: Int): [Post!]!
+  posts(filter: PostFilter, orderBy: [PostOrderBy!], cursor: PostUniqueFilter, distinct: [PostDistinctEnum!], limit: Int, offset: Int): [Post!]!
   postsCount(filter: PostFilter): Int!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -465,14 +603,14 @@ type Query {
   findUniquePost(filter: PostUniqueFilter!): Post!
   findUniqueCategory(filter: CategoryUniqueFilter!): Category!
   findUniqueTypeTest(filter: TypeTestUniqueFilter!): TypeTest!
-  findFirstUser(filter: UserFilter, orderBy: [UserOrderBy!]): User
-  findFirstPost(filter: PostFilter, orderBy: [PostOrderBy!]): Post
-  findFirstCategory(filter: CategoryFilter, orderBy: [CategoryOrderBy!]): Category
-  findFirstTypeTest(filter: TypeTestFilter, orderBy: [TypeTestOrderBy!]): TypeTest
-  findManyUser(filter: UserFilter, orderBy: [UserOrderBy!], limit: Int, offset: Int): [User!]!
-  findManyPost(filter: PostFilter, orderBy: [PostOrderBy!], limit: Int, offset: Int): [Post!]!
-  findManyCategory(filter: CategoryFilter, orderBy: [CategoryOrderBy!], limit: Int, offset: Int): [Category!]!
-  findManyTypeTest(filter: TypeTestFilter, orderBy: [TypeTestOrderBy!], limit: Int, offset: Int): [TypeTest!]!
+  findFirstUser(filter: UserFilter, orderBy: [UserOrderBy!], cursor: UserUniqueFilter, distinct: [UserDistinctEnum!]): User
+  findFirstPost(filter: PostFilter, orderBy: [PostOrderBy!], cursor: PostUniqueFilter, distinct: [PostDistinctEnum!]): Post
+  findFirstCategory(filter: CategoryFilter, orderBy: [CategoryOrderBy!], cursor: CategoryUniqueFilter, distinct: [CategoryDistinctEnum!]): Category
+  findFirstTypeTest(filter: TypeTestFilter, orderBy: [TypeTestOrderBy!], cursor: TypeTestUniqueFilter, distinct: [TypeTestDistinctEnum!]): TypeTest
+  findManyUser(filter: UserFilter, orderBy: [UserOrderBy!], cursor: UserUniqueFilter, distinct: [UserDistinctEnum!], limit: Int, offset: Int): [User!]!
+  findManyPost(filter: PostFilter, orderBy: [PostOrderBy!], cursor: PostUniqueFilter, distinct: [PostDistinctEnum!], limit: Int, offset: Int): [Post!]!
+  findManyCategory(filter: CategoryFilter, orderBy: [CategoryOrderBy!], cursor: CategoryUniqueFilter, distinct: [CategoryDistinctEnum!], limit: Int, offset: Int): [Category!]!
+  findManyTypeTest(filter: TypeTestFilter, orderBy: [TypeTestOrderBy!], cursor: TypeTestUniqueFilter, distinct: [TypeTestDistinctEnum!], limit: Int, offset: Int): [TypeTest!]!
 }
 
 type Mutation {
@@ -480,10 +618,10 @@ type Mutation {
   createOnePost(input: PostCreateInput!): Post!
   createOneCategory(input: CategoryCreateInput!): Category!
   createOneTypeTest(input: TypeTestCreateInput!): TypeTest!
-  createManyUser(input: [UserCreateInput!]!): Int!
-  createManyPost(input: [PostCreateInput!]!): Int!
-  createManyCategory(input: [CategoryCreateInput!]!): Int!
-  createManyTypeTest(input: [TypeTestCreateInput!]!): Int!
+  createManyUser(input: [UserCreateManyInput!]!): Int!
+  createManyPost(input: [PostCreateManyInput!]!): Int!
+  createManyCategory(input: [CategoryCreateManyInput!]!): Int!
+  createManyTypeTest(input: [TypeTestCreateManyInput!]!): Int!
   updateOneUser(where: UserUniqueFilter!, data: UserUpdateInput!): User!
   updateOnePost(where: PostUniqueFilter!, data: PostUpdateInput!): Post!
   updateOneCategory(where: CategoryUniqueFilter!, data: CategoryUpdateInput!): Category!
@@ -500,4 +638,8 @@ type Mutation {
   deleteManyPost(where: PostFilter!): Int!
   deleteManyCategory(where: CategoryFilter!): Int!
   deleteManyTypeTest(where: TypeTestFilter!): Int!
+  upsertOneUser(where: UserUniqueFilter!, create: UserCreateInput!, update: UserUpdateInput!): User!
+  upsertOnePost(where: PostUniqueFilter!, create: PostCreateInput!, update: PostUpdateInput!): Post!
+  upsertOneCategory(where: CategoryUniqueFilter!, create: CategoryCreateInput!, update: CategoryUpdateInput!): Category!
+  upsertOneTypeTest(where: TypeTestUniqueFilter!, create: TypeTestCreateInput!, update: TypeTestUpdateInput!): TypeTest!
 }

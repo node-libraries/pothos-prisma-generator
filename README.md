@@ -7,6 +7,8 @@
 
 Automatic generation of GraphQL schema from Prisma schema for [Pothos GraphQL](https://pothos-graphql.dev/).
 
+![](https://raw.githubusercontent.com/node-libraries/pothos-prisma-generator/master/documents/screenshot01.png)
+
 ## Overview
 
 `pothos-prisma-generator` automatically generates full-featured GraphQL queries, mutations, relation fields, and filters directly from your `schema.prisma`.
@@ -16,11 +18,12 @@ The schema is built dynamically in-memory at runtime—no need to generate and m
 ### Supported Operations & Features
 
 - **Queries**: `count<Model>`, `findUnique<Model>`, `findFirst<Model>`, `findMany<Model>`
-- **Mutations**: `createOne<Model>`, `createMany<Model>`, `updateOne<Model>`, `updateMany<Model>`, `deleteOne<Model>`, `deleteMany<Model>`
+- **Mutations**: `createOne<Model>`, `createMany<Model>`, `updateOne<Model>`, `updateMany<Model>`, `deleteOne<Model>`, `deleteMany<Model>`, `upsertOne<Model>`
 - **Relations**: Automatic 1-to-1, 1-to-many relation fields, plus relation count fields (e.g., `user.posts`, `user.postsCount`)
-- **Paging & Sorting**: `limit`, `offset`, and multi-field `orderBy`
-- **Filtering**: Deep filtering powered by Prisma (`equals`, `contains`, `in`, `lt`, `lte`, etc.)
-- **Directives**: Configure permissions, filters, defaults, and field visibility via schema comments (`/// @pothos-generator ...`)
+- **Paging & Sorting**: `limit`, `offset`, `cursor`, `distinct`, and multi-field `orderBy` (safely excluding list relations)
+- **Filtering**: Deep filtering powered by Prisma (`equals`, `contains`, `mode` [Insensitive/Default], `AND`, `OR`, `NOT`, `in`, `lt`, `lte`, etc.)
+- **Directives**: Configure permissions, filters, defaults, field visibility (`readable`), and mutability (`writable`) via schema comments (`/// @pothos-generator ...`)
+- **Async Support**: Asynchronous `authority`, `replace`, and parameter callbacks supported out of the box
 - **Built-in Scalars**: Auto-registers `BigInt`, `DateTime`, `Json`, `Decimal`, and `Bytes` via `graphql-scalars`
 
 ---
@@ -96,14 +99,12 @@ import { prismaDmmf } from "./generated/prisma-dmmf";
 const prisma = new PrismaClient();
 
 export interface Context {
-  user?: {
-    id: string;
-    roles: string[];
-  };
+  user?: { id: string; roles: string[] };
 }
 
 export const builder = new SchemaBuilder<{
   Context: Context;
+  Prisma: typeof prisma;
 }>({
   plugins: [
     PrismaPlugin,
@@ -116,105 +117,87 @@ export const builder = new SchemaBuilder<{
     dmmf: prismaDmmf,
   },
   pothosPrismaGenerator: {
-    // Dynamic replacement in directives (e.g. "%%USER%%" -> current user ID)
+    authority: ({ context }) => context.user?.roles ?? [],
     replace: {
       "%%USER%%": ({ context }) => context.user?.id,
-    },
-    // User authority/roles function
-    authority: ({ context }) => context.user?.roles ?? [],
-    // Default includes
-    defaultIncludes: {
-      operations: true, // Default: true (all operations exposed unless excluded)
-      fields: true,     // Default: true
     },
   },
 });
 
+// Build GraphQL schema
 export const schema = builder.toSchema();
 ```
 
 ---
 
-## Directives (`@pothos-generator`)
+## Directives Reference
 
-You can control operation availability, permissions, default filters, and field accessibility directly inside `schema.prisma` using `/// @pothos-generator` documentation comments.
+Directives are written as triple-slash comments (`/// @pothos-generator <directive> <JSON5>`) above models or fields in `schema.prisma`.
 
-Directives follow the JSON5 format:
+### Model Directives
+
+#### 1. `operation` - Filter generated operations
+
+Controls which query and mutation fields are generated for the model.
+
+- Supported operations:
+  - `count`, `findUnique`, `findFirst`, `findMany`
+  - `createOne`, `createMany`, `updateOne`, `updateMany`, `deleteOne`, `deleteMany`, `upsertOne`
+- Shorthand groups: `query`, `mutation`, `find`, `create`, `update`, `delete`, `upsert`, `all`
+
 ```prisma
-/// @pothos-generator <directiveName> <json5Params>
+/// Exclude bulk mutations:
+/// @pothos-generator operation {exclude:["deleteMany","updateMany"]}
+
+/// Or only allow reading and creating single items:
+/// @pothos-generator operation {include:["findMany","findFirst","findUnique","createOne"]}
 ```
 
-### Supported Operation Categories
+#### 2. `executable` - Restrict operation execution permissions
 
-- `query`: `findUnique`, `findFirst`, `findMany`, `count`
-- `find`: `findUnique`, `findFirst`, `findMany`
-- `create`: `createOne`, `createMany`
-- `update`: `updateOne`, `updateMany`
-- `delete`: `deleteOne`, `deleteMany`
-- `mutation`: All create, update, delete operations
-- `all`: All queries and mutations
-
----
-
-### Directive Reference
-
-#### 1. `operation` - Filter exposed operations
-
-Include or exclude specific GraphQL operations.
+Restricts who can execute specific operations on the model based on user authority.
 
 ```prisma
-/// Include only createOne and updateOne
-/// @pothos-generator operation {include:["createOne","updateOne"]}
-
-/// Exclude deleteMany
-/// @pothos-generator operation {exclude:["deleteMany"]}
+/// Only users with "ADMIN" role can delete records
+/// @pothos-generator executable {include:["delete"],authority:["ADMIN"]}
 ```
 
-#### 2. `executable` - Restrict execution permissions
+#### 3. `where` - Default / Forced query filters
 
-Enforces permissions on operations. Raises an error if the user does not possess the required authority.
-
-```prisma
-/// Mutations require USER role
-/// @pothos-generator executable {include:["mutation"],authority:["USER"]}
-```
-
-#### 3. `where` - Enforce server-side filters
-
-Automatically injects conditions into Prisma queries. If multiple directives match, the first matching directive is applied.
+Automatically merges filters into queries. Often used for multitenancy or soft deletes.
 
 ```prisma
-/// Admins can see all, standard users see only published records
-/// @pothos-generator where {include:["query"],where:{},authority:["ADMIN"]}
-/// @pothos-generator where {include:["query"],where:{published:true}}
+/// Only query non-deleted records
+/// @pothos-generator where {where:{deletedAt:null}}
 
-/// Users can only update or delete their own records
-/// @pothos-generator where {include:["update","delete"],where:{authorId:"%%USER%%"}}
+/// Automatically scope records to logged-in user
+/// @pothos-generator where {where:{authorId:"%%USER%%"}}
 ```
 
 #### 4. `order` - Default sort order
 
-Specifies default sorting for queries.
+Specifies default sorting for `findMany` and `findFirst`.
 
 ```prisma
-/// @pothos-generator order {orderBy:{title:"asc"}}
+/// Default order by createdAt descending
+/// @pothos-generator order {orderBy:{createdAt:"desc"}}
 ```
 
-#### 5. `limit` - Limit query result count
+#### 5. `limit` - Enforce maximum fetch limit
 
-Caps the maximum number of items returned, preventing denial-of-service from unbounded queries.
+Restricts maximum `limit` for `findMany`. Prevents requesting unbounded data.
 
 ```prisma
-/// Cap to 50 items maximum
-/// @pothos-generator limit {limit:50}
+/// Cap at 100 records max
+/// @pothos-generator limit {limit:100}
 ```
 
-#### 6. `input-field` - Control allowed input fields
+#### 6. `input-field` - Exclude fields from inputs
 
-Controls which fields can be specified in mutation input arguments.
+Omits specified fields from GraphQL input types (`CreateInput`, `UpdateInput`).
 
 ```prisma
-/// Exclude internal fields from creation input
+/// Exclude auto-generated fields from create/update inputs
 /// @pothos-generator input-field {fields:{exclude:["id","createdAt","updatedAt"]}}
 ```
 
@@ -254,6 +237,28 @@ model User {
 }
 ```
 
+#### 10. `writable` (Field directive) - Field mutation access
+
+Placed on individual model fields to restrict or disable write access in mutations (`createOne`, `createMany`, `updateOne`, `upsertOne`).
+
+- Setting `writable false` completely omits the field from all GraphQL input types.
+- Setting `writable ["ADMIN"]` (or `{ authority: ["ADMIN"] }`) validates user authority at mutation runtime and rejects unauthorized writes.
+
+```prisma
+model User {
+  id    String @id @default(uuid())
+  email String @unique
+
+  /// Never allow writing via mutations (excluded from input types)
+  /// @pothos-generator writable false
+  createdAt DateTime @default(now())
+
+  /// Only ADMIN can update or create with this field
+  /// @pothos-generator writable ["ADMIN"]
+  roles String[]
+}
+```
+
 ---
 
 ## Code API: Dynamic Model Extensions
@@ -281,35 +286,21 @@ builder.addModelOperations("User", {
 
 // Add field directives
 builder.addFieldDirectives("User", "roles", "readable", ["ADMIN"]);
+builder.addFieldDirectives("User", "createdAt", "writable", false);
+```
 
-// Add model options
-builder.addModelOptions(
-  "User",
-  { include: ["mutation"] },
-  { authScopes: { ADMIN: true } }
-);
+### Parameter Callbacks
 
-// Parameter interceptor callback
-builder.addModelParameterCallback((params, generatorParams) => {
-  if (generatorParams.modelName === "Post" && generatorParams.operationPrefix === "createOne") {
-    return {
-      ...params,
-      input: {
-        ...params.input,
-        authorId: generatorParams.params.ctx.user?.id,
-      },
-    };
-  }
+Inspect or mutate query arguments before execution:
+
+```typescript
+builder.addModelParameterCallback(async (params, { modelName, operationPrefix }) => {
+  console.log(`Executing ${operationPrefix} on ${modelName}`);
   return params;
 });
 ```
 
 ---
-
-## Sample Projects
-
-- [next-pothos (Next.js)](https://github.com/SoraKumo001/next-pothos) - Deployed on [Vercel](https://next-pothos.vercel.app/)
-- [nest-pothos (NestJS)](https://github.com/SoraKumo001/nest-pothos) - Deployed on [Render](https://nest-pothos.onrender.com)
 
 ## License
 

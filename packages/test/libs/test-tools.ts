@@ -1,6 +1,6 @@
 import { DocumentNode, execute } from "graphql";
 import { RemoveReadonly, RuntimeDataModel } from "pothos-prisma-generator";
-import { getSdk } from "../generated/graphql";
+import { getSdk } from "../test/generated/graphql";
 import { createBuilder } from "./builder";
 import type { Context } from "./context";
 import { prisma } from "./context";

@@ -4,11 +4,7 @@
   "documents": "./graphql/*.graphql",
   "generates": {
     "./test/generated/graphql.ts": {
-      "plugins": [
-        "typescript",
-        "typescript-operations",
-        "typescript-generic-sdk"
-      ],
+      "plugins": ["typescript-operations", "typescript-generic-sdk"],
       "config": { "scalars": { "DateTime": "string" } }
     }
   }

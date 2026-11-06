@@ -21,10 +21,12 @@ const findOperations = ["findUnique", "findFirst", "findMany"] as const;
 const createOperations = ["createOne", "createMany"] as const;
 const updateOperations = ["updateOne", "updateMany"] as const;
 const deleteOperations = ["deleteOne", "deleteMany"] as const;
+const upsertOperations = ["upsertOne"] as const;
 const mutationOperations = [
   ...createOperations,
   ...updateOperations,
   ...deleteOperations,
+  ...upsertOperations,
 ] as const;
 const queryOperations = [...findOperations, ...countOperations] as const;
 const allOperations = [...queryOperations, ...mutationOperations];
@@ -36,6 +38,7 @@ const operationMap = {
   create: createOperations,
   update: updateOperations,
   delete: deleteOperations,
+  upsert: upsertOperations,
   mutation: mutationOperations,
 };
 
@@ -44,8 +47,10 @@ export type ExtendOperation =
   | Operation
   | "mutation"
   | "query"
+  | "create"
   | "update"
   | "delete"
+  | "upsert"
   | "all";
 
 export type FilterOperations = {
@@ -84,6 +89,13 @@ export type ModelDirective = {
 
 export type FieldDirective = {
   readable?: string[];
+  writable?:
+    | boolean
+    | string[]
+    | {
+        operations?: ExtendOperation[];
+        authority?: string[];
+      };
 };
 
 export type ModelAuthorityType<T> = {
@@ -126,15 +138,29 @@ export type ParameterCallback<Types extends SchemaTypes> = (
     take?: number;
     skip?: number;
     input?: object;
+    cursor?: object;
+    distinct?: unknown[];
   },
   generatorParams: GeneratorParamsType<Types>,
-) => {
-  where?: object;
-  orderBy?: object;
-  take?: number;
-  skip?: number;
-  input?: object;
-};
+) =>
+  | {
+      where?: object;
+      orderBy?: object;
+      take?: number;
+      skip?: number;
+      input?: object;
+      cursor?: object;
+      distinct?: unknown[];
+    }
+  | Promise<{
+      where?: object;
+      orderBy?: object;
+      take?: number;
+      skip?: number;
+      input?: object;
+      cursor?: object;
+      distinct?: unknown[];
+    }>;
 
 export type PrismaSchemaGeneratorParams<
   T extends keyof PrismaSchemaGenerator<SchemaTypes>,
@@ -188,9 +214,16 @@ export class PrismaSchemaGenerator<
   replaceValues?: {
     [key: string]: (props: {
       context: Types["Context"];
-    }) => object | string | number | undefined;
+    }) =>
+      | object
+      | string
+      | number
+      | undefined
+      | Promise<object | string | number | undefined>;
   };
-  authorityFunc?: (props: { context: SchemaTypes["Context"] }) => string[];
+  authorityFunc?: (props: {
+    context: SchemaTypes["Context"];
+  }) => string[] | Promise<string[]>;
 
   customGenerator: {
     [K in keyof PrismaSchemaGenerator<Types>]?: PrismaSchemaGenerator<Types>[K][];
@@ -245,7 +278,12 @@ export class PrismaSchemaGenerator<
     search: string,
     replaceFunction: (props: {
       context: Types["Context"];
-    }) => object | string | number | undefined,
+    }) =>
+      | object
+      | string
+      | number
+      | undefined
+      | Promise<object | string | number | undefined>,
   ) {
     if (!this.replaceValues) this.replaceValues = {};
     this.replaceValues[search] = replaceFunction;
@@ -256,10 +294,32 @@ export class PrismaSchemaGenerator<
     if (!replaceEntries || Object.keys(replaceEntries).length === 0) {
       return traverse(target).map(function () {});
     }
-    const computedValues: Record<string, object | string | number | undefined> =
-      {};
+    const computedValues: Record<string, unknown> = {};
+    let hasPromise = false;
     for (const key of Object.keys(replaceEntries)) {
-      computedValues[key] = replaceEntries[key](props);
+      const val = replaceEntries[key](props);
+      if (val instanceof Promise) {
+        hasPromise = true;
+      }
+      computedValues[key] = val;
+    }
+
+    if (hasPromise) {
+      return (async () => {
+        for (const key of Object.keys(computedValues)) {
+          if (computedValues[key] instanceof Promise) {
+            computedValues[key] = await computedValues[key];
+          }
+        }
+        return traverse(target).map(function (value) {
+          if (
+            typeof value === "string" &&
+            Object.hasOwn(computedValues, value)
+          ) {
+            this.update(computedValues[value]);
+          }
+        });
+      })();
     }
 
     return traverse(target).map(function (value) {
@@ -269,10 +329,14 @@ export class PrismaSchemaGenerator<
     });
   }
 
-  setAuthority(func: (props: { context: Types["Context"] }) => string[]) {
+  setAuthority(
+    func: (props: {
+      context: Types["Context"];
+    }) => string[] | Promise<string[]>,
+  ) {
     this.authorityFunc = func;
   }
-  getAuthority(context: Types["Context"]) {
+  getAuthority(context: Types["Context"]): string[] | Promise<string[]> {
     /* istanbul ignore next */
     return this.authorityFunc?.({ context }) ?? [];
   }
@@ -320,11 +384,11 @@ export class PrismaSchemaGenerator<
       values,
     ] as (typeof this.modelDirectives)[string][K];
   }
-  addFieldDirectives(
+  addFieldDirectives<K extends keyof FieldDirective>(
     modelName: string,
     fieldName: string | string[],
-    directive: keyof FieldDirective,
-    value: string[],
+    directive: K,
+    value: NonNullable<FieldDirective[K]>,
   ) {
     this.fieldDirectives[modelName] = this.fieldDirectives[modelName] ?? {};
     const fieldNames = Array.isArray(fieldName) ? fieldName : [fieldName];
@@ -332,9 +396,10 @@ export class PrismaSchemaGenerator<
       this.fieldDirectives[modelName][name] =
         this.fieldDirectives[modelName][name] ?? {};
       this.fieldDirectives[modelName][name][directive] = [
-        ...(this.fieldDirectives[modelName][name][directive] ?? []),
+        ...((this.fieldDirectives[modelName][name][directive] as unknown[]) ??
+          []),
         value,
-      ];
+      ] as never;
     });
   }
   protected createModelOptions() {
@@ -433,18 +498,18 @@ export class PrismaSchemaGenerator<
     });
   }
   protected createModelInputField() {
-    this.getModels().forEach(({ name }) => {
+    this.getModels().forEach(({ name, fields }) => {
       const directives = this.getModelDirectives(name, "input-field");
-      this.modelInputWithoutFields[name] = directives.reduce(
+      const withoutFields = directives.reduce(
         (pre, directive) => {
           const operations = this.getFilterOperations(directive);
-          const { fields } = directive;
+          const { fields: targetFields } = directive;
           return operations.reduce(
             (pre, operation) => ({
               ...pre,
               [operation]: [
                 ...(pre[operation] ?? []),
-                ...this.getModelFields(name, fields),
+                ...this.getModelFields(name, targetFields),
               ],
             }),
             pre,
@@ -452,6 +517,36 @@ export class PrismaSchemaGenerator<
         },
         {} as ModelInputWithoutFields[string],
       );
+
+      fields.forEach(({ name: fieldName }) => {
+        const writable = this.getFieldWritable(name, fieldName);
+        if (writable === false) {
+          mutationOperations.forEach((operation) => {
+            withoutFields[operation] = [
+              ...(withoutFields[operation] ?? []),
+              fieldName,
+            ];
+          });
+        } else if (
+          writable &&
+          typeof writable === "object" &&
+          !Array.isArray(writable) &&
+          !writable.authority &&
+          writable.operations
+        ) {
+          const ops = this.getFilterOperations({
+            include: writable.operations,
+          });
+          ops.forEach((operation) => {
+            withoutFields[operation] = [
+              ...(withoutFields[operation] ?? []),
+              fieldName,
+            ];
+          });
+        }
+      });
+
+      this.modelInputWithoutFields[name] = withoutFields;
     });
   }
   protected createModelInputData() {
@@ -509,7 +604,8 @@ export class PrismaSchemaGenerator<
         ?.replace(/\\n/g, "\n")
         .match(regex)
         ?.map((text) => {
-          const [, key, json] = text.match(/^(readable)\s+(.*?)$/) ?? [];
+          const [, key, json] =
+            text.match(/^(readable|writable)\s+(.*?)$/) ?? [];
           if (!key || !json)
             throw new Error(
               `Error parsing schema directive: ${modelName}.${fieldName}\n ${text}`,
@@ -551,13 +647,48 @@ export class PrismaSchemaGenerator<
   };
 
   getFieldReadable(modelName: string, fieldName: string) {
-    return this.fieldDirectives[modelName][fieldName]?.readable?.reduce(
+    return this.fieldDirectives[modelName]?.[fieldName]?.readable?.reduce(
       (a, b) => {
         b.forEach((v) => a.add(v));
         return a;
       },
       new Set<string>(),
     );
+  }
+
+  getFieldWritable(modelName: string, fieldName: string) {
+    const directives = this.fieldDirectives[modelName]?.[fieldName]?.writable;
+    if (!directives || directives.length === 0) return undefined;
+    return directives[directives.length - 1];
+  }
+
+  checkFieldWritable(
+    modelName: string,
+    fieldName: string,
+    authority: string[],
+  ): boolean {
+    const writable = this.getFieldWritable(modelName, fieldName);
+    if (writable === undefined) return true;
+    if (writable === false) return false;
+    let requiredAuth: string[] | undefined;
+    if (Array.isArray(writable)) {
+      requiredAuth = writable;
+    } else if (typeof writable === "object" && writable.authority) {
+      requiredAuth = writable.authority;
+    }
+    if (requiredAuth && requiredAuth.length > 0) {
+      return authority.some((a) => requiredAuth!.includes(a));
+    }
+    return true;
+  }
+
+  checkInputWritable(modelName: string, input: unknown, authority: string[]) {
+    if (!input || typeof input !== "object") return;
+    for (const key of Object.keys(input)) {
+      if (!this.checkFieldWritable(modelName, key, authority)) {
+        throw new Error(`Field '${key}' is not writable for your authority`);
+      }
+    }
   }
 
   getModelFields(
@@ -626,7 +757,7 @@ export class PrismaSchemaGenerator<
       throw new Error("No permission");
     return true;
   }
-  getModelWhere({
+  async getModelWhere({
     params,
     modelName,
     operationPrefix,
@@ -642,22 +773,22 @@ export class PrismaSchemaGenerator<
     modelName: string;
     operationPrefix: Operation;
     authority: string[];
-  }): { [key: string]: unknown } | undefined {
-    const values = this.modelWhere[modelName][operationPrefix];
+  }): Promise<{ [key: string]: unknown } | undefined> {
+    const values = this.modelWhere[modelName]?.[operationPrefix];
     const whereModel = values?.find(
       (value) =>
         value[0].length === 0 || value[0].some((v) => authority.includes(v)),
     );
-    return this.replaceValue(whereModel?.[1] ?? [], {
+    return (await this.replaceValue(whereModel?.[1] ?? [], {
       context: params.ctx,
-    });
+    })) as { [key: string]: unknown } | undefined;
   }
   getModelLimit(
     modelName: string,
     operationPrefix: Operation,
     authority: string[],
   ) {
-    const values = this.modelLimit[modelName][operationPrefix];
+    const values = this.modelLimit[modelName]?.[operationPrefix];
     const limitModel = values?.find(
       (value) =>
         value[0].length === 0 || value[0].some((v) => authority.includes(v)),
@@ -670,19 +801,21 @@ export class PrismaSchemaGenerator<
     operationPrefix: Operation,
     authority: string[],
   ) {
-    const values = this.modelOrder[modelName][operationPrefix];
+    const values = this.modelOrder[modelName]?.[operationPrefix];
     const action = values?.find(
       (value) =>
         value[0].length === 0 || value[0].some((v) => authority.includes(v)),
     );
     return action?.[1] ?? [];
   }
-  getParameters<
+  async getParameters<
     WHERE extends object,
     ORDERBY extends object,
     TAKE extends number,
     SKIP extends number,
     INPUT extends object,
+    CURSOR extends object,
+    DISTINCT extends unknown[],
   >(
     params: {
       where?: WHERE;
@@ -690,6 +823,8 @@ export class PrismaSchemaGenerator<
       take?: TAKE;
       skip?: SKIP;
       input?: INPUT;
+      cursor?: CURSOR;
+      distinct?: DISTINCT;
     },
     generatorParams: {
       params: {
@@ -704,29 +839,34 @@ export class PrismaSchemaGenerator<
       operationPrefix: Operation;
       authority: string[];
     },
-  ) {
-    return this.modelParameterCallbacks.reduce((pre, callback) => {
-      return callback(pre, generatorParams) as typeof params;
-    }, params);
+  ): Promise<typeof params> {
+    let current = params;
+    for (const callback of this.modelParameterCallbacks) {
+      current = (await callback(current, generatorParams)) as typeof params;
+    }
+    return current;
   }
   getModelInputFields(modelName: string) {
-    return this.modelInputWithoutFields[modelName];
+    return (
+      this.modelInputWithoutFields[modelName] ??
+      ({} as Record<Operation, string[]>)
+    );
   }
-  getModelInputData(
+  async getModelInputData(
     modelName: string,
     operationPrefix: Operation,
     authority: string[],
     ctx: SchemaTypes["Context"],
-  ) {
-    const values = this.modelInputData[modelName][operationPrefix];
+  ): Promise<object> {
+    const values = this.modelInputData[modelName]?.[operationPrefix];
     const action =
       values?.find(
         (value) =>
           value[0].length === 0 || value[0].some((v) => authority.includes(v)),
       )?.[1] ?? [];
-    return this.replaceValue(action, {
+    return (await this.replaceValue(action, {
       context: ctx,
-    });
+    })) as object;
   }
   getCreateInput<Name extends keyof Types["PrismaTypes"] & string>(
     modelName: Name,
@@ -742,6 +882,20 @@ export class PrismaSchemaGenerator<
       without && without.length > 0 ? undefined : false,
     );
   }
+  getCreateManyInput<Name extends keyof Types["PrismaTypes"] & string>(
+    modelName: Name,
+    without?: string[],
+  ): InputObjectRef<
+    Types,
+    (PrismaModelTypes & Types["PrismaTypes"][Name])["Create"]
+  > {
+    const fields = this.getModelInputFields(modelName)["createMany"] ?? [];
+    return super.getCreateManyInput(
+      modelName,
+      [...fields, ...(without ?? [])],
+      without && without.length > 0 ? undefined : false,
+    );
+  }
   getUpdateInput<Name extends keyof Types["PrismaTypes"] & string>(
     modelName: Name,
     without?: string[],
@@ -750,6 +904,10 @@ export class PrismaSchemaGenerator<
     (PrismaModelTypes & Types["PrismaTypes"][Name])["Update"]
   > {
     const fields = this.getModelInputFields(modelName)["updateOne"] ?? [];
-    return super.getUpdateInput(modelName, [...fields, ...(without ?? [])]);
+    return super.getUpdateInput(
+      modelName,
+      [...fields, ...(without ?? [])],
+      without && without.length > 0 ? undefined : false,
+    );
   }
 }

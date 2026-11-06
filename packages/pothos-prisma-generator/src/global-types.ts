@@ -39,11 +39,11 @@ declare global {
         modelName: string,
         filterOperations: FilterOperations
       ): void;
-      addFieldDirectives(
+      addFieldDirectives<K extends keyof FieldDirective>(
         modelName: string,
         fieldName: string | string[],
-        directive: keyof FieldDirective,
-        value: string[]
+        directive: K,
+        value: NonNullable<FieldDirective[K]>
       ): void;
       addModelDirectives<
         K extends keyof ModelDirective,
@@ -77,9 +77,18 @@ declare global {
             context,
           }: {
             context: Types["Context"];
-          }) => object | string | number | undefined;
+          }) =>
+            | object
+            | string
+            | number
+            | undefined
+            | Promise<object | string | number | undefined>;
         };
-        authority: ({ context }: { context: Types["Context"] }) => string[];
+        authority?: ({
+          context,
+        }: {
+          context: Types["Context"];
+        }) => string[] | Promise<string[]>;
         callbacks?: GeneratorCallback<Types>[];
         modelFields?: {
           [key in keyof Types["PrismaTypes"]]?: {

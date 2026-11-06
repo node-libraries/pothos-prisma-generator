@@ -176,6 +176,8 @@ query FindManyUser(
   $orderBy: [UserOrderBy!]
   $limit: Int
   $offset: Int
+  $cursor: UserUniqueFilter
+  $distinct: [UserDistinctEnum!]
   $postFilter: PostFilter
   $postOrderBy: [PostOrderBy!]
   $postLimit: Int
@@ -186,6 +188,8 @@ query FindManyUser(
     orderBy: $orderBy
     limit: $limit
     offset: $offset
+    cursor: $cursor
+    distinct: $distinct
   ) {
     ...user
     posts(
@@ -208,6 +212,8 @@ query FindManyPost(
   $limit: Int
   $offset: Int
   $orderBy: [PostOrderBy!]
+  $cursor: PostUniqueFilter
+  $distinct: [PostDistinctEnum!]
   $categoryFilter: CategoryFilter
   $categoryOrderBy: [CategoryOrderBy!]
   $categoryLimit: Int
@@ -218,6 +224,8 @@ query FindManyPost(
     orderBy: $orderBy
     limit: $limit
     offset: $offset
+    cursor: $cursor
+    distinct: $distinct
   ) {
     ...post
     author {
@@ -282,15 +290,15 @@ mutation CreateOneCategory($input: CategoryCreateInput!) {
   }
 }
 
-mutation CreateManyUser($input: [UserCreateInput!]!) {
+mutation CreateManyUser($input: [UserCreateManyInput!]!) {
   createManyUser(input: $input)
 }
 
-mutation CreateManyPost($input: [PostCreateInput!]!) {
+mutation CreateManyPost($input: [PostCreateManyInput!]!) {
   createManyPost(input: $input)
 }
 
-mutation CreateManyCategory($input: [CategoryCreateInput!]!) {
+mutation CreateManyCategory($input: [CategoryCreateManyInput!]!) {
   createManyCategory(input: $input)
 }
 
@@ -358,4 +366,34 @@ mutation DeleteManyPost($where: PostFilter!) {
 
 mutation DeleteManyCategory($where: CategoryFilter!) {
   deleteManyCategory(where: $where)
+}
+
+mutation UpsertOneUser(
+  $where: UserUniqueFilter!
+  $create: UserCreateInput!
+  $update: UserUpdateInput!
+) {
+  upsertOneUser(where: $where, create: $create, update: $update) {
+    ...user
+  }
+}
+
+mutation UpsertOnePost(
+  $where: PostUniqueFilter!
+  $create: PostCreateInput!
+  $update: PostUpdateInput!
+) {
+  upsertOnePost(where: $where, create: $create, update: $update) {
+    ...post
+  }
+}
+
+mutation UpsertOneCategory(
+  $where: CategoryUniqueFilter!
+  $create: CategoryCreateInput!
+  $update: CategoryUpdateInput!
+) {
+  upsertOneCategory(where: $where, create: $create, update: $update) {
+    ...category
+  }
 }
