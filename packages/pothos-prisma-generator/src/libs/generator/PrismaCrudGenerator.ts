@@ -6,7 +6,7 @@ import {
   SchemaTypes,
 } from "@pothos/core";
 import { getModel, PrismaModelTypes } from "@pothos/plugin-prisma";
-import { DMMF, getPrismaClient } from "@prisma/client/runtime/library";
+import { DMMF, getPrismaClient } from "@prisma/client/runtime/client";
 import type {
   FilterOps,
   PrismaOrderByFields,
@@ -526,15 +526,24 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
 
   getEnum(name: string) {
     if (!this.enumRefs.has(name)) {
-      const enums = this.getDMMF(this.builder).enums;
+      const enums = this.getDMMF(this.builder)?.enums;
       const modelEnum = Array.isArray(enums)
         ? (enums as DMMF.DatamodelEnum[]).find((e) => e.name === name)
-        : enums[name];
+        : enums?.[name];
       if (modelEnum) {
         const enumRef = this.builder.enumType(name, {
           values: modelEnum.values.map(({ name }) => name),
         });
         this.enumRefs.set(name, enumRef);
+      } else {
+        const client = (this.builder.options as unknown as { prisma?: { client?: Record<string, unknown> } }).prisma?.client;
+        const clientEnum = client?.[name];
+        if (clientEnum && typeof clientEnum === "object") {
+          const enumRef = this.builder.enumType(name, {
+            values: Object.keys(clientEnum),
+          });
+          this.enumRefs.set(name, enumRef);
+        }
       }
     }
     return this.enumRefs.get(name)!;

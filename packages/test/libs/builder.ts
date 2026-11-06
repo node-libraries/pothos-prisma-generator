@@ -6,6 +6,7 @@ import PothosPrismaGeneratorPlugin from "pothos-prisma-generator";
 import PothosSchemaExporter from "pothos-schema-exporter";
 import { Context, prisma } from "./context";
 import type PrismaTypes from "@pothos/plugin-prisma/generated";
+import { prismaDmmf } from "./prisma-dmmf";
 
 /**
  * Create a new schema builder instance
@@ -28,6 +29,7 @@ export const createBuilder = (defaultIncludes?: {
     ],
     prisma: {
       client: prisma,
+      dmmf: prismaDmmf,
     },
     scopeAuth: {
       authScopes: async (context) =>

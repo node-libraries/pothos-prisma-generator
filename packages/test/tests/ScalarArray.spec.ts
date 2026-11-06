@@ -1,9 +1,9 @@
-import { PrismaClient } from "@prisma/client";
-import { beforeAllAsync } from "jest-async";
+import { createPrismaClient } from "../libs/client";
+import { beforeAllAsync } from "../libs/async";
 import { getClient } from "../libs/test-tools";
 
 describe("ScalarArray", () => {
-  const prisma = new PrismaClient({});
+  const prisma = createPrismaClient({});
 
   const property = beforeAllAsync(async () => {
     const typeTest = await prisma.typeTest.findFirst({

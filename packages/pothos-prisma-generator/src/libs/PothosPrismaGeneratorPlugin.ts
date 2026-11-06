@@ -111,8 +111,8 @@ export class PothosPrismaGeneratorPlugin<
     );
   }
   wrapResolve(
-    resolver: GraphQLFieldResolver<unknown, SchemaTypes["Context"], object>,
-    fieldConfig: PothosOutputFieldConfig<SchemaTypes>
+    resolver: GraphQLFieldResolver<unknown, Types["Context"], object>,
+    fieldConfig: PothosOutputFieldConfig<Types>
   ) {
     const fieldDirectives = Object.values(
       this.generator.fieldDirectives[fieldConfig.parentType] ?? {}
@@ -125,7 +125,7 @@ export class PothosPrismaGeneratorPlugin<
 
       const newResolver: GraphQLFieldResolver<
         unknown,
-        SchemaTypes["Context"],
+        Types["Context"],
         object
       > = (source, args, context, info) => {
         const authority = this.generator.getAuthority(context);

@@ -1,4 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "./context";
+import { prismaDmmf } from "./prisma-dmmf";
 import { DocumentNode } from "graphql";
 import { RemoveReadonly, RuntimeDataModel } from "pothos-prisma-generator";
 import { createBuilder } from "./builder";
@@ -44,17 +45,27 @@ export const getClient = async (
 const removeReadOnly = <T>(object: T) => object as RemoveReadonly<T>;
 
 export const setModelDirective = (model: string, directive: string[]) => {
-  const prisma = new PrismaClient();
+  const dmmfModels = prismaDmmf.datamodel.models;
+  const dmmfModel = (dmmfModels as any[]).find((m) => m.name === model);
+  const dmmfDoc = dmmfModel?.documentation;
+  if (dmmfModel) {
+    dmmfModel.documentation = directive.join("\n");
+  }
+
   const { models } = (
-    prisma as PrismaClient & {
+    prisma as unknown as {
       _runtimeDataModel: RuntimeDataModel;
     }
   )._runtimeDataModel;
-  const document = models[model].documentation;
+  const document = models[model]?.documentation;
   const m = removeReadOnly(models);
-  m[model].documentation = directive.join("\\n");
+  if (m[model]) {
+    m[model].documentation = directive.join("\n");
+  }
+
   return () => {
-    m[model].documentation = document;
+    if (dmmfModel) dmmfModel.documentation = dmmfDoc;
+    if (m[model]) m[model].documentation = document;
   };
 };
 
@@ -63,18 +74,29 @@ export const setFieldDirective = (
   field: string | string[],
   directive: string[]
 ) => {
-  const prisma = new PrismaClient();
+  const dmmfModels = prismaDmmf.datamodel.models;
+  const dmmfModel = (dmmfModels as any[]).find((m) => m.name === model);
+  const dmmfField = dmmfModel?.fields?.find((v: any) => v.name === field);
+  const dmmfDoc = dmmfField?.documentation;
+  if (dmmfField) {
+    dmmfField.documentation = directive.join("\n");
+  }
+
   const { models } = (
-    prisma as PrismaClient & {
+    prisma as unknown as {
       _runtimeDataModel: RuntimeDataModel;
     }
   )._runtimeDataModel;
   const modelField = removeReadOnly(
-    models[model].fields.find((v) => v.name === field)!
+    models[model]?.fields?.find((v) => v.name === field)
   );
-  const document = modelField.documentation;
-  modelField.documentation = directive.join("\\n");
+  const document = modelField?.documentation;
+  if (modelField) {
+    modelField.documentation = directive.join("\n");
+  }
+
   return () => {
-    modelField.documentation = document;
+    if (dmmfField) dmmfField.documentation = dmmfDoc;
+    if (modelField) modelField.documentation = document;
   };
 };

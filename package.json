@@ -5,9 +5,11 @@
   "repository": "https://github.com/node-libraries/pothos-prisma-generator",
   "author": "SoraKumo <info@croud.jp>",
   "license": "MIT",
-  "devDependencies": {
-    "@types/jest": "^29.5.14"
+  "scripts": {
+    "build": "pnpm --filter pothos-prisma-generator run build",
+    "test": "pnpm --filter \"@/test\" test"
   },
+  "devDependencies": {},
   "pnpm": {
     "neverBuiltDependencies": []
   }

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { PrismaSchemaGenerator } from "./generator/PrismaSchemaGenerator.js";
-import type { SchemaTypes } from "@pothos/core";
+import type { FieldRef, SchemaTypes } from "@pothos/core";
 type LowerFirst<T extends string> = T extends `${infer F}${infer R}`
   ? `${Lowercase<F>}${R}`
   : T;
@@ -213,7 +213,7 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
 export const createModelCountQuery = (
   t: PothosSchemaTypes.QueryFieldBuilder<any, any>,
   generator: PrismaSchemaGenerator<any>
-) => {
+): Record<string, FieldRef<any, any, "Query">> => {
   const operationPrefix = "count";
   return Object.fromEntries(
     generator
@@ -582,7 +582,7 @@ export const createModelMutation = (
 export const createManyModelMutation = (
   t: PothosSchemaTypes.MutationFieldBuilder<any, any>,
   generator: PrismaSchemaGenerator<any>
-) => {
+): Record<string, FieldRef<any, any, "Mutation">> => {
   const operationPrefix = "createMany";
   return Object.fromEntries(
     generator
@@ -724,7 +724,7 @@ export const updateModelMutation = (
 export const updateManyModelMutation = (
   t: PothosSchemaTypes.MutationFieldBuilder<any, any>,
   generator: PrismaSchemaGenerator<any>
-) => {
+): Record<string, FieldRef<any, any, "Mutation">> => {
   const operationPrefix = "updateMany";
   return Object.fromEntries(
     generator
@@ -861,7 +861,7 @@ export const deleteModelMutation = (
 export const deleteManyModelMutation = (
   t: PothosSchemaTypes.MutationFieldBuilder<any, any>,
   generator: PrismaSchemaGenerator<any>
-) => {
+): Record<string, FieldRef<any, any, "Mutation">> => {
   const operationPrefix = "deleteMany";
   return Object.fromEntries(
     generator

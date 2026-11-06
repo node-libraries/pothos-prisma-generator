@@ -1,2 +1,8 @@
 packages:
   - packages/**
+allowBuilds:
+  '@apollo/protobufjs': true
+  '@parcel/watcher': true
+  '@prisma/engines': true
+  esbuild: true
+  prisma: true

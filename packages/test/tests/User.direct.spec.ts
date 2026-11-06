@@ -1,10 +1,10 @@
-import { PrismaClient } from "@prisma/client";
+import { createPrismaClient } from "../libs/client";
 import gql from "graphql-tag";
-import { beforeAllAsync } from "jest-async";
+import { beforeAllAsync } from "../libs/async";
 import { getClient } from "../libs/test-tools";
 
 describe("User(Direct)", () => {
-  const prisma = new PrismaClient({});
+  const prisma = createPrismaClient({});
   const property = beforeAllAsync(async () => {
     const user = await prisma.user.findUniqueOrThrow({
       where: { email: "example@example.com" },

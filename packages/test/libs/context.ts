@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { createPrismaClient } from "./client";
 
 declare let global: { prisma?: PrismaClient };
 
@@ -10,7 +11,7 @@ global.prisma?.$disconnect();
 
 export const prisma =
   global.prisma ??
-  new PrismaClient({
+  createPrismaClient({
     log: [
       {
         emit: "stdout",

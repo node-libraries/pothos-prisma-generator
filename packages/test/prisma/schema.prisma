@@ -7,11 +7,17 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 generator pothos {
-  provider = "prisma-pothos-types"
+  provider          = "prisma-pothos-types"
+  generateDatamodel = true
+  documentation     = true
+}
+
+generator pothosPrismaGenerator {
+  provider = "pothos-prisma-generator"
+  output   = "../libs/prisma-dmmf.ts"
 }
 
 model User {

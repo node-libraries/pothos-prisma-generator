@@ -1,11 +1,12 @@
-import { type Optional } from "@prisma/client/runtime/library";
+import { type Optional } from "@prisma/client/runtime/client";
 import JSON5 from "json5";
 import traverse from "traverse";
 import {
   PrismaCrudGenerator,
   RuntimeDataModel,
 } from "./PrismaCrudGenerator.js";
-import type { FieldRef, SchemaTypes } from "@pothos/core";
+import type { FieldRef, SchemaTypes, InputObjectRef } from "@pothos/core";
+import type { PrismaModelTypes } from "@pothos/plugin-prisma";
 
 export type RemoveReadonly<O> = {
   -readonly [K in keyof O]: RemoveReadonly<O[K]>;
@@ -719,7 +720,7 @@ export class PrismaSchemaGenerator<
   getCreateInput<Name extends keyof Types["PrismaTypes"] & string>(
     modelName: Name,
     without?: string[]
-  ) {
+  ): InputObjectRef<Types, (PrismaModelTypes & Types["PrismaTypes"][Name])["Create"]> {
     const fields = this.getModelInputFields(modelName)["createOne"] ?? [];
     return super.getCreateInput(
       modelName,
@@ -730,7 +731,7 @@ export class PrismaSchemaGenerator<
   getUpdateInput<Name extends keyof Types["PrismaTypes"] & string>(
     modelName: Name,
     without?: string[]
-  ) {
+  ): InputObjectRef<Types, (PrismaModelTypes & Types["PrismaTypes"][Name])["Update"]> {
     const fields = this.getModelInputFields(modelName)["updateOne"] ?? [];
     return super.getUpdateInput(modelName, [...fields, ...(without ?? [])]);
   }

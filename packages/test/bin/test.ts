@@ -1,6 +1,6 @@
-import { PrismaClient } from "@prisma/client";
+import { createPrismaClient } from "../libs/client";
 
-export const prisma = new PrismaClient();
+export const prisma = createPrismaClient();
 
 const main = async () => {
   const v = await prisma.post.findFirst();

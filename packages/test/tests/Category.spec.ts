@@ -1,5 +1,5 @@
-import { PrismaClient } from "@prisma/client";
-import { beforeAllAsync } from "jest-async";
+import { createPrismaClient } from "../libs/client";
+import { beforeAllAsync } from "../libs/async";
 import { OrderBy } from "../generated/graphql";
 import { getClient, setModelDirective } from "../libs/test-tools";
 
@@ -14,7 +14,7 @@ describe("Category", () => {
     `@pothos-generator limit {limit:10}`,
   ]);
 
-  const prisma = new PrismaClient({});
+  const prisma = createPrismaClient({});
 
   const property = beforeAllAsync(async () => {
     const user = await prisma.user.findUniqueOrThrow({

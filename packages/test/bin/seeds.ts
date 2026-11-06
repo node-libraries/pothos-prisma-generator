@@ -1,6 +1,7 @@
-import { PrismaClient, Role } from "@prisma/client";
+import { Role } from "@prisma/client";
+import { createPrismaClient } from "../libs/client";
 
-export const prisma = new PrismaClient();
+export const prisma = createPrismaClient();
 
 const formatNumber = (num: number) => {
   return num.toString().padStart(2, "0");
