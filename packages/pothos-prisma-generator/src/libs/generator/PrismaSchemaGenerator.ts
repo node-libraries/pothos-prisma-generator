@@ -251,25 +251,22 @@ export class PrismaSchemaGenerator<
     this.replaceValues[search] = replaceFunction;
   }
   replaceValue(target: object, props: { context: Types["Context"] }) {
-    const replaces: {
-      [key: string]: (props: {
-        context: Types["Context"];
-      }) => object | string | number | undefined;
-    } = {};
-    const src = { ...target };
-    traverse(src).forEach((value) => {
-      const func = this.replaceValues?.[value];
-      if (func) {
-        replaces[value] = func;
-      }
-    });
-    const replaceValues = Object.fromEntries(
-      Object.entries(replaces).map(([key, func]) => [key, func(props)])
-    );
-    return traverse(src).forEach(function (value) {
-      const v = replaceValues[value];
-      if (v) {
-        this.update(v);
+    if (!target || typeof target !== "object") return target;
+    const replaceEntries = this.replaceValues;
+    if (!replaceEntries || Object.keys(replaceEntries).length === 0) {
+      return traverse(target).map(function () {});
+    }
+    const computedValues: Record<string, object | string | number | undefined> = {};
+    for (const key of Object.keys(replaceEntries)) {
+      computedValues[key] = replaceEntries[key](props);
+    }
+
+    return traverse(target).map(function (value) {
+      if (
+        typeof value === "string" &&
+        Object.prototype.hasOwnProperty.call(computedValues, value)
+      ) {
+        this.update(computedValues[value]);
       }
     });
   }
@@ -366,7 +363,7 @@ export class PrismaSchemaGenerator<
       const directives = this.getModelDirectives(name, "executable");
       this.modelExecutable[name] = directives.reduce((pre, directive) => {
         const operations = this.getFilterOperations(directive);
-        const { authority } = directive;
+        const { authority = [] } = directive;
         return operations.reduce(
           (pre, operation) => ({
             ...pre,
@@ -571,10 +568,11 @@ export class PrismaSchemaGenerator<
   ): Exclude<ModelDirective[T], undefined>[] {
     return this.modelDirectives[modelName]?.[kind] ?? [];
   }
-  getModelOperations(modelName: string) {
+  getModelOperations(modelName: string): Operation[] {
     const directives = this.getModelDirectives(modelName, "operation");
-    const operators = directives.reduce<string[]>((_, action) => {
-      return this.getFilterOperations(action);
+    const operators = directives.reduce<Operation[]>((acc, action) => {
+      const next = this.getFilterOperations(action);
+      return acc.filter((op) => next.includes(op));
     }, this.getFilterOperations({}));
     return operators;
   }
@@ -605,10 +603,10 @@ export class PrismaSchemaGenerator<
     operationPrefix: Operation;
     authority: string[];
   }) {
-    const values = this.modelExecutable[modelName][operationPrefix];
-    if (!values) return true;
+    const values = this.modelExecutable[modelName]?.[operationPrefix];
+    if (!values || values.length === 0) return true;
     const executable = values.reduce((pre, value) => {
-      value[0].forEach((v) => pre.add(v));
+      (value[0] ?? []).forEach((v) => pre.add(v));
       return pre;
     }, new Set<string>());
     if (!authority.some((v) => executable.has(v)))
@@ -725,7 +723,7 @@ export class PrismaSchemaGenerator<
     return super.getCreateInput(
       modelName,
       [...fields, ...(without ?? [])],
-      false
+      without && without.length > 0 ? undefined : false
     );
   }
   getUpdateInput<Name extends keyof Types["PrismaTypes"] & string>(

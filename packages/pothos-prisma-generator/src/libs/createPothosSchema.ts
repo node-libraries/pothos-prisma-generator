@@ -86,7 +86,7 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                 query: (
                   args: {
                     filter: object;
-                    limit: number;
+                    limit?: number;
                     offset?: number;
                     orderBy?: object;
                   },
@@ -110,6 +110,7 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                     operationPrefix,
                     authority,
                   } as const;
+                  generator.checkModelExecutable(generatorParams);
                   const modelWhere = generator.getModelWhere(generatorParams);
                   const modelLimit = generator.getModelLimit(
                     modelName,
@@ -117,7 +118,21 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                     authority
                   );
 
-                  const { where, take, skip, orderBy } =
+                  const safeLimit =
+                    typeof args.limit === "number"
+                      ? Math.max(0, args.limit)
+                      : undefined;
+                  const safeOffset =
+                    typeof args.offset === "number"
+                      ? Math.max(0, args.offset)
+                      : undefined;
+
+                  const take =
+                    modelLimit !== undefined && safeLimit !== undefined
+                      ? Math.min(modelLimit, safeLimit)
+                      : modelLimit ?? safeLimit;
+
+                  const { where, take: resolvedTake, skip, orderBy } =
                     generator.getParameters(
                       {
                         where: {
@@ -126,11 +141,8 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                             : {}),
                           ...modelWhere,
                         },
-                        take:
-                          modelLimit && typeof args.limit === "number"
-                            ? Math.min(modelLimit, args.limit)
-                            : modelLimit ?? args.limit,
-                        skip: args.offset,
+                        take,
+                        skip: safeOffset,
                         orderBy:
                           args.orderBy && Object.keys(args.orderBy).length
                             ? args.orderBy
@@ -142,7 +154,7 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                   return {
                     ...getWhere(where),
                     orderBy,
-                    take,
+                    take: resolvedTake,
                     skip,
                   };
                 },
@@ -176,6 +188,7 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                     operationPrefix,
                     authority,
                   } as const;
+                  generator.checkModelExecutable(generatorParams);
                   const modelWhere = generator.getModelWhere(generatorParams);
 
                   const { where } = generator.getParameters(
@@ -477,14 +490,25 @@ export const createModelListQuery = (
                 operationPrefix,
                 authority
               );
-              const { where, take, skip, orderBy } = generator.getParameters(
+              const safeLimit =
+                typeof args.limit === "number"
+                  ? Math.max(0, args.limit)
+                  : undefined;
+              const safeOffset =
+                typeof args.offset === "number"
+                  ? Math.max(0, args.offset)
+                  : undefined;
+
+              const take =
+                modelLimit !== undefined && safeLimit !== undefined
+                  ? Math.min(modelLimit, safeLimit)
+                  : modelLimit ?? safeLimit;
+
+              const { where, take: resolvedTake, skip, orderBy } = generator.getParameters(
                 {
                   where: { ...args.filter, ...modelWhere },
-                  take:
-                    modelLimit && args.limit
-                      ? Math.min(modelLimit, args.limit)
-                      : modelLimit ?? args.limit,
-                  skip: args.offset,
+                  take,
+                  skip: safeOffset,
                   orderBy:
                     args.orderBy && Object.keys(args.orderBy).length
                       ? args.orderBy
@@ -497,7 +521,7 @@ export const createModelListQuery = (
                 ...query,
                 ...getWhere(where),
                 orderBy,
-                take,
+                take: resolvedTake,
                 skip,
               });
               return result;
@@ -555,6 +579,7 @@ export const createModelMutation = (
                 operationPrefix,
                 authority,
               } as const;
+              generator.checkModelExecutable(generatorParams);
               const modelInput = generator.getModelInputData(
                 modelName,
                 operationPrefix,

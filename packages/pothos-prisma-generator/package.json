@@ -28,6 +28,9 @@
   "bin": {
     "pothos-prisma-generator": "./bin/pothos-prisma-generator.mjs"
   },
+  "publishConfig": {
+    "access": "public"
+  },
   "license": "MIT",
   "scripts": {
     "build": "tsc && tsc -p ./tsconfig.esm.json && cpy esm dist",

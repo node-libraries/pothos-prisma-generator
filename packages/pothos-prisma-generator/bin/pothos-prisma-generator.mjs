@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import fs from "fs";
+import path from "path";
 import helper from "@prisma/generator-helper";
 helper.generatorHandler({
   onManifest: () => ({
@@ -8,10 +9,11 @@ helper.generatorHandler({
     version: "1.0.0",
   }),
   async onGenerate(options) {
-    const path = options.generator.output?.value;
-    if (path) {
-      fs.promises.writeFile(
-        path,
+    const outputPath = options.generator.output?.value;
+    if (outputPath) {
+      await fs.promises.mkdir(path.dirname(outputPath), { recursive: true });
+      await fs.promises.writeFile(
+        outputPath,
         `export const prismaDmmf = ${JSON.stringify(
           { datamodel: options.dmmf.datamodel },
           null,
