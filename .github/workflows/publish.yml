@@ -13,7 +13,7 @@ concurrency:
 
 jobs:
   check-version:
-    name: Check Version & Tag
+    name: Check Version
     runs-on: ubuntu-latest
     outputs:
       should_publish: ${{ steps.check.outputs.should_publish }}
@@ -22,10 +22,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
-      - name: Check version and tag
+      - name: Check version against npm
         id: check
         run: |
           VERSION=$(node -p "require('./packages/pothos-prisma-generator/package.json').version")
@@ -33,11 +31,12 @@ jobs:
           echo "version=${VERSION}" >> $GITHUB_OUTPUT
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
 
-          if git rev-parse "${TAG}" >/dev/null 2>&1; then
-            echo "Tag ${TAG} already exists. Skipping publish."
+          NPM_VERSION=$(npm view "pothos-prisma-generator@${VERSION}" version 2>/dev/null || true)
+          if [ -n "${NPM_VERSION}" ]; then
+            echo "Version ${VERSION} is already published on npm. Skipping publish."
             echo "should_publish=false" >> $GITHUB_OUTPUT
           else
-            echo "Tag ${TAG} does not exist. Proceeding to publish."
+            echo "Version ${VERSION} is not published yet. Proceeding to publish."
             echo "should_publish=true" >> $GITHUB_OUTPUT
           fi
 
@@ -59,10 +58,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 24
 
-      - name: Install pnpm
-        run: npm -g install pnpm
+      - name: Install latest npm and pnpm
+        run: npm -g install npm@latest pnpm
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -81,7 +80,7 @@ jobs:
           npm run --prefix packages/test test:actions
 
   publish:
-    name: Create Tag & Publish to npm
+    name: Publish to npm & Create Release
     needs: [check-version, test-and-build]
     runs-on: ubuntu-latest
     permissions:
@@ -91,11 +90,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 22
-          registry-url: "https://registry.npmjs.org"
+          node-version: 24
 
-      - name: Install pnpm
-        run: npm -g install pnpm
+      - name: Install latest npm and pnpm
+        run: npm -g install npm@latest pnpm
 
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -110,20 +108,18 @@ jobs:
       - name: Run build
         run: pnpm build
 
-      - name: Create Git Tag and Release
+      - name: Publish to npm (OIDC Provenance)
+        run: |
+          cd packages/pothos-prisma-generator
+          npm publish --provenance --access public
+
+      - name: Create Git Tag and GitHub Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           TAG: ${{ needs.check-version.outputs.tag }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git tag -a "${TAG}" -m "Release ${TAG}"
-          git push origin "${TAG}"
-          gh release create "${TAG}" --title "${TAG}" --generate-notes
-
-      - name: Publish to npm (OIDC Provenance)
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: |
-          cd packages/pothos-prisma-generator
-          npm publish --provenance --access public
+          git tag -fa "${TAG}" -m "Release ${TAG}"
+          git push --force origin "${TAG}"
+          gh release create "${TAG}" --title "${TAG}" --generate-notes || gh release edit "${TAG}" --title "${TAG}" --generate-notes
